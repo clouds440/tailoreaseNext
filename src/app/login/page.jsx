@@ -169,7 +169,7 @@ const LoginForm = () => {
             </label>
           </div>
           <SimpleButton
-            btnText={isLoading ? <LoadingSpinner size={24} /> : Login}
+            btnText={isLoading ? <LoadingSpinner size={24} /> : "Login"}
             type={"primary-submit"}
             extraclasses={"w-full"}
           />
