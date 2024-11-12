@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import {
   db,
@@ -127,9 +127,11 @@ const LoginForm = () => {
 
   const placeHolderStyles = `absolute top-5 pointer-events-none left-1 ${theme.colorText} duration-300 transform -translate-y-7 scale-75 origin-left peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:${theme.colorText} peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-blue-500`;
 
-  if (userLoggedIn) {
-    return <router.push to={"/"} />;
-  }
+  useEffect(() => {
+    if (userLoggedIn) {
+      router.push("/");
+    }
+  }, [userLoggedIn, router]);
 
   return (
     <div className="flex items-center justify-center mt-8 max-w-2xl w-auto mx-auto p-6 rounded-md select-none">

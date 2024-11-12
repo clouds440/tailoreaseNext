@@ -4,12 +4,11 @@ import Navbar from "@/components/Navbar"; // Adjust path to Navbar component
 import "./globals.css"; // Import global styles
 import { UserProvider } from "@/utils/UserContext";
 import PopupMessage from "@/components/PopupMessage";
-import { Moderustic } from "next/font/google";
+import { Roboto } from "next/font/google";
 
-const moderustic = Moderustic({
+const roboto = Roboto({
+  weight: "400",
   subsets: ["latin"],
-  weight: ["300", "800"],
-  display: "swap",
 });
 
 export const metadata = {
@@ -19,7 +18,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={moderustic.className}>
+    <html lang="en" className={roboto.className}>
       <body
         className="relative flex h-screen w-screen"
         style={{

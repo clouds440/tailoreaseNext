@@ -3,7 +3,6 @@ import SimpleButton from "./SimpleButton";
 import { EditIcon } from "../../public/icons/svgIcons";
 import LoadingSpinner from "./LoadingSpinner";
 import UserContext from "@/utils/UserContext";
-import { t } from "i18next";
 
 function EditFieldModal({ field, value, onClose, onSave, isLoading }) {
   const [inputValue, setInputValue] = useState(value);
