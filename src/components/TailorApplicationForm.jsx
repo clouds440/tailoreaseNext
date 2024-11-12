@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import UserContext from "@/utils/UserContext";
-import { t } from "i18next";
 import SimpleButton from "./SimpleButton";
 import { LinkIcon } from "../../public/icons/svgIcons";
 

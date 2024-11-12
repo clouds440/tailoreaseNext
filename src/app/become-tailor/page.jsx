@@ -4,7 +4,6 @@ import TailorApplicationForm from "@/components/TailorApplicationForm";
 import TailorSpecialitiesForm from "@/components/TailorSpecialitiesForm";
 import ProgressBar from "@/components/ProgressBar";
 import UserContext from "@/utils/UserContext";
-import { t } from "i18next";
 import { MoonLoader } from "react-spinners";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -125,7 +124,7 @@ const BecomeTailor = () => {
           "A verification email has been sent. Please verify to activate your business account.",
       });
       setPopUpMessageTrigger(true);
-      navigate("/");
+      router.push("/");
     } catch (error) {
       console.error("Error submitting business application:", error);
       setShowMessage({
@@ -149,11 +148,9 @@ const BecomeTailor = () => {
 
   return hasBusinessAccount ? (
     <div className="flex flex-col justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30">
-      <div className="text-white max-w-xl mb-4">
-        <span className="flex text-2xl">
-          You already have a business account!
-        </span>
-        <span className="">
+      <div className="text-white max-w-xl mb-4 flex flex-col items-center text-center">
+        <span className="text-2xl">You already have a business account!</span>
+        <span>
           If you don't see your business dashboard, please check your email for
           a confirmation email from TailorEase.
         </span>

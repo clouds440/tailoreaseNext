@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import UserContext from "@/utils/UserContext";
-import { t } from "i18next";
 import LoadingSpinner from "./LoadingSpinner";
 import SimpleButton from "./SimpleButton";
 import { LinkIcon } from "../../public/icons/svgIcons";
@@ -193,7 +192,7 @@ const TailorSpecialitiesForm = ({
               placeholder=" "
             />
             <label className={`${placeHolderStyles}`} htmlFor="experience">
-              Experience
+              Experience (in years)
             </label>
           </div>
 
@@ -252,7 +251,7 @@ const TailorSpecialitiesForm = ({
                   {specialitiesData.specialities.includes(speciality) && (
                     <span className="text-green-500 mr-2">✔</span>
                   )}
-                  {t(speciality)}
+                  {speciality}
                 </div>
               ))}
             </div>
