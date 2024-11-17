@@ -174,6 +174,7 @@ const LoginForm = () => {
             btnText={isLoading ? <LoadingSpinner size={24} /> : "Login"}
             type={"primary-submit"}
             extraclasses={"w-full"}
+            disabled={isLoading}
           />
           <div className="items-center justify-center flex flex-row mt-8">
             <span>Forgot Password? &nbsp;</span>

@@ -95,8 +95,17 @@ const SignUpForm = () => {
       });
       setPopUpMessageTrigger("true");
       setUserLoggedIn(true);
-      setUserData(formData);
-      navigate("/");
+
+      const userData = {
+        uid: user.uid,
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+      };
+      sessionStorage.setItem("userData", JSON.stringify(userData));
+      localStorage.setItem("userData", JSON.stringify(userData));
+      setUserData(userData);
+      router.push("/");
     } catch (error) {
       let errorMessage = "An error occurred: " + ` ${error.message}`;
       let errorType = "danger";
@@ -198,6 +207,7 @@ const SignUpForm = () => {
             btnText={isLoading ? <LoadingSpinner size={24} /> : "Sign Up"}
             type={"primary-submit"}
             extraclasses={"w-full"}
+            disabled={isLoading}
           />
           <div className="items-center justify-center flex flex-row mt-8">
             <Link href={"/login"}>

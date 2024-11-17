@@ -296,6 +296,7 @@ const TailorSpecialitiesForm = ({
               type={"primary-submit"}
               extraclasses={"w-full"}
               onClick={handleFinalSubmit}
+              disabled={isLoading}
             />
           </div>
 

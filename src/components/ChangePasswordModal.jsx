@@ -139,6 +139,7 @@ function ChangePasswordModal({ onClose, onSave, isLoading }) {
               }
               type={"primary-submit"}
               extraclasses={"w-full"}
+              disabled={isLoading}
             />
           </div>
         </form>
