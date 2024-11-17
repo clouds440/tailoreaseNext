@@ -13,7 +13,7 @@ import {
   doc,
 } from "@/utils/firebaseConfig";
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import EditFieldModal from "@/components/EditFieldModal";
 import ChangePasswordModal from "@/components/ChangePasswordModal";
 import Optionselector from "@/components/OptionSelector";
@@ -233,9 +233,11 @@ function AccountSettings() {
     // Code to save the changes to the account here
   };
 
-  if (!userLoggedIn) {
-    return router.push("/login");
-  }
+  useEffect(() => {
+    if (!userLoggedIn) {
+      router.push("/login");
+    }
+  }, [userLoggedIn, router]);
 
   return (
     <div

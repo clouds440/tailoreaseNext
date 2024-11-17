@@ -81,20 +81,45 @@ const BecomeTailor = () => {
   // Final submit: combine data and handle form submission
   const handleSubmit = async (finalData) => {
     const combinedData = { ...formData, ...finalData };
-    console.log("Combined form data (before removing picture):", combinedData);
 
     // Extract `businessPicture` from `combinedData` to avoid storing it directly in Firestore
     const { businessPicture, ...dataWithoutPicture } = combinedData;
 
     setIsLoading(true);
     try {
-      // 1. Upload the image to a local directory in the project at "./images/profile"
+      // 1. Upload the image to a local directory in the project at "./images/profile/business"
+      let businessPictureUrl = "";
+      if (businessPicture) {
+        const fileName = `business-${Date.now()}.jpg`; // Unique file name
+        const targetPath = "images/profile/business"; // Dynamic storage path
+
+        // Fetch API call to the reusable route.js route
+        const response = await fetch("/api/imageUpload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            imageData: businessPicture, // Base64 encoded image
+            fileName,
+            targetPath,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Image upload failed: ${errorText}`);
+        }
+
+        const { url } = await response.json();
+        businessPictureUrl = url; // Public URL of the uploaded image
+      }
 
       // 2. Add business details to the "tailors" collection in Firestore
       const tailorsRef = collection(db, "tailors");
       const tailorDocRef = await addDoc(tailorsRef, {
         ...dataWithoutPicture,
-        businessPictureUrl: "imageUrl", // change this to the local image url and unique name
+        businessPictureUrl: businessPictureUrl, // change this to the local image url and unique name
         approved: false,
         ownerId: userData.uid,
       });

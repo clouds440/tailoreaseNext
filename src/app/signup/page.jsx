@@ -1,8 +1,9 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import SimpleButton from "@/components/SimpleButton";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import UserContext from "@/utils/UserContext";
 import {
   auth,
@@ -29,6 +30,7 @@ const SignUpForm = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -121,9 +123,11 @@ const SignUpForm = () => {
   const inputStyles = `w-full p-1 mt-4 peer ${theme.colorText} border-b-2 z-10 ${theme.colorBorder} outline-none focus:border-blue-500 transition-all duration-300 bg-transparent`;
   const placeHolderStyles = `absolute top-5 pointer-events-none left-1 ${theme.colorText} duration-300 transform -translate-y-7 scale-75 origin-left peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:${theme.colorText} peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-blue-500`;
 
-  if (userLoggedIn) {
-    return <Navigate to={"/"} />;
-  }
+  useEffect(() => {
+    if (userLoggedIn) {
+      router.push("/");
+    }
+  }, [userLoggedIn, router]);
 
   return (
     <div className="flex items-center justify-center mt-8 max-w-2xl w-auto mx-auto p-6 rounded-md select-none">

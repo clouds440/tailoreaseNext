@@ -3,6 +3,7 @@ import UserContext from "@/utils/UserContext";
 import LoadingSpinner from "./LoadingSpinner";
 import SimpleButton from "./SimpleButton";
 import { LinkIcon } from "../../public/icons/svgIcons";
+import Image from "next/image";
 
 const TailorSpecialitiesForm = ({
   formData,
@@ -22,7 +23,7 @@ const TailorSpecialitiesForm = ({
     useContext(UserContext);
   const [previewImage, setPreviewImage] = useState(null);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, files } = e.target;
 
     // Validate file type
@@ -37,6 +38,24 @@ const TailorSpecialitiesForm = ({
         setPopUpMessageTrigger(true);
         return;
       }
+
+      try {
+        // Convert file to Base64
+        const base64 = await convertToBase64(file);
+
+        // Update state with the Base64 image
+        setSpecialitiesData({ ...specialitiesData, [name]: base64 });
+        setPreviewImage(URL.createObjectURL(file));
+      } catch (error) {
+        console.error("Error converting file to Base64:", error);
+        setShowMessage({
+          type: "error",
+          message: "Failed to process the image. Please try again.",
+        });
+        setPopUpMessageTrigger(true);
+      }
+
+      return; // Prevent further execution for this case
     }
 
     if (name === "specialities") {
@@ -47,16 +66,20 @@ const TailorSpecialitiesForm = ({
           ? prevData.specialities.filter((item) => item !== selectedOption)
           : [...prevData.specialities, selectedOption],
       }));
-    } else if (name === "businessPicture") {
-      const file = files[0];
-      if (file) {
-        setSpecialitiesData({ ...specialitiesData, [name]: file });
-        setPreviewImage(URL.createObjectURL(file));
-      }
     } else {
       setSpecialitiesData({ ...specialitiesData, [name]: value });
     }
   };
+
+  // Helper function to convert a file to a Base64 string
+  function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result); // Base64 string
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file); // Read file as Base64
+    });
+  }
 
   const handleFinalSubmit = (e) => {
     e.preventDefault();
@@ -127,7 +150,11 @@ const TailorSpecialitiesForm = ({
         <h2 className={`flex text-xl text-${theme.themeColor} font-bold mb-4`}>
           Become A Tailor
         </h2>
-        <form onSubmit={handleFinalSubmit} noValidate>
+        <form
+          onSubmit={handleFinalSubmit}
+          encType="multipart/form-data"
+          noValidate
+        >
           {/* Image Dropzone */}
           <div
             className="flex items-center justify-center w-full h-64 mb-4 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-700"
@@ -139,10 +166,12 @@ const TailorSpecialitiesForm = ({
               className="flex flex-col items-center justify-center w-full h-full"
             >
               {previewImage ? (
-                <img
+                <Image
                   src={previewImage}
                   alt="Preview"
                   className="w-full h-full object-cover rounded-lg cursor-pointer"
+                  width={300}
+                  height={256}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center pt-5 pb-6 cursor-pointer">

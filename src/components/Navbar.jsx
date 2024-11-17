@@ -87,19 +87,29 @@ const Navbar = () => {
     // Add more options here as needed
   ];
 
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState(undefined);
+  const [windowHeight, setWindowHeight] = useState(undefined);
 
   useEffect(() => {
+    // Only execute on the client side
     const handleResize = () => {
-      setWindowHeight(window.innerHeight);
       setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
     };
+
+    // Initial window size on mount
+    handleResize();
+
+    // Add event listener to handle window resizing
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
-  const animate = window.innerWidth >= 768 ? 10 : -10;
+  const animate = windowWidth >= 768 ? 10 : -10;
   const linkStyles = `flex items-center justify-center md:justify-start cursor-pointer px-4 py-2 rounded-xl w-auto md:w-full duration-500 ${theme.hoverBg}`;
 
   return (
@@ -132,7 +142,11 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            <div className="flex items-center justify-between md:mt-10">
+            <div
+              className={`flex items-center justify-between ${
+                windowHeight >= 500 ? "md:mt-10" : "md:mt-3"
+              }`}
+            >
               <ul className="md:space-y-2 justify-evenly select-none w-full md:inline grid grid-flow-col">
                 <li className={linkStyles}>
                   <HomeIcon size={"5"} color={`${theme.iconColor}`} />
@@ -146,7 +160,7 @@ const Navbar = () => {
                 </li>
                 <li
                   className={`${
-                    windowHeight >= 450 ? "" : "md:hidden"
+                    windowHeight >= 420 ? "" : "md:hidden"
                   } ${linkStyles}`}
                 >
                   <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
@@ -156,7 +170,7 @@ const Navbar = () => {
                 </li>
                 <li
                   className={`${
-                    windowHeight >= 500 ? "" : "md:hidden"
+                    windowHeight >= 470 ? "" : "md:hidden"
                   } ${linkStyles}`}
                 >
                   <ContactIcon size={"5"} color={`${theme.iconColor}`} />
@@ -195,7 +209,7 @@ const Navbar = () => {
             className={`absolute w-auto md:w-36 z-50 ${
               windowWidth >= 768
                 ? "md:pt-4 md:bottom-14"
-                : "left-2 top-[100px] px-2 py-2 rounded-md " + theme.mainTheme
+                : "right-1 top-[100px] px-2 py-2 rounded-md " + theme.mainTheme
             }`}
             initial={{ opacity: 0, y: animate }}
             animate={{ opacity: 1, y: 0 }}

@@ -36,7 +36,7 @@ export default function RootLayout({ children }) {
 
             {/* Main content with scrollable overflow */}
             <div
-              className={`overflow-y-auto flex-1 mt-[85px] md:mt-0 px-[3px]`}
+              className={`overflow-y-auto flex-1 mt-[85px] md:mt-0 px-[1px]`}
             >
               <PopupMessage />
               {children} {/* Renders each page's content */}
