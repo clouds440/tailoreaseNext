@@ -3,13 +3,14 @@
 import React, { useState, useContext } from "react";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "@/components/SimpleButton";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const ContactUs = () => {
-  const { theme, setShowMessage, setPopUpMessageTrigger } =
+  const { theme, setShowMessage, setPopUpMessageTrigger, userData } =
     useContext(UserContext);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    name: userData?.fullName ? userData.fullName : "",
+    email: userData?.email ? userData.email : "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,8 +25,24 @@ const ContactUs = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      setShowMessage({ type: "warning", message: "All fields are required!" });
+    if (!formData.name.trim()) {
+      setShowMessage({ type: "warning", message: "Please enter your name" });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+    if (!formData.email || !/^\S+@\S+\.\S+$/.test(formData.email)) {
+      setShowMessage({
+        type: "warning",
+        message: "Provide a valid email",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+    if (!formData.message.trim()) {
+      setShowMessage({
+        type: "warning",
+        message: "Please write a message",
+      });
       setPopUpMessageTrigger(true);
       return;
     }
@@ -38,6 +55,7 @@ const ContactUs = () => {
           message: "Message sent successfully!",
         });
         setPopUpMessageTrigger(true);
+        console.log(formData);
         setFormData({ name: "", email: "", message: "" });
       }, 1000);
     } catch (error) {
@@ -52,11 +70,11 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-8 rounded-md select-none border border-gray-300">
-      <div className="flex flex-col md:flex-row">
+    <div className="max-w-4xl mx-auto mt-8 rounded-xl select-none border border-gray-300">
+      <div className="flex flex-col rounded-xl md:flex-row">
         {/* Left Section */}
         <div
-          className={`w-full md:w-1/2 p-6 ${theme.mainTheme} flex flex-col items-start border-b md:border-b-0 md:border-r border-gray-300`}
+          className={`w-full md:w-1/2 p-6 ${theme.mainTheme} flex flex-col items-start border-b md:border-b-0 md:border-r border-gray-300 rounded-l-xl`}
         >
           <h2 className={`text-2xl text-${theme.themeColor} font-bold mb-4`}>
             Get in Touch
@@ -125,7 +143,7 @@ const ContactUs = () => {
         </div>
 
         {/* Right Section (Form) */}
-        <div className={`w-full md:w-1/2 p-6 ${theme.mainTheme}`}>
+        <div className={`w-full md:w-1/2 p-6 rounded-r-xl ${theme.mainTheme}`}>
           <h2 className={`text-xl text-${theme.themeColor} font-bold mb-4`}>
             Contact Us
           </h2>
@@ -160,6 +178,7 @@ const ContactUs = () => {
             </div>
             <div className="relative mb-4">
               <textarea
+                maxLength={500}
                 id="message"
                 name="message"
                 value={formData.message}
@@ -172,9 +191,11 @@ const ContactUs = () => {
               </label>
             </div>
             <SimpleButton
-              btnText={isSubmitting ? "Sending..." : "Send Message"}
+              btnText={
+                isSubmitting ? <LoadingSpinner size={24} /> : "Send Message"
+              }
               type="primary-submit"
-              extraclasses="w-full"
+              extraclasses={"w-full"}
               disabled={isSubmitting}
             />
           </form>

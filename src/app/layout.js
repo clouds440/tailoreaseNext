@@ -1,5 +1,4 @@
 // src/app/layout.js
-import { useContext } from "react";
 import Navbar from "@/components/Navbar"; // Adjust path to Navbar component
 import "./globals.css"; // Import global styles
 import { UserProvider } from "@/utils/UserContext";

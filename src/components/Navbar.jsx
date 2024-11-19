@@ -166,11 +166,11 @@ const Navbar = () => {
                 >
                   <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
                   <span className={"hidden md:inline-block md:ml-2"}>
-                    Become Tailor
+                    Business
                   </span>
                 </li>
                 <li
-                  onClick={() => router.push("/Contactus")}
+                  onClick={() => router.push("/contact-us")}
                   className={`${
                     windowHeight >= 470 ? "" : "md:hidden"
                   } ${linkStyles}`}
