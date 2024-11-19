@@ -148,7 +148,7 @@ const Navbar = () => {
               }`}
             >
               <ul className="md:space-y-2 justify-evenly select-none w-full md:inline grid grid-flow-col">
-                <li className={linkStyles}>
+                <li onClick={() => router.push("/")} className={linkStyles}>
                   <HomeIcon size={"5"} color={`${theme.iconColor}`} />
                   <span className={"hidden md:inline-block md:ml-2"}>Home</span>
                 </li>
@@ -159,16 +159,18 @@ const Navbar = () => {
                   </span>
                 </li>
                 <li
+                  onClick={() => router.push("/become-tailor")}
                   className={`${
                     windowHeight >= 420 ? "" : "md:hidden"
                   } ${linkStyles}`}
                 >
                   <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
                   <span className={"hidden md:inline-block md:ml-2"}>
-                    Services
+                    Become Tailor
                   </span>
                 </li>
                 <li
+                  onClick={() => router.push("/Contactus")}
                   className={`${
                     windowHeight >= 470 ? "" : "md:hidden"
                   } ${linkStyles}`}

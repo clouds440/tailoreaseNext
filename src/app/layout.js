@@ -13,12 +13,18 @@ const roboto = Roboto({
 
 export const metadata = {
   title: "TailorEase", // Set default title
-  description: "AI Enhanced Fitting Experience", // Set default description
+  description: "AI Enhanced Fitting Experience",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={roboto.className}>
+      <head>
+        <link
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+          rel="stylesheet"
+        />
+      </head>
       <body
         className="relative flex h-screen w-screen"
         style={{
