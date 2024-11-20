@@ -41,7 +41,7 @@ export default function Home() {
           <div className="relative" data-aos="fade-left">
             <img
               className="tailor"
-              src="images/other_images/animation.gif"
+              src="graphics/animation.gif"
               alt="This is the 3D animation of a tailor."
             />
             <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 rounded-2xl text-[#00000017] text-[22rem] font-extrabold -z-10">
@@ -209,9 +209,9 @@ export default function Home() {
               </div>
 
               <SimpleButton
-                btnText="Subscribe"
-                extraclasses="mt-4 py-3"
-                type="submit"
+                btnText={"Subscribe"}
+                extraclasses="mt-4 py-2"
+                type="primary-submit"
                 disabled={false} // Set to true for disabling
                 onClick={() => { }}
               />
