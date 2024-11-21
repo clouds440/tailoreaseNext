@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
         <UserProvider>
           <div className={`relative flex h-screen w-screen font-sans`}>
             {/* Navbar with fixed position */}
-            <div className="fixed md:relative w-full md:w-36 z-40">
+            <div className="fixed md:relative w-full md:w-40 z-40">
               <Navbar />
             </div>
 

@@ -115,7 +115,7 @@ const Navbar = () => {
   return (
     <div className="flex">
       <nav
-        className={`flex-shrink-0 fixed top-0 md:left-0 h-24 md:h-screen w-screen md:w-36 rounded-md ${theme.mainTheme}`}
+        className={`flex-shrink-0 fixed top-0 md:left-0 h-24 md:h-screen w-screen md:w-40 rounded-md ${theme.mainTheme}`}
       >
         <div className="justify-between h-full">
           <div>
@@ -208,7 +208,7 @@ const Navbar = () => {
       <AnimatePresence>
         {dropdownOpen && (
           <motion.div
-            className={`absolute w-auto md:w-36 z-50 ${
+            className={`absolute w-auto md:w-40 z-50 ${
               windowWidth >= 768
                 ? "md:pt-4 md:bottom-14"
                 : "right-1 top-[100px] px-2 py-2 rounded-md " + theme.mainTheme

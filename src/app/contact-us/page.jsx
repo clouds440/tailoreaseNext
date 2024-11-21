@@ -70,7 +70,7 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-8 rounded-xl select-none border border-gray-300">
+    <div className="max-w-4xl mx-auto mt-8 rounded-xl border border-gray-300">
       <div className="flex flex-col rounded-xl md:flex-row">
         {/* Left Section */}
         <div
@@ -86,21 +86,21 @@ const ContactUs = () => {
           </p>
           <ul className={`${theme.colorText} space-y-2 mb-6`}>
             <li>
-              <strong>Email:</strong> support@example.com
+              <strong>Email:</strong> support@tailorease.com
             </li>
             <li>
-              <strong>Phone:</strong> +1 (123) 456-7890
+              <strong>WhatsApp:</strong> +92 (310) 8646268
             </li>
             <li>
-              <strong>Address:</strong> 123 Contact Lane, Suite 456, Your City,
-              Country
+              <strong>Address:</strong> 3rd Floor, Ufone Tower, Office No. 248,
+              Islamabad, Pakistan
             </li>
           </ul>
 
           {/* Social Media Links */}
           <div className="flex space-x-4 mt-6">
             <a
-              href="https://www.facebook.com"
+              href="https://www.facebook.com/tailorease"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-blue-600 hover:text-blue-800"
@@ -108,7 +108,7 @@ const ContactUs = () => {
               <i className="fab fa-facebook-f"></i>
             </a>
             <a
-              href="https://www.twitter.com"
+              href="https://www.twitter.com/tailorease"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-blue-400 hover:text-blue-600"
@@ -116,7 +116,7 @@ const ContactUs = () => {
               <i className="fab fa-twitter"></i>
             </a>
             <a
-              href="https://www.instagram.com"
+              href="https://www.instagram.com/tailorease"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-pink-600 hover:text-pink-800"
@@ -124,7 +124,7 @@ const ContactUs = () => {
               <i className="fab fa-instagram"></i>
             </a>
             <a
-              href="https://www.linkedin.com"
+              href="https://www.linkedin.com/tailorease"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-blue-700 hover:text-blue-900"
@@ -132,7 +132,7 @@ const ContactUs = () => {
               <i className="fab fa-linkedin-in"></i>
             </a>
             <a
-              href="https://www.youtube.com"
+              href="https://www.youtube.com/tailorease"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-red-600 hover:text-red-800"
@@ -145,7 +145,7 @@ const ContactUs = () => {
         {/* Right Section (Form) */}
         <div className={`w-full md:w-1/2 p-6 rounded-r-xl ${theme.mainTheme}`}>
           <h2 className={`text-xl text-${theme.themeColor} font-bold mb-4`}>
-            Contact Us
+            Write us a message
           </h2>
           <form onSubmit={handleSubmit} noValidate>
             <div className="relative mb-4">
