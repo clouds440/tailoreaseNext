@@ -77,11 +77,11 @@ function EditFieldModal({ field, value, onClose, onSave, isLoading }) {
         className={`${theme.mainTheme} rounded-lg p-6 w-full max-w-md relative`}
       >
         <h2 className={`flex text-xl text-${theme.themeColor} font-bold mb-4`}>
-          Change ${field}
+          Change {fieldLabels[field]}
           <EditIcon
             size={"6"}
             color={`${theme.iconColor}`}
-            extraClasses={"ml-3 rtl:mr-3"}
+            extraClasses={"ml-3"}
           />
         </h2>
         <form onSubmit={handleSubmit}>

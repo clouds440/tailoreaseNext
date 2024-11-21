@@ -87,7 +87,7 @@ function ChangePasswordModal({ onClose, onSave, isLoading }) {
           <EditIcon
             size={"6"}
             color={`${theme.iconColor}`}
-            extraClasses={"ltr:ml-3 rtl:mr-3"}
+            extraClasses={"ml-3"}
           />
         </h2>
         <form onSubmit={handleSubmit}>
