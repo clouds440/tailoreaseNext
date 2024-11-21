@@ -11,9 +11,6 @@ function SimpleButton({
   const simple =
     "bg-gray-100 opacity-85 text-gray-900 hover:bg-gray-300 " + extraclasses;
   const danger = "bg-red-700 text-white hover:bg-rose-500 " + extraclasses;
-  const disable =
-    "bg-slate-500 text-white hover:bg-rose-600 cursor-not-allowed " +
-    extraclasses;
 
   let style;
   switch (type) {
@@ -32,8 +29,8 @@ function SimpleButton({
     <button
       type={type === "primary-submit" ? "submit" : "button"}
       className={`${
-        disabled ? disable : style
-      } flex items-center justify-center px-4 py-1 rounded-md duration-500 select-none`}
+        disabled && "cursor-not-allowed"
+      } flex items-center justify-center px-4 py-1 rounded-md duration-500 select-none ${style}`}
       onClick={onClick}
       disabled={disabled}
     >

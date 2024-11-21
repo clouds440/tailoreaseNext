@@ -14,6 +14,7 @@ import {
   ServicesIcon,
   ContactIcon,
   LoginIcon,
+  InfoIcon,
 } from "../../public/icons/svgIcons";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -124,7 +125,7 @@ const Navbar = () => {
             >
               <Logo
                 fontSize={"text-2xl"}
-                classes={`md:my-5 md:pb-5 mx-5 pr-4 md:mx-0 md:pr-0 ${theme.colorBorder}`}
+                classes={`md:my-5 md:pb-5 mx-5 pr-4 md:mx-0 md:pr-0 items-center justify-center ${theme.colorBorder}`}
               />
               {userLoggedIn ? (
                 <div className="py-1 mt-3 text-center mx-5 md:mx-0 select-none">
@@ -158,17 +159,19 @@ const Navbar = () => {
                     Market
                   </span>
                 </li>
-                <li
-                  onClick={() => router.push("/become-tailor")}
-                  className={`${
-                    windowHeight >= 420 ? "" : "md:hidden"
-                  } ${linkStyles}`}
-                >
-                  <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
-                  <span className={"hidden md:inline-block md:ml-2"}>
-                    Business
-                  </span>
-                </li>
+                {userLoggedIn && (
+                  <li
+                    onClick={() => router.push("/become-tailor")}
+                    className={`${
+                      windowHeight >= 420 ? "" : "md:hidden"
+                    } ${linkStyles}`}
+                  >
+                    <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
+                    <span className={"hidden md:inline-block md:ml-2"}>
+                      Business
+                    </span>
+                  </li>
+                )}
                 <li
                   onClick={() => router.push("/contact-us")}
                   className={`${
@@ -180,6 +183,19 @@ const Navbar = () => {
                     Contact
                   </span>
                 </li>
+                {!userLoggedIn && (
+                  <li
+                    onClick={() => router.push("/about-us")}
+                    className={`${
+                      windowHeight >= 420 ? "" : "md:hidden"
+                    } ${linkStyles}`}
+                  >
+                    <InfoIcon size={"5"} color={`${theme.iconColor}`} />
+                    <span className={"hidden md:inline-block md:ml-2"}>
+                      About
+                    </span>
+                  </li>
+                )}
                 {userLoggedIn && (
                   <div>
                     <div className="relative md:absolute md:bottom-1 w-full">

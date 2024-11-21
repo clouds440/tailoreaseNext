@@ -1,10 +1,7 @@
 import Link from "next/link";
 const Logo = ({ classes, fontSize }) => {
   return (
-    <div
-      dir="ltr"
-      className={`flex select-none items-center justify-center ${classes}`}
-    >
+    <div dir="ltr" className={`flex select-none ${classes}`}>
       <Link href={"/"}>
         <span className="flex">
           <h1 className={`font-bold ${fontSize} text-cyan-600`}>Tailor</h1>

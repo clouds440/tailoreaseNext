@@ -7,19 +7,17 @@ import SimpleButton from "../components/SimpleButton";
 import Link from "next/link";
 
 export default function Home() {
-  const { theme } = useContext(UserContext); // Access theme from UserContext
-
-  const inputStyles = `w-full p-1 mt-4 peer ${theme.colorText} border-b-2 z-10 ${theme.colorBorder} outline-none focus:border-blue-500 transition-all duration-300 bg-transparent`;
-
-  const placeHolderStyles = `absolute top-5 pointer-events-none left-1 ${theme.colorText} duration-300 transform -translate-y-7 scale-75 origin-left peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:${theme.colorText} peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-blue-500`;
+  const { theme, inputStyles, placeHolderStyles } = useContext(UserContext); // Access theme from UserContext
 
   return (
     <>
       <div
-        className={`max-w-[97%] p-8 mx-auto my-4 border rounded-3xl flex flex-col items-center overflow-hidden select-none ${theme.mainTheme} ${theme.colorBorder}`}
+        className={`max-w-[97%] p-6 mx-auto my-4 border rounded-3xl flex flex-col items-center overflow-hidden select-none ${theme.mainTheme} ${theme.colorBorder}`}
       >
         {/* Top Section */}
-        <div className={`w-full flex flex-wrap-reverse justify-evenly items-center`}>
+        <div
+          className={`w-full flex flex-wrap-reverse justify-evenly items-center`}
+        >
           {/* Left Section */}
           <div data-aos="fade-right" className="max-w-lg mt-4">
             <h3 className={`text-7xl font-extrabold ${theme.colorText}`}>
@@ -33,7 +31,10 @@ export default function Home() {
               try-on outfits and place orders instantly!
             </p>
             <Link href={"/signup"}>
-              <SimpleButton btnText="Get Started Now" extraclasses="mt-4 py-3" />
+              <SimpleButton
+                btnText="Get Started Now"
+                extraclasses="mt-4 py-3"
+              />
             </Link>
           </div>
 
@@ -151,13 +152,12 @@ export default function Home() {
           Footer
         </p>
         {/* Footer Box Wrapper */}
-        <div className={`w-full flex flex-wrap justify-between space-y-8 md:space-y-0 p-6 rounded-3xl`}>
+        <div
+          className={`w-full flex flex-wrap justify-between space-y-8 md:space-y-0 p-6 rounded-3xl`}
+        >
           {/* Left - Logo and Social Links */}
           <div className="flex flex-col space-y-6 w-full md:w-1/3">
-            <Logo
-              fontSize={"text-2xl"}
-              classes={`md:my-5 md:pb-5 mx-5 pr-4 md:mx-0 md:pr-0 ${theme.colorBorder}`}
-            />
+            <Logo fontSize={"text-2xl"} />
             <h3 className={`text-3xl font-bold ${theme.colorText}`}>
               Virtual Tailor
             </h3>
@@ -177,16 +177,30 @@ export default function Home() {
 
           {/* Center - Quick Links */}
           <div className="flex flex-col space-y-4 w-full md:w-1/3">
-            <h3 className={`text-3xl font-bold ${theme.colorText}`}>Quick Links</h3>
-            <Link href="/about" className={`text-lg ${theme.subTextColor}`}>
-              About Us
-            </Link>
-            <Link href="/contact" className={`text-lg ${theme.subTextColor}`}>
-              Contact Us
-            </Link>
-            <Link href="/faq" className={`text-lg ${theme.subTextColor}`}>
-              FAQ
-            </Link>
+            <h3 className={`text-3xl font-bold ${theme.colorText}`}>
+              Quick Links
+            </h3>
+            <div className="flex w-auto">
+              <Link
+                href="/about-us"
+                className={`text-lg ${theme.subTextColor}`}
+              >
+                About Us
+              </Link>
+            </div>
+            <div className="flex w-auto">
+              <Link
+                href="/contact-us"
+                className={`text-lg ${theme.subTextColor}`}
+              >
+                Contact Us
+              </Link>
+            </div>
+            <div className="flex w-auto">
+              <Link href="/faq" className={`text-lg ${theme.subTextColor}`}>
+                Frequently Asked Questions
+              </Link>
+            </div>
           </div>
 
           {/* Right - Newsletter Subscription */}
@@ -213,7 +227,7 @@ export default function Home() {
                 extraclasses="mt-4 py-2"
                 type="primary-submit"
                 disabled={false} // Set to true for disabling
-                onClick={() => { }}
+                onClick={() => {}}
               />
             </form>
           </div>
@@ -221,7 +235,7 @@ export default function Home() {
 
         {/* Secondary Footer */}
         <div className={`w-full text-center text-lg`}>
-          © 2024 Virtual Tailor. All Rights Reserved.
+          © 2024 TailorEase. All Rights Reserved.
         </div>
       </div>
     </>

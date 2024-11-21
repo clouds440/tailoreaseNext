@@ -116,6 +116,13 @@ const LinkIcon = ({ size, color, extraClasses }) => (
     <line x1="10" y1="14" x2="20" y2="4" /> <polyline points="15 4 20 4 20 9" />
   </svg>
 );
+const InfoIcon = ({ size, color, extraClasses }) => (
+  <svg {...svgProps} className={`h-${size} w-${size} ${color} ${extraClasses}`}>
+    <path stroke="none" d="M0 0h24v24H0z" /> <circle cx="12" cy="12" r="9" />{" "}
+    <line x1="12" y1="8" x2="12.01" y2="8" />{" "}
+    <polyline points="11 12 12 12 12 16 13 16" />
+  </svg>
+);
 
 export {
   EditIcon,
@@ -132,4 +139,5 @@ export {
   SendIcon,
   LoginIcon,
   LinkIcon,
+  InfoIcon,
 };

@@ -26,6 +26,7 @@ import {
   UserIcon,
 } from "../../../public/icons/svgIcons";
 import SimpleButton from "@/components/SimpleButton";
+import DialogBox from "@/components/DialogBox";
 
 function AccountSettings() {
   const {
@@ -47,6 +48,7 @@ function AccountSettings() {
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
   const fieldLabels = {
     fullName: "Full Name",
@@ -229,8 +231,15 @@ function AccountSettings() {
       type: "success",
       message: "Changes saved!",
     });
-    setPopUpMessageTrigger("true");
+    setPopUpMessageTrigger(true);
     // Code to save the changes to the account here
+  };
+
+  const handleDiscardChanges = () => {
+    router.push("/");
+  };
+  const handleCancel = () => {
+    setShowDialog(false);
   };
 
   useEffect(() => {
@@ -241,7 +250,7 @@ function AccountSettings() {
 
   return (
     <div
-      className={`mt-8 max-w-2xl w-auto mx-auto p-6 rounded-md select-none ${theme.mainTheme}`}
+      className={`mt-8 max-w-[97%] w-auto mx-auto p-6 rounded-3xl select-none ${theme.mainTheme}`}
     >
       <h2
         className={`flex text-2xl font-bold mb-6 pt-6 border-b ${theme.colorBorder}`}
@@ -252,55 +261,68 @@ function AccountSettings() {
           extraClasses={"ml-3 rtl:mr-3 mt-1"}
         />
       </h2>
-      <div className="space-y-4">
-        <h2 className="flex text-xl font-semibold  mb-6">
-          Personal Information
-          <UserIcon color={`${theme.iconColor}`} extraClasses={"ml-3 mt-1"} />
-        </h2>
-        <div className="flex justify-between items-center">
-          <span>Full Name</span>
-          <span
-            className={`flex  cursor-pointer ${theme.hoverText}`}
-            onClick={() => handleFieldClick("fullName")}
-          >
-            {userData.fullName}
-            <EditIcon color={`${theme.iconColor}`} extraClasses={"ml-3 mt-1"} />
-          </span>
+      <div className="md:flex md:space-x-5 lg:space-x-14">
+        <div className="space-y-4 w-full md:w-1/2">
+          <h2 className="flex text-xl font-semibold  mb-6">
+            Personal Information
+            <UserIcon color={`${theme.iconColor}`} extraClasses={"ml-3 mt-1"} />
+          </h2>
+          <div className="flex justify-between items-center">
+            <span>Full Name</span>
+            <span
+              className={`flex  cursor-pointer ${theme.hoverText}`}
+              onClick={() => handleFieldClick("fullName")}
+            >
+              {userData.fullName}
+              <EditIcon
+                color={`${theme.iconColor}`}
+                extraClasses={"ml-3 mt-1"}
+              />
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span>Email</span>
+            <span className={`cursor-default`}>{userData.email}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span>Phone Number</span>
+            <span
+              className={`flex  cursor-pointer ${theme.hoverText}`}
+              onClick={() => handleFieldClick("phone")}
+            >
+              {userData.phone !== "" ? (
+                userData.phone
+              ) : (
+                <span
+                  className={`italic ${theme.colorText} ${theme.hoverText}`}
+                >
+                  <sub>click to add phone number</sub>
+                </span>
+              )}
+              <EditIcon
+                color={`${theme.iconColor}`}
+                extraClasses={"ml-3 mt-1"}
+              />
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span>Password</span>
+            <span
+              className={`flex cursor-pointer ${theme.hoverText}`}
+              onClick={() => handleFieldClick("password")}
+            >
+              ●●●●●●●●
+              <EditIcon
+                color={`${theme.iconColor}`}
+                extraClasses={"ml-3 mt-1"}
+              />
+            </span>
+          </div>
         </div>
-        <div className="flex justify-between items-center">
-          <span>Email</span>
-          <span className={`cursor-default`}>{userData.email}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span>Phone Number</span>
-          <span
-            className={`flex  cursor-pointer ${theme.hoverText}`}
-            onClick={() => handleFieldClick("phone")}
-          >
-            {userData.phone !== "" ? (
-              userData.phone
-            ) : (
-              <span className={`italic ${theme.colorText} ${theme.hoverText}`}>
-                <sub>click to add phone number</sub>
-              </span>
-            )}
-            <EditIcon color={`${theme.iconColor}`} extraClasses={"ml-3 mt-1"} />
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span>Password</span>
-          <span
-            className={`flex cursor-pointer ${theme.hoverText}`}
-            onClick={() => handleFieldClick("password")}
-          >
-            ●●●●●●●●
-            <EditIcon color={`${theme.iconColor}`} extraClasses={"ml-3 mt-1"} />
-          </span>
-        </div>
-        <div className="space-y-4">
-          <h2
-            className={`flex ltr:text-xl rtl:text-lg font-semibold mb-6 pt-6`}
-          >
+        <div className={`w-0 border-r ${theme.colorBorder}`}></div>{" "}
+        {/* divider line */}
+        <div className="space-y-4 w-full md:w-1/2 mt-8 md:mt-0">
+          <h2 className={`flex text-xl font-semibold  mb-6`}>
             Preferrences
             <AdjustmentsIcon
               color={`${theme.iconColor}`}
@@ -316,14 +338,24 @@ function AccountSettings() {
               theme={theme}
             />
           </div>
-          <div className="flex justify-end items-center">
-            <SimpleButton
-              onClick={handleSavePreferences}
-              btnText={"Save Changes"}
-              type={"primary"}
-              extraclasses={"w-full"}
-            />
-          </div>
+        </div>
+      </div>
+      <div className="flex mt-8">
+        <div className="flex items-center mx-auto justify-center space-x-3">
+          <SimpleButton
+            onClick={() => {
+              setShowDialog(true);
+            }}
+            btnText={"Discard Changes"}
+            type={"simple"}
+            extraclasses={"w-auto"}
+          />
+          <SimpleButton
+            onClick={handleSavePreferences}
+            btnText={"Save Changes"}
+            type={"primary"}
+            extraclasses={"w-auto px-6"}
+          />
         </div>
       </div>
 
@@ -342,6 +374,16 @@ function AccountSettings() {
           onClose={() => setIsPasswordModalOpen(false)}
           onSave={hadleChangePassword}
           isLoading={isLoading}
+        />
+      )}
+      {showDialog && (
+        <DialogBox
+          title={"Warning!"}
+          message="Are you sure you want to discard all the changes?"
+          type="warning"
+          showDialog={showDialog}
+          setShowDialog={setShowDialog}
+          buttons={[{ label: "Yes, Discard", onClick: handleDiscardChanges }]}
         />
       )}
     </div>

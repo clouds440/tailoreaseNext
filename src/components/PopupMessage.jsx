@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import UserContext from "@/utils/UserContext";
 
 function PopupMessage() {
-  const { showMessage, popUpMessageTrigger, resetPopUpMessageTrigger } =
+  const { showMessage, popUpMessageTrigger, setPopUpMessageTrigger } =
     useContext(UserContext);
   const [visible, setVisible] = useState(false);
 
@@ -13,14 +13,14 @@ function PopupMessage() {
       setVisible(true);
       const timer = setTimeout(() => {
         setVisible(false);
-        resetPopUpMessageTrigger(); // Reset the trigger after showing the message
-      }, 4000); // message active time (in ms)
+        setTimeout(() => {
+          setPopUpMessageTrigger(false); // Reset the trigger
+        }, 300); // Match the exit animation duration
+      }, 4000);
 
       return () => clearTimeout(timer);
     }
-  }, [popUpMessageTrigger, resetPopUpMessageTrigger]);
-
-  if (!visible) return null;
+  }, [popUpMessageTrigger]);
 
   let iconPath, bgColor;
 
@@ -62,7 +62,9 @@ function PopupMessage() {
 
   const handleClose = () => {
     setVisible(false);
-    resetPopUpMessageTrigger();
+    setTimeout(() => {
+      setPopUpMessageTrigger(false);
+    }, 300); // Match exit animation duration
   };
 
   return (
