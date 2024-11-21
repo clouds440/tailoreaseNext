@@ -4,6 +4,7 @@ import "./globals.css"; // Import global styles
 import { UserProvider } from "@/utils/UserContext";
 import PopupMessage from "@/components/PopupMessage";
 import { Roboto } from "next/font/google";
+import ChatBot from "../components/ChatBot";
 
 const roboto = Roboto({
   weight: "400",
@@ -44,6 +45,7 @@ export default function RootLayout({ children }) {
               className={`overflow-y-auto flex-1 mt-[85px] md:mt-0 px-[1px]`}
             >
               <PopupMessage />
+              <ChatBot />
               {children} {/* Renders each page's content */}
             </div>
           </div>
