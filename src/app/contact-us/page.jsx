@@ -70,21 +70,21 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-8 rounded-xl border border-gray-300">
-      <div className="flex flex-col rounded-xl md:flex-row">
+    <div className="w-[85%] h-[80%] flex-grow mx-auto mt-8 rounded-xl border border-gray-300">
+      <div className="flex flex-col h-full rounded-xl md:flex-row">
         {/* Left Section */}
         <div
-          className={`w-full md:w-1/2 p-6 ${theme.mainTheme} flex flex-col items-start border-b md:border-b-0 md:border-r border-gray-300 rounded-l-xl`}
+          className={`w-full md:w-1/2 p-6 ${theme.mainTheme} flex flex-col items-start justify-center border-b md:border-b-0 md:border-r border-gray-300 rounded-l-xl`}
         >
-          <h2 className={`text-2xl text-${theme.themeColor} font-bold mb-4`}>
+          <h2 className={`text-3xl text-${theme.themeColor} font-bold mb-4`}>
             Get in Touch
           </h2>
-          <p className={`${theme.colorText} mb-6`}>
+          <p className={`${theme.colorText} mb-6 text-lg`}>
             Have questions or need assistance? Fill out the form, and we’ll get
             back to you as soon as possible. You can also reach us via email or
             phone for immediate support.
           </p>
-          <ul className={`${theme.colorText} space-y-2 mb-6`}>
+          <ul className={`${theme.colorText} space-y-3 mb-6`}>
             <li>
               <strong>Email:</strong> support@tailorease.com
             </li>
@@ -100,7 +100,7 @@ const ContactUs = () => {
           {/* Social Media Links */}
           <div className="flex space-x-4 mt-6">
             <a
-              href="https://www.facebook.com/tailorease"
+              href="https://www.facebook.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-blue-600 hover:text-blue-800"
@@ -108,7 +108,7 @@ const ContactUs = () => {
               <i className="fab fa-facebook-f"></i>
             </a>
             <a
-              href="https://www.twitter.com/tailorease"
+              href="https://www.twitter.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-blue-400 hover:text-blue-600"
@@ -116,7 +116,7 @@ const ContactUs = () => {
               <i className="fab fa-twitter"></i>
             </a>
             <a
-              href="https://www.instagram.com/tailorease"
+              href="https://www.instagram.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-pink-600 hover:text-pink-800"
@@ -124,7 +124,7 @@ const ContactUs = () => {
               <i className="fab fa-instagram"></i>
             </a>
             <a
-              href="https://www.linkedin.com/tailorease"
+              href="https://www.linkedin.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-blue-700 hover:text-blue-900"
@@ -132,7 +132,7 @@ const ContactUs = () => {
               <i className="fab fa-linkedin-in"></i>
             </a>
             <a
-              href="https://www.youtube.com/tailorease"
+              href="https://www.youtube.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-red-600 hover:text-red-800"
@@ -145,10 +145,10 @@ const ContactUs = () => {
         {/* Right Section (Form) */}
         <div className={`w-full md:w-1/2 p-6 rounded-r-xl ${theme.mainTheme}`}>
           <h2 className={`text-xl text-${theme.themeColor} font-bold mb-4`}>
-            Write us a message
+            Contact Us
           </h2>
           <form onSubmit={handleSubmit} noValidate>
-            <div className="relative mb-4">
+            <div className="relative mb-6">
               <input
                 type="text"
                 id="name"
@@ -162,7 +162,7 @@ const ContactUs = () => {
                 Name
               </label>
             </div>
-            <div className="relative mb-4">
+            <div className="relative mb-6">
               <input
                 type="email"
                 id="email"
@@ -176,14 +176,14 @@ const ContactUs = () => {
                 Email
               </label>
             </div>
-            <div className="relative mb-4">
+            <div className="relative mb-6">
               <textarea
                 maxLength={500}
                 id="message"
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                className={`${inputStyles} h-28 resize-none`}
+                className={`${inputStyles} h-36 resize-none`}
                 placeholder=" "
               />
               <label className={`${placeHolderStyles}`} htmlFor="message">
