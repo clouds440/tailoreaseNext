@@ -73,9 +73,7 @@ function ChangePasswordModal({ onClose, onSave, isLoading }) {
     };
   }, [onClose]);
 
-  const inputStyles = `w-full p-1 mt-4 peer ${theme.colorText} border-b-2 z-10 ${theme.colorBorder} outline-none focus:border-blue-500 transition-all duration-300 bg-transparent`;
-
-  const placeHolderStyles = `absolute top-5 pointer-events-none left-1 ${theme.colorText} duration-300 transform -translate-y-7 scale-75 origin-left peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:${theme.colorText} peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-blue-500`;
+  const {inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center rounded-md z-40">

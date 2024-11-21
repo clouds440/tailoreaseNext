@@ -66,8 +66,7 @@ const TailorApplicationForm = ({ onNext }) => {
     onNext(formData); // Pass form data to the next component
   };
 
-  const inputStyles = `w-full p-1 mt-4 peer ${theme.colorText} border-b-2 z-10 ${theme.colorBorder} outline-none focus:border-blue-500 transition-all duration-300 bg-transparent`;
-  const placeHolderStyles = `absolute top-5 pointer-events-none left-1 ${theme.colorText} duration-300 transform -translate-y-7 scale-75 origin-left peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:${theme.colorText} peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-blue-500`;
+  const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
     <div className="flex items-center justify-center mt-4 max-w-2xl w-auto mx-auto p-6 rounded-md select-none">
