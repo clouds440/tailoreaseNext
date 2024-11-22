@@ -45,6 +45,12 @@ function AccountSettings() {
     field: "",
     value: "",
   });
+  const [DialogBoxInfo, setDialogBoxInfo] = useState({
+    title: "",
+    message: "",
+    type: "",
+    buttons: [],
+  });
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -282,7 +288,19 @@ function AccountSettings() {
           </div>
           <div className="flex justify-between items-center">
             <span>Email</span>
-            <span className={`cursor-default`}>{userData.email}</span>
+            <span
+              className={`flex  cursor-pointer ${theme.hoverText}`}
+              onClick={() => {
+                setShowDialog(true);
+                setDialogBoxInfo({
+                  title: "Information!",
+                  message: "Email address cannot be changed!",
+                  type: "info",
+                });
+              }}
+            >
+              {userData.email}
+            </span>
           </div>
           <div className="flex justify-between items-center">
             <span>Phone Number</span>
@@ -345,6 +363,14 @@ function AccountSettings() {
           <SimpleButton
             onClick={() => {
               setShowDialog(true);
+              setDialogBoxInfo({
+                title: "Warning!",
+                message: "Are you sure you want to discard all changes?",
+                type: "warning",
+                buttons: [
+                  { label: "Yes, Discard", onClick: handleDiscardChanges },
+                ],
+              });
             }}
             btnText={"Discard Changes"}
             type={"simple"}
@@ -378,12 +404,12 @@ function AccountSettings() {
       )}
       {showDialog && (
         <DialogBox
-          title={"Warning!"}
-          message="Are you sure you want to discard all the changes?"
-          type="warning"
+          title={DialogBoxInfo.title}
+          message={DialogBoxInfo.message}
+          type={DialogBoxInfo.type}
           showDialog={showDialog}
           setShowDialog={setShowDialog}
-          buttons={[{ label: "Yes, Discard", onClick: handleDiscardChanges }]}
+          buttons={DialogBoxInfo.buttons}
         />
       )}
     </div>

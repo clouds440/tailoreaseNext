@@ -22,7 +22,7 @@ const ShiftingBounceLoader = ({ size }) => {
       "rgba(20, 189, 52, 1)", // Green
     ];
 
-    const transitionDuration = 2000; // 2 seconds for each transition
+    const transitionDuration = 1000; // 2 seconds for each transition
     const frameRate = 50; // Update every 50ms
     const steps = transitionDuration / frameRate; // Total steps per transition
 
