@@ -17,64 +17,44 @@ export const UserProvider = ({ children }) => {
     message: "",
   });
 
+  const themes = {
+    midnightWhisper: {
+      themeName: "midnightWhisper",
+      mainTheme: "midnight-whisper",
+      colorText: "text-gray-100",
+      colorBorder: "border-gray-100",
+      iconColor: "text-blue-500",
+      hoverText: "hover:text-blue-400",
+      hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
+    },
+    lunarGlow: {
+      themeName: "lunarGlow",
+      mainTheme: "lunar-glow",
+      colorText: "text-black",
+      colorBorder: "border-black",
+      iconColor: "text-blue-600",
+      hoverText: "hover:text-gray-600",
+      hoverBg: "hover:bg-gray-300 hover:bg-opacity-70",
+    },
+    oceanHaze: {
+      themeName: "oceanHaze",
+      mainTheme: "ocean-haze",
+      colorText: "text-sky-200",
+      colorBorder: "border-sky-200",
+      iconColor: "text-amber-400",
+      hoverText: "hover:text-amber-300",
+      hoverBg: "hover:bg-amber-300 hover:bg-opacity-50",
+    },
+  };
+
   const handleSetTheme = (themeName) => {
     if (themeName === "systemDefault") {
-      // Check system preference
       const prefersDark = window.matchMedia(
         "(prefers-color-scheme: dark)"
       ).matches;
-
-      if (prefersDark) {
-        setTheme({
-          themeName: "midnightWhisper",
-          mainTheme: "midnight-whisper",
-          colorText: "text-gray-100",
-          colorBorder: "border-gray-100",
-          iconColor: "text-blue-500",
-          hoverText: "hover:text-blue-400",
-          hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
-        });
-      } else {
-        setTheme({
-          themeName: "lunarGlow",
-          mainTheme: "lunar-glow",
-          colorText: "text-black",
-          colorBorder: "border-black",
-          iconColor: "text-blue-600",
-          hoverText: "hover:text-gray-600",
-          hoverBg: "hover:bg-gray-300 hover:bg-opacity-70",
-        });
-      }
-    } else if (themeName === "midnightWhisper") {
-      setTheme({
-        themeName: "midnightWhisper",
-        mainTheme: "midnight-whisper",
-        colorText: "text-gray-100",
-        colorBorder: "border-gray-100",
-        iconColor: "text-blue-500",
-        hoverText: "hover:text-blue-400",
-        hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
-      });
-    } else if (themeName === "lunarGlow") {
-      setTheme({
-        themeName: "lunarGlow",
-        mainTheme: "lunar-glow",
-        colorText: "text-black",
-        colorBorder: "border-black",
-        iconColor: "text-blue-600",
-        hoverText: "hover:text-gray-600",
-        hoverBg: "hover:bg-gray-300 hover:bg-opacity-70",
-      });
-    } else if (themeName === "oceanHaze") {
-      setTheme({
-        themeName: "oceanHaze",
-        mainTheme: "ocean-haze",
-        colorText: "text-sky-200",
-        colorBorder: "border-sky-200",
-        iconColor: "text-amber-400",
-        hoverText: "hover:text-amber-300",
-        hoverBg: "hover:bg-amber-300 hover:bg-opacity-50",
-      });
+      setTheme(prefersDark ? themes.midnightWhisper : themes.lunarGlow);
+    } else {
+      setTheme(themes[themeName]);
     }
   };
 
@@ -113,17 +93,17 @@ export const UserProvider = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
-        userData,
         setUserData,
-        theme,
-        setTheme,
-        userLoggedIn,
-        setUserLoggedIn,
-        popUpMessageTrigger,
-        setPopUpMessageTrigger,
-        showMessage,
         setShowMessage,
         handleSetTheme,
+        setPopUpMessageTrigger,
+        setUserLoggedIn,
+        setTheme,
+        theme,
+        userData,
+        userLoggedIn,
+        popUpMessageTrigger,
+        showMessage,
         inputStyles,
         placeHolderStyles,
       }}
