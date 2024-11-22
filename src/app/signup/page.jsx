@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useState, useEffect } from "react";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SimpleButton from "@/components/SimpleButton";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -129,7 +129,7 @@ const SignUpForm = () => {
     }
   };
 
-  const {inputStyles, placeHolderStyles } = useContext(UserContext);
+  const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   useEffect(() => {
     if (userLoggedIn) {

@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import UserContext from "@/utils/UserContext";
-import LoadingSpinner from "./LoadingSpinner";
+import { LoadingSpinner } from "./LoadingSpinner";
 import SimpleButton from "./SimpleButton";
 import { LinkIcon } from "../../public/icons/svgIcons";
 import Image from "next/image";

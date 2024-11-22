@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import SimpleButton from "./SimpleButton";
-import LoadingSpinner from "./LoadingSpinner";
+import { LoadingSpinner } from "./LoadingSpinner";
 import { EditIcon } from "../../public/icons/svgIcons";
 import UserContext from "@/utils/UserContext";
 
@@ -73,7 +73,7 @@ function ChangePasswordModal({ onClose, onSave, isLoading }) {
     };
   }, [onClose]);
 
-  const {inputStyles, placeHolderStyles } = useContext(UserContext);
+  const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center rounded-md z-40">

@@ -4,7 +4,7 @@ import TailorApplicationForm from "@/components/TailorApplicationForm";
 import TailorSpecialitiesForm from "@/components/TailorSpecialitiesForm";
 import ProgressBar from "@/components/ProgressBar";
 import UserContext from "@/utils/UserContext";
-import { MoonLoader } from "react-spinners";
+import { ClipLoader } from "react-spinners";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -166,7 +166,7 @@ const BecomeTailor = () => {
   if (hasBusinessAccount === null) {
     return (
       <div className="flex justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30">
-        <MoonLoader size={60} color="#ffffff" />
+        <ClipLoader size={60} color="#ffffff" />
       </div>
     ); // Loading indicator while checking
   }

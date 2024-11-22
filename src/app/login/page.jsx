@@ -10,7 +10,7 @@ import {
   getDocs,
   sendPasswordResetEmail,
 } from "@/utils/firebaseConfig";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SimpleButton from "@/components/SimpleButton";
 import Link from "next/link";
 import UserContext from "@/utils/UserContext";

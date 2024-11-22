@@ -3,7 +3,7 @@
 import React, { useState, useContext } from "react";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "@/components/SimpleButton";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const ContactUs = () => {
   const { theme, setShowMessage, setPopUpMessageTrigger, userData } =
