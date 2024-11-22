@@ -22,21 +22,21 @@ module.exports = {
           "-webkit-background-clip": "text",
           "-webkit-text-fill-color": "transparent",
         },
-        ".theme-default": {
+        ".midnight-whisper": {
           backgroundColor: "rgba(31, 41, 55, 0.75)", // bg-gray-800 bg-opacity-70
           backdropFilter: "blur(24px)", // backdrop-blur-xl
           boxShadow: "0 1px 2px 0 #fde047", // shadow-yellow-300 shadow-sm
           color: "#ffffff", // Set all text to white
           borderColor: "#ffffff", // White border color
         },
-        ".theme-light": {
+        ".lunar-glow": {
           backgroundColor: "rgba(220, 231, 235, 0.8)", // Lighter background
           backdropFilter: "blur(24px)", // backdrop-blur-xl
           boxShadow: "0 1px 2px 0 #546e7a", // gray shadow color
           color: "#000000", // Set all text to black
           borderColor: "#000000", // Black border color
         },
-        ".theme-azure": {
+        ".ocean-haze": {
           backgroundColor: "rgba(13, 71, 161, 0.75)", // sky background
           backdropFilter: "blur(40px)", // backdrop-blur-xl
           boxShadow: "0 1px 2px 0 #5dade2", // light blue shadow color

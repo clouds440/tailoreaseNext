@@ -17,24 +17,73 @@ export const UserProvider = ({ children }) => {
     message: "",
   });
 
+  const handleSetTheme = (themeName) => {
+    if (themeName === "systemDefault") {
+      // Check system preference
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+
+      if (prefersDark) {
+        setTheme({
+          themeName: "midnightWhisper",
+          mainTheme: "midnight-whisper",
+          colorText: "text-gray-100",
+          colorBorder: "border-gray-100",
+          iconColor: "text-blue-500",
+          hoverText: "hover:text-blue-400",
+          hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
+        });
+      } else {
+        setTheme({
+          themeName: "lunarGlow",
+          mainTheme: "lunar-glow",
+          colorText: "text-black",
+          colorBorder: "border-black",
+          iconColor: "text-blue-600",
+          hoverText: "hover:text-gray-600",
+          hoverBg: "hover:bg-gray-300 hover:bg-opacity-70",
+        });
+      }
+    } else if (themeName === "midnightWhisper") {
+      setTheme({
+        themeName: "midnightWhisper",
+        mainTheme: "midnight-whisper",
+        colorText: "text-gray-100",
+        colorBorder: "border-gray-100",
+        iconColor: "text-blue-500",
+        hoverText: "hover:text-blue-400",
+        hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
+      });
+    } else if (themeName === "lunarGlow") {
+      setTheme({
+        themeName: "lunarGlow",
+        mainTheme: "lunar-glow",
+        colorText: "text-black",
+        colorBorder: "border-black",
+        iconColor: "text-blue-600",
+        hoverText: "hover:text-gray-600",
+        hoverBg: "hover:bg-gray-300 hover:bg-opacity-70",
+      });
+    } else if (themeName === "oceanHaze") {
+      setTheme({
+        themeName: "oceanHaze",
+        mainTheme: "ocean-haze",
+        colorText: "text-sky-200",
+        colorBorder: "border-sky-200",
+        iconColor: "text-amber-400",
+        hoverText: "hover:text-amber-300",
+        hoverBg: "hover:bg-amber-300 hover:bg-opacity-50",
+      });
+    }
+  };
+
   useEffect(() => {
     // Ensure this runs only on the client
     if (typeof window !== "undefined") {
       // Fetch theme
-      const savedTheme = localStorage.getItem("theme");
-      setTheme(
-        savedTheme
-          ? JSON.parse(savedTheme)
-          : {
-              themeName: "default",
-              mainTheme: "theme-default",
-              colorText: "text-gray-100",
-              colorBorder: "border-gray-100",
-              iconColor: "text-blue-600",
-              hoverText: "hover:text-blue-400",
-              hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
-            }
-      );
+      const savedTheme = localStorage.getItem("TailorEaseTheme");
+      handleSetTheme(savedTheme ? JSON.parse(savedTheme) : "systemDefault");
 
       // Fetch user data
       const savedUser =
@@ -74,6 +123,7 @@ export const UserProvider = ({ children }) => {
         setPopUpMessageTrigger,
         showMessage,
         setShowMessage,
+        handleSetTheme,
         inputStyles,
         placeHolderStyles,
       }}

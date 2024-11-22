@@ -34,7 +34,7 @@ function AccountSettings() {
     theme,
     userLoggedIn,
     setUserData,
-    setTheme,
+    handleSetTheme,
     setShowMessage,
     setPopUpMessageTrigger,
   } = useContext(UserContext);
@@ -184,55 +184,19 @@ function AccountSettings() {
   };
 
   const themeOptions = [
-    { value: "default", label: "Default" },
-    { value: "light", label: "Light" },
-    { value: "azure", label: "Azure" },
+    { value: "systemDefault", label: "System Default" },
+    { value: "midnightWhisper", label: "Midnight Whisper" },
+    { value: "lunarGlow", label: "Lunar Glow" },
+    { value: "oceanHaze", label: "Ocean Haze" },
   ];
-
-  const [selectedTheme, setSelectedTheme] = useState(theme.themeName);
-  const savedLanguage = JSON.parse(localStorage.getItem("lang")) || "en";
-  const [selectedLanguage, setSelectedLanguage] = useState(savedLanguage);
 
   const handleThemeChange = (e) => {
     const themeName = e.target.value;
-    setSelectedTheme(themeName);
-
-    if (themeName === "default") {
-      setTheme({
-        themeName: "default",
-        mainTheme: "theme-default",
-        colorText: "text-gray-100",
-        colorBorder: "border-gray-100",
-        iconColor: "text-blue-500",
-        hoverText: "hover:text-blue-400",
-        hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
-      });
-    } else if (themeName === "light") {
-      setTheme({
-        themeName: "light",
-        mainTheme: "theme-light",
-        colorText: "text-black",
-        colorBorder: "border-black",
-        iconColor: "text-blue-600",
-        hoverText: "hover:text-gray-600",
-        hoverBg: "hover:bg-gray-300 hover:bg-opacity-70",
-      });
-    } else if (themeName === "azure") {
-      setTheme({
-        themeName: "azure",
-        mainTheme: "theme-azure",
-        colorText: "text-sky-200",
-        colorBorder: "border-sky-200",
-        iconColor: "text-amber-400",
-        hoverText: "hover:text-amber-300",
-        hoverBg: "hover:bg-amber-300 hover:bg-opacity-50",
-      });
-    }
+    handleSetTheme(themeName);
   };
 
   const handleSavePreferences = () => {
-    localStorage.setItem("theme", JSON.stringify(theme));
-    localStorage.setItem("lang", JSON.stringify(selectedLanguage));
+    localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName));
     setShowMessage({
       type: "success",
       message: "Changes saved!",
@@ -243,9 +207,6 @@ function AccountSettings() {
 
   const handleDiscardChanges = () => {
     router.push("/");
-  };
-  const handleCancel = () => {
-    setShowDialog(false);
   };
 
   useEffect(() => {
@@ -267,7 +228,9 @@ function AccountSettings() {
           extraClasses={"ml-3 rtl:mr-3 mt-1"}
         />
       </h2>
+      {/* Parent Settings div */}
       <div className="md:flex md:space-x-5 lg:space-x-14">
+        {/* Personal Info Section */}
         <div className="space-y-4 w-full md:w-1/2">
           <h2 className="flex text-xl font-semibold  mb-6">
             Personal Information
@@ -337,8 +300,9 @@ function AccountSettings() {
             </span>
           </div>
         </div>
-        <div className={`w-0 border-r ${theme.colorBorder}`}></div>{" "}
         {/* divider line */}
+        <div className={`w-0 border-r ${theme.colorBorder}`}></div>{" "}
+        {/* Preferrences section */}
         <div className="space-y-4 w-full md:w-1/2 mt-8 md:mt-0">
           <h2 className={`flex text-xl font-semibold  mb-6`}>
             Preferrences
@@ -351,9 +315,10 @@ function AccountSettings() {
             <label htmlFor="select-options">Theme</label>
             <Optionselector
               options={themeOptions}
-              value={selectedTheme}
+              value={theme.themeName}
               onChange={handleThemeChange}
               theme={theme}
+              classes={"w-40"}
             />
           </div>
         </div>

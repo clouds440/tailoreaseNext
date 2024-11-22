@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const OptionSelector = ({ options, value, onChange, theme }) => {
+const OptionSelector = ({ options, value, onChange, theme, classes }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -30,7 +30,10 @@ const OptionSelector = ({ options, value, onChange, theme }) => {
   }, []);
 
   return (
-    <div className="relative inline-block text-left w-36" ref={dropdownRef}>
+    <div
+      className={`relative inline-block text-left ${classes}`}
+      ref={dropdownRef}
+    >
       <div
         className={`p-2 flex items-center justify-between outline-none rounded-md cursor-pointer ${theme.mainTheme} ${theme.hoverBg}`}
         onClick={() => setIsOpen(!isOpen)}
