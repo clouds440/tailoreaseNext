@@ -11,7 +11,6 @@ const DialogBox = ({
   type = "info",
   buttons = [],
   showDialog,
-  onClose,
   setShowDialog,
 }) => {
   const [isVisible, setIsVisible] = useState(showDialog);
@@ -62,8 +61,21 @@ const DialogBox = ({
     setTimeout(() => {
       setShowDialog(false);
     }, 300);
-    onClose && onClose(); // Call the parent-provided onClose function
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        handleClose(); // Trigger the Cancel button on Esc key press
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleClose]);
 
   return (
     <AnimatePresence>

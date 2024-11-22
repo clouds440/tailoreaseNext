@@ -3,13 +3,23 @@ import SimpleButton from "./SimpleButton";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { EditIcon } from "../../public/icons/svgIcons";
 import UserContext from "@/utils/UserContext";
+import { motion, AnimatePresence } from "framer-motion";
 
-function ChangePasswordModal({ onClose, onSave, isLoading }) {
+function ChangePasswordModal({
+  onSave,
+  isLoading,
+  isPasswordModalOpen,
+  setIsPasswordModalOpen,
+}) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { theme, setShowMessage, setPopUpMessageTrigger } =
     useContext(UserContext);
+  const [isVisible, setIsVisible] = useState(isPasswordModalOpen);
+  useEffect(() => {
+    setIsVisible(isPasswordModalOpen);
+  }, [isPasswordModalOpen]);
 
   const [formData, setFormData] = useState({
     currentPassword: "",
@@ -59,10 +69,17 @@ function ChangePasswordModal({ onClose, onSave, isLoading }) {
     onSave(formData);
   };
 
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      setIsPasswordModalOpen(false);
+    }, 300);
+  };
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
-        onClose(); // Trigger the Cancel button on Esc key press
+        handleClose(); // Trigger the Cancel button on Esc key press
       }
     };
 
@@ -71,78 +88,108 @@ function ChangePasswordModal({ onClose, onSave, isLoading }) {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose]);
+  }, [handleClose]);
 
   const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center rounded-md z-40">
-      <div
-        className={`${theme.mainTheme} p-6 rounded-lg w-full max-w-md relative`}
-      >
-        <h2 className={`flex text-xl text-${theme.themeColor} font-bold mb-4`}>
-          Change Password
-          <EditIcon
-            size={"6"}
-            color={`${theme.iconColor}`}
-            extraClasses={"ml-3"}
-          />
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="relative mb-4">
-            <input
-              type="password"
-              name="currentPassword"
-              value={formData.currentPassword}
-              onChange={handleChange}
-              className={`${inputStyles}`}
-              placeholder=" "
-              required
-            />
-            <label className={`${placeHolderStyles}`}>Current Password</label>
-          </div>
-          <div className="relative mb-4">
-            <input
-              type="password"
-              name="newPassword"
-              value={formData.newPassword}
-              onChange={handleChange}
-              className={`${inputStyles}`}
-              placeholder=" "
-              required
-            />
-            <label className={`${placeHolderStyles}`}>New Password</label>
-          </div>
-          <div className="relative mb-4">
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className={`${inputStyles}`}
-              placeholder=" "
-              required
-            />
-            <label className={`${placeHolderStyles}`}>Confirm Password</label>
-          </div>
-          <div className="flex justify-end space-x-2 rtl:space-x-reverse">
-            <SimpleButton
-              btnText={"Cancel"}
-              onClick={onClose}
-              type={"cancel"}
-            />
-            <SimpleButton
-              btnText={
-                isLoading ? <LoadingSpinner size={24} /> : "Change Password"
-              }
-              type={"primary-submit"}
-              extraclasses={"w-full"}
-              disabled={isLoading}
-            />
-          </div>
-        </form>
-      </div>
-    </div>
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          className={`fixed inset-0 flex items-center justify-center`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div
+            className={`bg-black bg-opacity-70 fixed inset-0 rounded-3xl`}
+          ></div>
+          <motion.div
+            className={`bg-white rounded-xl shadow-lg w-11/12 max-w-md z-50 ${theme.mainTheme}`}
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div
+              className={`${theme.mainTheme} p-6 rounded-lg w-full max-w-md relative`}
+            >
+              <h2
+                className={`flex text-xl text-${theme.themeColor} font-bold mb-4`}
+              >
+                Change Password
+                <EditIcon
+                  size={"6"}
+                  color={`${theme.iconColor}`}
+                  extraClasses={"ml-3"}
+                />
+              </h2>
+              <form onSubmit={handleSubmit}>
+                <div className="relative mb-4">
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    value={formData.currentPassword}
+                    onChange={handleChange}
+                    className={`${inputStyles}`}
+                    placeholder=" "
+                    required
+                  />
+                  <label className={`${placeHolderStyles}`}>
+                    Current Password
+                  </label>
+                </div>
+                <div className="relative mb-4">
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={formData.newPassword}
+                    onChange={handleChange}
+                    className={`${inputStyles}`}
+                    placeholder=" "
+                    required
+                  />
+                  <label className={`${placeHolderStyles}`}>New Password</label>
+                </div>
+                <div className="relative mb-4">
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className={`${inputStyles}`}
+                    placeholder=" "
+                    required
+                  />
+                  <label className={`${placeHolderStyles}`}>
+                    Confirm Password
+                  </label>
+                </div>
+                <div className="flex justify-end space-x-2 rtl:space-x-reverse">
+                  <SimpleButton
+                    btnText={"Cancel"}
+                    onClick={handleClose}
+                    type={"cancel"}
+                  />
+                  <SimpleButton
+                    btnText={
+                      isLoading ? (
+                        <LoadingSpinner size={24} />
+                      ) : (
+                        "Change Password"
+                      )
+                    }
+                    type={"primary-submit"}
+                    extraclasses={"w-full"}
+                    disabled={isLoading}
+                  />
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

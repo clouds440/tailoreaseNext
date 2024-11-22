@@ -352,9 +352,10 @@ function AccountSettings() {
 
       {modalInfo.isOpen && (
         <EditFieldModal
+          modalInfo={modalInfo}
+          setModalInfo={setModalInfo}
           field={modalInfo.field}
           value={modalInfo.value}
-          onClose={() => setModalInfo({ isOpen: false, field: "", value: "" })}
           onSave={handleFieldSave}
           isLoading={isLoading}
         />
@@ -362,9 +363,10 @@ function AccountSettings() {
 
       {isPasswordModalOpen && (
         <ChangePasswordModal
-          onClose={() => setIsPasswordModalOpen(false)}
+          setIsPasswordModalOpen={setIsPasswordModalOpen}
           onSave={hadleChangePassword}
           isLoading={isLoading}
+          isPasswordModalOpen={isPasswordModalOpen}
         />
       )}
       {showDialog && (
