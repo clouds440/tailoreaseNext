@@ -15,6 +15,8 @@ import {
   ContactIcon,
   LoginIcon,
   InfoIcon,
+  ShirtIcon,
+  TailorIcon,
 } from "../../public/icons/svgIcons";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -157,6 +159,12 @@ const Navbar = () => {
                   <CartIcon size={"5"} color={`${theme.iconColor}`} />
                   <span className={"hidden md:inline-block md:ml-2"}>
                     Market
+                  </span>
+                </li>
+                <li className={linkStyles} onClick={() => router.push("/tailors-list")}>
+                  <TailorIcon size={"5"} color={`${theme.iconColor}`} />
+                  <span className={"hidden md:inline-block md:ml-2"}>
+                    Tailors
                   </span>
                 </li>
                 {userLoggedIn && (

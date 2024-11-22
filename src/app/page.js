@@ -224,7 +224,7 @@ export default function Home() {
 
               <SimpleButton
                 btnText={"Subscribe"}
-                extraclasses="mt-4 py-2"
+                extraclasses="mt-4 py-2 -translate-y-3 "
                 type="primary-submit"
                 disabled={false} // Set to true for disabling
                 onClick={() => {}}

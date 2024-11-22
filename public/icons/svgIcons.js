@@ -123,6 +123,15 @@ const InfoIcon = ({ size, color, extraClasses }) => (
     <polyline points="11 12 12 12 12 16 13 16" />
   </svg>
 );
+const TailorIcon = ({ size, color, extraClasses }) => (
+  <svg {...svgProps} className={`h-${size} w-${size} ${color} ${extraClasses}`}>
+    <path stroke="none" d="M0 0h24v24H0z" />
+    <circle cx="8" cy="8" r="3" />
+    <circle cx="16" cy="16" r="3" />
+    <path d="M9.5 9.5L15 15" />
+    <path d="M4 20l5-5M20 4l-5 5" />
+  </svg>
+);
 
 export {
   EditIcon,
@@ -140,4 +149,5 @@ export {
   LoginIcon,
   LinkIcon,
   InfoIcon,
+  TailorIcon,
 };
