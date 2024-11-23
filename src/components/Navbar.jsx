@@ -161,7 +161,10 @@ const Navbar = () => {
                     Market
                   </span>
                 </li>
-                <li className={linkStyles} onClick={() => router.push("/tailors-list")}>
+                <li
+                  className={linkStyles}
+                  onClick={() => router.push("/tailors")}
+                >
                   <TailorIcon size={"5"} color={`${theme.iconColor}`} />
                   <span className={"hidden md:inline-block md:ml-2"}>
                     Tailors

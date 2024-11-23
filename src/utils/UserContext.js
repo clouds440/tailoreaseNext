@@ -26,6 +26,7 @@ export const UserProvider = ({ children }) => {
       iconColor: "text-blue-500",
       hoverText: "hover:text-blue-400",
       hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
+      hoverShadow: "hover:shadow-md hover:shadow-amber-400",
     },
     lunarGlow: {
       themeName: "lunarGlow",
@@ -35,6 +36,7 @@ export const UserProvider = ({ children }) => {
       iconColor: "text-blue-600",
       hoverText: "hover:text-gray-600",
       hoverBg: "hover:bg-gray-300 hover:bg-opacity-70",
+      hoverShadow: "hover:shadow-md hover:shadow-gray-800",
     },
     oceanHaze: {
       themeName: "oceanHaze",
@@ -44,6 +46,7 @@ export const UserProvider = ({ children }) => {
       iconColor: "text-amber-400",
       hoverText: "hover:text-amber-300",
       hoverBg: "hover:bg-amber-300 hover:bg-opacity-50",
+      hoverShadow: "hover:shadow-md hover:shadow-cyan-400",
     },
   };
 

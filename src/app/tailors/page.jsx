@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef, useContext } from "react";
-import { createPortal } from "react-dom";
-import { db } from "../../utils/firebaseConfig";
+import { db } from "@/utils/firebaseConfig";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { PropagateLoader } from "react-spinners";
 import UserContext from "@/utils/UserContext";
+import SimpleButton from "@/components/SimpleButton";
+import { AnimatePresence, motion } from "framer-motion";
 
 const TailorListPage = () => {
   const { theme } = useContext(UserContext);
@@ -93,6 +94,12 @@ const TailorListPage = () => {
     };
   }, []);
 
+  const dropdownVariants = {
+    hidden: { scaleY: 0, transformOrigin: "top" },
+    visible: { scaleY: 1, transformOrigin: "top" },
+    exit: { scaleY: 0, transformOrigin: "top" },
+  };
+
   const toggleDropdown = () => {
     if (!dropdownOpen && dropdownButtonRef.current) {
       const rect = dropdownButtonRef.current.getBoundingClientRect();
@@ -118,53 +125,52 @@ const TailorListPage = () => {
   };
 
   return (
-    <div className={`w-[100%] overflow-hidden mx-auto p-6 select-none`}>
-      <div
-        className={`mb-4 p-4 ${theme.mainTheme} border-b ${theme.colorBorder} rounded-lg`}
-      >
+    <div className={`w-full overflow-hidden mx-auto p-6 select-none`}>
+      <div className={`mb-4 p-4 ${theme.mainTheme} rounded-lg`}>
         <h2 className={`text-2xl font-bold mb-6 ${theme.colorText}`}>
           All Registered Tailors
         </h2>
-        <div
-          className={`w-full shadow-md flex justify-between items-center relative`}
-        >
+        <div className={`w-full flex justify-between items-center relative`}>
           <div className="relative" ref={dropdownButtonRef}>
-            <button
-              className={`px-4 py-2 rounded-lg border ${theme.colorBorder} ${theme.colorText} bg-${theme.buttonBg} hover:bg-${theme.buttonHoverBg}`}
+            <SimpleButton
+              type={"simple"}
+              btnText={`Sort by: ${filters.sortBy}`}
+              extraclasses={`px-4 py-2 border font-semibold ${theme.colorBorder}`}
               onClick={toggleDropdown}
-            >
-              Sort by: {filters.sortBy}
-            </button>
+            />
           </div>
-          <button
-            className={`px-4 py-2 rounded-lg border ${theme.colorBorder} text-white bg-${theme.buttonBg} hover:bg-${theme.buttonHoverBg}`}
-            onClick={applyFilters}
-          >
-            Apply
-          </button>
         </div>
       </div>
       <div
-        className={`mt-4 rounded-xl z-0 overflow-hidden p-6 ${theme.mainTheme}`}
+        className={`mt-4 rounded-lg z-0 overflow-hidden p-6 ${theme.mainTheme}`}
       >
         {loading ? (
           <div className="flex justify-center items-center h-40">
-            <PropagateLoader color="blue" />
+            <PropagateLoader color="#1976d2" />
           </div>
         ) : (
           tailorList.map((tailor, index) => (
             <div
               key={index}
-              className={`cursor-pointer hover:border-yellow-500 relative flex items-center justify-between p-4 mb-4 border rounded-md ${theme.colorBorder}`}
+              className={`cursor-pointer relative flex items-center justify-between p-4 mb-4 rounded-lg border transition-all duration-300 transform hover:scale-[1.01] ${theme.hoverShadow} ${theme.colorBorder}`}
             >
               <div className="flex items-center space-x-4">
                 <img
-                  src={
-                    tailor.businessPictureUrl || "/images/profile/default.jpg"
-                  }
-                  className="w-32 h-20 object-cover rounded-lg"
+                  src={tailor.businessPictureUrl}
+                  className="w-32 h-24 object-cover rounded-lg"
                   alt={tailor.businessName}
+                  onError={(e) => {
+                    if (!e.target.dataset.fallback) {
+                      e.target.dataset.fallback = true; // Mark that fallback is being used
+                      e.target.src = "/images/profile/business/default.png";
+                    } else {
+                      console.error(
+                        "Both original and default business images failed to load."
+                      );
+                    }
+                  }}
                 />
+
                 <div className="flex flex-col">
                   <h3 className={`text-lg font-bold ${theme.colorText}`}>
                     {tailor.businessName}
@@ -172,7 +178,7 @@ const TailorListPage = () => {
                       ({tailor.openTime} - {tailor.closeTime})
                     </span>
                   </h3>
-                  <span className="text-yellow-500 text-sm">
+                  <span className="text-yellow-600 text-sm">
                     {"★".repeat(Math.floor(tailor.rating))}{" "}
                     {"☆".repeat(5 - Math.floor(tailor.rating))}
                   </span>
@@ -180,7 +186,7 @@ const TailorListPage = () => {
               </div>
               <div className="flex justify-center items-center">
                 <span
-                  className=" text-yellow-500 font-bold text-sm px-2 py-3"
+                  className="text-yellow-600 font-bold text-sm px-2 py-3 bg-gray-200 rounded-full shadow-md"
                   style={{
                     minWidth: "40px",
                     textAlign: "center",
@@ -193,17 +199,22 @@ const TailorListPage = () => {
           ))
         )}
       </div>
-      {dropdownOpen &&
-        createPortal(
-          <div
+      <AnimatePresence>
+        {dropdownOpen && (
+          <motion.div
             ref={dropdownRef}
-            className={`absolute p-4 w-auto ${theme.mainTheme} text-${theme.colorText} rounded-md shadow-lg border ${theme.colorBorder}`}
+            className={`absolute mt-1 p-4 w-auto ${theme.mainTheme} text-${theme.colorText} rounded-md shadow-lg border ${theme.colorBorder}`}
             style={{
               top: dropdownPosition.top,
               left: dropdownPosition.left,
               zIndex: 1000,
               width: "fit-content",
             }}
+            initial="hidden"
+            animate={dropdownOpen ? "visible" : "hidden"}
+            exit="exit"
+            variants={dropdownVariants}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
           >
             <div className="relative min-w-[18rem] mb-4">
               <h3 className="font-bold text-lg mb-2">Select Filters</h3>
@@ -214,8 +225,8 @@ const TailorListPage = () => {
                     onClick={() => handleChange(speciality)}
                     className={`p-2 border rounded-lg cursor-pointer ${
                       specialityFilter.includes(speciality)
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-600"
+                        ? "bg-blue-500"
+                        : `bg-gray-600 ${theme.hoverBg}`
                     }`}
                   >
                     {specialityFilter.includes(speciality) && (
@@ -226,9 +237,15 @@ const TailorListPage = () => {
                 ))}
               </div>
             </div>
-          </div>,
-          document.body
+            <SimpleButton
+              type={"simple"}
+              btnText={"Apply Filters"}
+              extraclasses={`px-4 py-2 rounded-lg`}
+              onClick={applyFilters}
+            />
+          </motion.div>
         )}
+      </AnimatePresence>
     </div>
   );
 };

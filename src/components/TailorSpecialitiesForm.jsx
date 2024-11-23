@@ -272,8 +272,8 @@ const TailorSpecialitiesForm = ({
                   }
                   className={`p-2 border rounded-lg cursor-pointer ${
                     specialitiesData.specialities.includes(speciality)
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-600"
+                      ? "bg-blue-500"
+                      : `bg-gray-600 ${theme.hoverBg}`
                   }`}
                 >
                   {specialitiesData.specialities.includes(speciality) && (
