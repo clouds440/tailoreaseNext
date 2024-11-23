@@ -5,6 +5,7 @@ import TailorSpecialitiesForm from "@/components/TailorSpecialitiesForm";
 import ProgressBar from "@/components/ProgressBar";
 import UserContext from "@/utils/UserContext";
 import { ClipLoader } from "react-spinners";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -28,32 +29,42 @@ const BecomeTailor = () => {
     useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({});
+  const [disableResendButton, setDisableResendButton] = useState(false);
   const router = useRouter();
 
   const [hasBusinessAccount, setHasBusinessAccount] = useState(null);
 
   useEffect(() => {
     const checkBusinessAccount = async () => {
-      if (!userLoggedIn) {
+      if (!userLoggedIn || !userData?.uid) {
         router.push("/signup");
-        return;
-      } // Exit if userData or uid is not available
+        return; // Exit if the user is not logged in or `uid` is not available
+      }
 
       try {
+        // Query to find a tailor document with ownerId matching the user UID
         const userQuery = query(
-          collection(db, "users"),
-          where("uid", "==", userData.uid)
+          collection(db, "tailors"),
+          where("ownerId", "==", userData.uid)
         );
         const querySnapshot = await getDocs(userQuery);
 
-        const docId = querySnapshot.docs[0].id;
-        const userDocRef = doc(db, "users", docId);
-        const userDocSnap = await getDoc(userDocRef);
+        if (!querySnapshot.empty) {
+          // Get the first matching tailor document
+          const tailorDoc = querySnapshot.docs[0];
+          const { approved } = tailorDoc.data();
 
-        if (userDocSnap.exists() && userDocSnap.data().bId) {
-          setHasBusinessAccount(true); // User has a business account
+          // Update state with `approved` value and existence flag
+          setHasBusinessAccount({
+            approved: approved || false, // Use `false` as a default if `approved` is undefined
+            exists: true,
+          });
         } else {
-          setHasBusinessAccount(false); // No business account found
+          // No tailor document found for this ownerId
+          setHasBusinessAccount({
+            approved: false,
+            exists: false,
+          });
         }
       } catch (error) {
         console.error("Error checking business account:", error);
@@ -163,6 +174,28 @@ const BecomeTailor = () => {
     }
   };
 
+  const handleResendEmail = async () => {
+    try {
+      setIsLoading(true);
+      setDisableResendButton(true);
+      await sendEmailVerification(auth.currentUser);
+      setShowMessage({
+        type: "success",
+        message:
+          "A verification email has been sent. Please verify to activate your business account.",
+      });
+      setPopUpMessageTrigger(true);
+    } catch (error) {
+      setShowMessage({
+        type: "error",
+        message: "Couldn't set verification email: " + error,
+      });
+      setPopUpMessageTrigger(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (hasBusinessAccount === null) {
     return (
       <div className="flex justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30">
@@ -171,23 +204,44 @@ const BecomeTailor = () => {
     ); // Loading indicator while checking
   }
 
-  return hasBusinessAccount ? (
-    <div className="flex flex-col justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30">
-      <div className="text-white max-w-xl mb-4 flex flex-col items-center text-center">
-        <span className="text-2xl">You already have a business account!</span>
-        <span>
-          If you don't see your business dashboard, please check your email for
-          a confirmation email from TailorEase.
-        </span>
+  return hasBusinessAccount.exists ? (
+    !hasBusinessAccount.approved ? (
+      <div className="flex flex-col justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30">
+        <div className="text-white max-w-xl mb-4 flex flex-col items-center text-center">
+          <span className="text-2xl">You already have a business account!</span>
+          <span>
+            If you don't see your business dashboard, please check your email
+            for a confirmation email from TailorEase.
+          </span>
+        </div>
+        <div className="flex space-x-3">
+          <Link href={"/"}>
+            <SimpleButton
+              btnText={"Go home"}
+              type={"primary"}
+              extraclasses={"py-3 px-8 text-xl"}
+            />
+          </Link>
+          <SimpleButton
+            btnText={
+              isLoading ? (
+                <LoadingSpinner size={26} />
+              ) : (
+                "Resend confirmation Email"
+              )
+            }
+            type={"primary"}
+            extraclasses={"py-3 px-8 text-xl min-w-[298px]"}
+            onClick={handleResendEmail}
+            disabled={disableResendButton}
+          />
+        </div>
       </div>
-      <Link href={"/"}>
-        <SimpleButton
-          btnText={"Go home"}
-          type={"primary"}
-          extraclasses={"py-3 px-8 text-xl"}
-        />
-      </Link>
-    </div>
+    ) : (
+      <div className="items-center justify-center text-3xl text-white flex h-full">
+        Your business dashboard is not ready
+      </div>
+    )
   ) : (
     <div className="h-full relative overflow-y-auto overflow-x-hidden">
       <ProgressBar steps={3} currentStep={step} stepNames={stepNames} />
