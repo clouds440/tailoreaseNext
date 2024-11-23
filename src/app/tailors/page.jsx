@@ -11,7 +11,6 @@ import { AnimatePresence, motion } from "framer-motion";
 const TailorListPage = () => {
   const { theme } = useContext(UserContext);
 
-  // Specialities filter options
   const specialities = [
     "Men Specialist",
     "Women Specialist",
@@ -21,7 +20,6 @@ const TailorListPage = () => {
     "Other",
   ];
 
-  // State for filters and dropdowns
   const [filters, setFilters] = useState({
     sortBy: "Top Rated",
     showCount: 60,
@@ -43,40 +41,43 @@ const TailorListPage = () => {
       const tailorCollectionRef = collection(db, "tailors");
       let q = query(tailorCollectionRef);
 
-      // Match all selected specialities
+      const querySnapshot = await getDocs(q);
+      let tailors = querySnapshot.docs.map((doc) => doc.data());
+
       if (appliedFilters.length > 0) {
-        q = query(
-          tailorCollectionRef,
-          where("specialities", "array-contains-any", appliedFilters)
+        tailors = tailors.filter((tailor) =>
+          appliedFilters.every((filter) => tailor.specialities.includes(filter))
         );
-
-        const querySnapshot = await getDocs(q);
-        const filteredTailors = querySnapshot.docs
-          .map((doc) => doc.data())
-          .filter((tailor) =>
-            appliedFilters.every((filter) =>
-              tailor.specialities.includes(filter)
-            )
-          );
-
-        setTailorList(filteredTailors);
-      } else {
-        const querySnapshot = await getDocs(q);
-        const tailors = querySnapshot.docs.map((doc) => doc.data());
-        setTailorList(tailors);
       }
+
+      const processedTailors = tailors.map((tailor) => {
+        let rating = tailor.rating || 0;
+        if (rating < 0) rating = 0;
+        const totalRanking = tailor.total_ranking || 5;
+
+        const normalizedRating = (rating / totalRanking) * 5;
+
+        return {
+          ...tailor,
+          normalizedRating,
+        };
+      });
+
+      const sortedTailors = processedTailors.sort(
+        (a, b) => b.normalizedRating - a.normalizedRating
+      );
+
+      setTailorList(sortedTailors);
     } catch (error) {
       console.error("Error fetching tailors:", error);
     }
     setLoading(false);
   };
 
-  // Initial fetch and when filters change
   useEffect(() => {
     fetchTailors();
   }, [appliedFilters]);
 
-  // Dropdown outside click
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (
@@ -161,12 +162,8 @@ const TailorListPage = () => {
                   alt={tailor.businessName}
                   onError={(e) => {
                     if (!e.target.dataset.fallback) {
-                      e.target.dataset.fallback = true; // Mark that fallback is being used
+                      e.target.dataset.fallback = true;
                       e.target.src = "/images/profile/business/default.png";
-                    } else {
-                      console.error(
-                        "Both original and default business images failed to load."
-                      );
                     }
                   }}
                 />
@@ -178,9 +175,9 @@ const TailorListPage = () => {
                       ({tailor.openTime} - {tailor.closeTime})
                     </span>
                   </h3>
-                  <span className="text-yellow-600 text-lg">
-                    {"★".repeat(Math.floor(tailor.rating))}
-                    {"☆".repeat(5 - Math.floor(tailor.rating))}
+                  <span className="text-yellow-600 text-sm">
+                    {"★".repeat(Math.floor(tailor.normalizedRating))}{" "}
+                    {"☆".repeat(5 - Math.floor(tailor.normalizedRating))}
                   </span>
                 </div>
               </div>
