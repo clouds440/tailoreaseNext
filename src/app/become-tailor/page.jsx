@@ -13,7 +13,6 @@ import {
   auth,
   collection,
   query,
-  getDoc,
   where,
   getDocs,
   addDoc,
@@ -53,6 +52,19 @@ const BecomeTailor = () => {
           // Get the first matching tailor document
           const tailorDoc = querySnapshot.docs[0];
           const { approved } = tailorDoc.data();
+
+          const tailorDocId = querySnapshot.docs[0].id;
+          const tailorRef = doc(db, "tailors", tailorDocId);
+
+          if (!approved && auth.currentUser.emailVerified) {
+            // If not approved and email is verified, update `approved` to true
+            await updateDoc(tailorRef, { approved: true });
+            setHasBusinessAccount({
+              approved: true,
+              exists: true,
+            });
+            return;
+          }
 
           // Update state with `approved` value and existence flag
           setHasBusinessAccount({
@@ -187,7 +199,7 @@ const BecomeTailor = () => {
       setPopUpMessageTrigger(true);
     } catch (error) {
       setShowMessage({
-        type: "error",
+        type: "danger",
         message: "Couldn't set verification email: " + error,
       });
       setPopUpMessageTrigger(true);
@@ -217,9 +229,9 @@ const BecomeTailor = () => {
         <div className="flex space-x-3">
           <Link href={"/"}>
             <SimpleButton
-              btnText={"Go home"}
+              btnText={"Go Home"}
               type={"primary"}
-              extraclasses={"py-3 px-8 text-xl"}
+              extraclasses={"py-2 px-5 text-xl"}
             />
           </Link>
           <SimpleButton
@@ -227,11 +239,11 @@ const BecomeTailor = () => {
               isLoading ? (
                 <LoadingSpinner size={26} />
               ) : (
-                "Resend confirmation Email"
+                "Resend Confirmation Email"
               )
             }
             type={"primary"}
-            extraclasses={"py-3 px-8 text-xl min-w-[298px]"}
+            extraclasses={"py-2 px-5 text-xl min-w-[298px]"}
             onClick={handleResendEmail}
             disabled={disableResendButton}
           />

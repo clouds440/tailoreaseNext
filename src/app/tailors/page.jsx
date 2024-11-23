@@ -178,8 +178,8 @@ const TailorListPage = () => {
                       ({tailor.openTime} - {tailor.closeTime})
                     </span>
                   </h3>
-                  <span className="text-yellow-600 text-sm">
-                    {"★".repeat(Math.floor(tailor.rating))}{" "}
+                  <span className="text-yellow-600 text-lg">
+                    {"★".repeat(Math.floor(tailor.rating))}
                     {"☆".repeat(5 - Math.floor(tailor.rating))}
                   </span>
                 </div>
