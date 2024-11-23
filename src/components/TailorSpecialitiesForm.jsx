@@ -277,7 +277,9 @@ const TailorSpecialitiesForm = ({
                   }`}
                 >
                   {specialitiesData.specialities.includes(speciality) && (
-                    <span className="text-green-500 mr-2">✔</span>
+                    <span className="text-green-500 absolute -translate-y-4 -translate-x-3">
+                      ✔
+                    </span>
                   )}
                   {speciality}
                 </div>
