@@ -25,6 +25,8 @@ const LoginForm = () => {
     setUserLoggedIn,
     setShowMessage,
     setPopUpMessageTrigger,
+    inputStyles,
+    placeHolderStyles,
   } = useContext(UserContext);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
@@ -122,8 +124,6 @@ const LoginForm = () => {
       setIsResetLoading(false);
     }
   };
-
-  const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   useEffect(() => {
     if (userLoggedIn) {

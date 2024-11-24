@@ -14,8 +14,13 @@ function ChangePasswordModal({
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { theme, setShowMessage, setPopUpMessageTrigger } =
-    useContext(UserContext);
+  const {
+    theme,
+    setShowMessage,
+    setPopUpMessageTrigger,
+    inputStyles,
+    placeHolderStyles,
+  } = useContext(UserContext);
   const [isVisible, setIsVisible] = useState(isPasswordModalOpen);
   useEffect(() => {
     setIsVisible(isPasswordModalOpen);
@@ -89,8 +94,6 @@ function ChangePasswordModal({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleClose]);
-
-  const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
     <AnimatePresence>

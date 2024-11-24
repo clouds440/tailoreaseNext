@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <>
       <div
-        className={`max-w-[97%] p-6 mx-auto my-4 border rounded-3xl flex flex-col items-center overflow-hidden select-none ${theme.mainTheme} ${theme.colorBorder}`}
+        className={`max-w-[97%] p-6 mx-auto my-4 rounded-3xl flex flex-col items-center overflow-hidden select-none ${theme.mainTheme}`}
       >
         {/* Top Section */}
         <div

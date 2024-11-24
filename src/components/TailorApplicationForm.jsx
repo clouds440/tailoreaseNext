@@ -11,8 +11,13 @@ const TailorApplicationForm = ({ onNext }) => {
     description: "",
   });
 
-  const { theme, setShowMessage, setPopUpMessageTrigger } =
-    useContext(UserContext);
+  const {
+    theme,
+    setShowMessage,
+    setPopUpMessageTrigger,
+    inputStyles,
+    placeHolderStyles,
+  } = useContext(UserContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,8 +70,6 @@ const TailorApplicationForm = ({ onNext }) => {
     }
     onNext(formData); // Pass form data to the next component
   };
-
-  const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
     <div className="flex items-center justify-center mt-4 max-w-2xl w-auto mx-auto p-6 rounded-md select-none">

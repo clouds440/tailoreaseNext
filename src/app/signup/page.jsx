@@ -21,6 +21,8 @@ const SignUpForm = () => {
     setUserLoggedIn,
     setShowMessage,
     setPopUpMessageTrigger,
+    inputStyles,
+    placeHolderStyles,
   } = useContext(UserContext);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -128,8 +130,6 @@ const SignUpForm = () => {
       setIsLoading(false);
     }
   };
-
-  const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   useEffect(() => {
     if (userLoggedIn) {

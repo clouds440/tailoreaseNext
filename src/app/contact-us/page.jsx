@@ -6,16 +6,21 @@ import SimpleButton from "@/components/SimpleButton";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const ContactUs = () => {
-  const { theme, setShowMessage, setPopUpMessageTrigger, userData } =
-    useContext(UserContext);
+  const {
+    theme,
+    setShowMessage,
+    setPopUpMessageTrigger,
+    userData,
+    inputStyles,
+    placeHolderStyles,
+  } = useContext(UserContext);
   const [formData, setFormData] = useState({
     name: userData?.fullName ? userData.fullName : "",
     email: userData?.email ? userData.email : "",
     message: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { inputStyles, placeHolderStyles } = useContext(UserContext);
+  const {} = useContext(UserContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -69,11 +74,11 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="w-[85%] h-[80%] flex-grow mx-auto mt-8 rounded-xl border border-gray-300">
+    <div className="w-[95%] h-auto flex-grow mx-auto mt-8 rounded-xl">
       <div className="flex flex-col h-full rounded-xl md:flex-row">
         {/* Left Section */}
         <div
-          className={`w-full md:w-1/2 p-6 ${theme.mainTheme} flex flex-col items-start justify-center border-b md:border-b-0 md:border-r border-gray-300 rounded-l-xl`}
+          className={`w-full md:w-1/2 p-6 ${theme.mainTheme} flex flex-col items-start border-b md:border-b-0 md:border-r ${theme.colorBorder} rounded-t-xl md:rounded-tr-none md:rounded-l-xl`}
         >
           <h2 className={`text-3xl text-${theme.themeColor} font-bold mb-4`}>
             Get in Touch
@@ -142,7 +147,9 @@ const ContactUs = () => {
         </div>
 
         {/* Right Section (Form) */}
-        <div className={`w-full md:w-1/2 p-6 rounded-r-xl ${theme.mainTheme}`}>
+        <div
+          className={`w-full md:w-1/2 p-6 rounded-b-xl md:rounded-bl-none md:rounded-r-xl ${theme.mainTheme}`}
+        >
           <h2 className={`text-xl text-${theme.themeColor} font-bold mb-4`}>
             Contact Us
           </h2>

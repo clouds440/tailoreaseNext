@@ -14,8 +14,13 @@ function EditFieldModal({
   modalInfo,
 }) {
   const [inputValue, setInputValue] = useState(value);
-  const { theme, setShowMessage, setPopUpMessageTrigger } =
-    useContext(UserContext);
+  const {
+    theme,
+    setShowMessage,
+    setPopUpMessageTrigger,
+    inputStyles,
+    placeHolderStyles,
+  } = useContext(UserContext);
   const [isVisible, setIsVisible] = useState(modalInfo.isOpen);
   useEffect(() => {
     setIsVisible(modalInfo.isOpen);
@@ -85,8 +90,6 @@ function EditFieldModal({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleClose]);
-
-  const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
     <AnimatePresence>

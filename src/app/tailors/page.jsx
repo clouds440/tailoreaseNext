@@ -176,7 +176,7 @@ const TailorListPage = () => {
                     </span>
                   </h3>
                   <span className="text-yellow-600 text-sm">
-                    {"★".repeat(Math.floor(tailor.normalizedRating))}{" "}
+                    {"★".repeat(Math.floor(tailor.normalizedRating))}
                     {"☆".repeat(5 - Math.floor(tailor.normalizedRating))}
                   </span>
                 </div>

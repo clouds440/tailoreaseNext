@@ -19,8 +19,13 @@ const TailorSpecialitiesForm = ({
     openTime: "",
     closeTime: "",
   });
-  const { theme, setShowMessage, setPopUpMessageTrigger } =
-    useContext(UserContext);
+  const {
+    theme,
+    setShowMessage,
+    setPopUpMessageTrigger,
+    inputStyles,
+    placeHolderStyles,
+  } = useContext(UserContext);
   const [previewImage, setPreviewImage] = useState(null);
 
   const handleChange = async (e) => {
@@ -138,8 +143,6 @@ const TailorSpecialitiesForm = ({
       setPreviewImage(URL.createObjectURL(file));
     }
   };
-
-  const { inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
     <div className="flex items-center justify-center mt-4 max-w-2xl w-auto mx-auto p-6 rounded-md select-none">
