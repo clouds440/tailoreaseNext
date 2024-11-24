@@ -7,9 +7,11 @@ import { PropagateLoader } from "react-spinners";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "@/components/SimpleButton";
 import { AnimatePresence, motion } from "framer-motion";
+import QuickView from "../../components/QuickView";
 
 const TailorListPage = () => {
   const { theme } = useContext(UserContext);
+  
 
   const specialities = [
     "Men Specialist",
@@ -35,6 +37,19 @@ const TailorListPage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [selectedTailor, setSelectedTailor] = useState(null);
+
+  const handleTailorClick = (tailor) => {
+    setSelectedTailor(tailor);
+    setPopupVisible(true);
+  };
+
+  const closePopup = () => {
+    setPopupVisible(false);
+    setSelectedTailor(null);
+  };
+
   const fetchTailors = async () => {
     setLoading(true);
     try {
@@ -50,22 +65,43 @@ const TailorListPage = () => {
         );
       }
 
+      // Compute global average and minimum reviews for Bayesian method
+      const allRatings = tailors.map((tailor) => tailor.rating || 0);
+      const globalAverageRating =
+        allRatings.length > 0
+          ? allRatings.reduce((sum, rating) => sum + rating, 0) /
+            allRatings.length
+          : 0;
+
+      const minReviews = 10;
+
       const processedTailors = tailors.map((tailor) => {
         let rating = tailor.rating || 0;
         if (rating < 0) rating = 0;
-        const totalRanking = tailor.total_ranking || 5;
 
-        const normalizedRating = (rating / totalRanking) * 5;
+        const totalRatings = tailor.total_rating || 6;
+        const numberOfReviews = totalRatings / 6;
+
+        const normalizedRating = (rating / totalRatings) * 5;
+
+        // Bayesian average ranking score
+        const bayesianScore =
+          (rating * numberOfReviews + globalAverageRating * minReviews) /
+          (numberOfReviews + minReviews);
 
         return {
           ...tailor,
           normalizedRating,
+          bayesianScore,
         };
       });
 
-      const sortedTailors = processedTailors.sort(
-        (a, b) => b.normalizedRating - a.normalizedRating
-      );
+      const sortedTailors = processedTailors.sort((a, b) => {
+        if (b.bayesianScore !== a.bayesianScore) {
+          return b.bayesianScore - a.bayesianScore;
+        }
+        return b.normalizedRating - a.normalizedRating;
+      });
 
       setTailorList(sortedTailors);
     } catch (error) {
@@ -154,6 +190,7 @@ const TailorListPage = () => {
             <div
               key={index}
               className={`cursor-pointer relative flex items-center justify-between p-4 mb-4 rounded-lg border transition-all duration-300 transform hover:scale-[1.01] ${theme.hoverShadow} ${theme.colorBorder}`}
+              onClick={() => handleTailorClick(tailor)} // Trigger popup
             >
               <div className="flex items-center space-x-4">
                 <img
@@ -167,7 +204,6 @@ const TailorListPage = () => {
                     }
                   }}
                 />
-
                 <div className="flex flex-col">
                   <h3 className={`text-lg font-bold ${theme.colorText}`}>
                     {tailor.businessName}
@@ -196,6 +232,10 @@ const TailorListPage = () => {
           ))
         )}
       </div>
+
+      {popupVisible && (
+        <QuickView theme={theme} tailor={selectedTailor} onClose={closePopup} />
+      )}
       <AnimatePresence>
         {dropdownOpen && (
           <motion.div
