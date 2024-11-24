@@ -142,9 +142,11 @@ const BecomeTailor = () => {
       const tailorsRef = collection(db, "tailors");
       const tailorDocRef = await addDoc(tailorsRef, {
         ...dataWithoutPicture,
-        businessPictureUrl: businessPictureUrl, // change this to the local image url and unique name
+        businessPictureUrl: businessPictureUrl,
         approved: false,
         ownerId: userData.uid,
+        rating: 0,
+        total_rating: 0,
       });
 
       // Get the newly created document ID
