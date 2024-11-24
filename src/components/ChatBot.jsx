@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { SyncLoader } from "react-spinners";
 import UserContext from "@/utils/UserContext";
 import { ShiftingBounceLoader } from "./LoadingSpinner";
+import axios from "axios";
 
 const ChatBot = () => {
   const { theme } = useContext(UserContext);
@@ -17,7 +18,37 @@ const ChatBot = () => {
   const chatBoxRef = useRef(null);
   const messagesEndRef = useRef(null);
 
-  const handleSendMessage = () => {
+  const generateResponse = async (userInput) => {
+    const apiKey = "AIzaSyD7GNyhfLL0sHivNLaJbLHjmA9FNc_ltMw";
+    const endpoint =
+      "https://generativelanguage.googleapis.com/v1beta/models/tunedModels/tailorease-9xsolh78gt2a:generateContent";
+
+    const payload = {
+      contents: [
+        {
+          parts: [{ text: userInput }],
+        },
+      ],
+    };
+
+    try {
+      const response = await fetch(`${endpoint}?key=${apiKey}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error communicating with AI:", error);
+      return null;
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage = { text: input, sender: "user" };
@@ -26,18 +57,15 @@ const ChatBot = () => {
 
     setIsTyping(true);
 
-    setTimeout(() => {
-      let botResponse = input.toLowerCase().includes("out of the box")
-        ? "Sorry, I am not allowed to answer out of the box."
-        : "Hello, how can I help you today?";
+    const botResponseData = await generateResponse(input);
 
-      if (!botResponse) {
-        botResponse = "I'm sorry, I didn't quite catch that.";
-      }
+    // Check if the response contains the expected structure
+    const botResponse =
+      botResponseData?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "I'm sorry, I didn't quite catch that."; // Fallback message
 
-      setIsTyping(false);
-      animateBotMessage(botResponse);
-    }, 2000);
+    setIsTyping(false);
+    animateBotMessage(botResponse);
   };
 
   const animateBotMessage = (text) => {
@@ -58,7 +86,7 @@ const ChatBot = () => {
         setMessages((prev) => [...prev, { text, sender: "bot" }]);
         setAnimatedMessage("");
       }
-    }, 200);
+    }, 50);
   };
 
   const handleClickOutside = (e) => {
@@ -133,7 +161,7 @@ const ChatBot = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className={`fixed bottom-[6rem] right-8 w-80 max-w-full h-[400px] bg-white rounded-lg shadow-lg flex flex-col z-[99999] ${theme.mainTheme} ${theme.colorBorder}`}
+            className={`fixed bottom-[6rem] right-8 w-[340px] max-w-full h-[510px] bg-white rounded-lg shadow-lg flex flex-col z-[99999] ${theme.mainTheme} ${theme.colorBorder}`}
             ref={chatBoxRef}
             variants={chatBoxVariants}
             initial="hidden"
