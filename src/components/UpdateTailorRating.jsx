@@ -83,7 +83,7 @@ const UpdateTailorRating = async ({
       });
 
       setStatusMessage({
-        type: "sucess",
+        type: "success",
         message: "Review added successfully",
       });
     } else {
