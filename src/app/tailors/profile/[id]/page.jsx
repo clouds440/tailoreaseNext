@@ -7,14 +7,16 @@ import { ClipLoader } from "react-spinners";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SimpleButton from "@/components/SimpleButton";
 import UserContext from "../../../../utils/UserContext";
+import { useRouter } from "next/navigation";
 
 const TailorProfile = () => {
   const [tailorData, setTailorData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Set initial loading state to true
   const [review, setReview] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const db = getFirestore();
-  const { theme, inputStyles, placeHolderStyles } = useContext(UserContext);
+  const router = useRouter();
+  const { theme, userLoggedIn, userData  } = useContext(UserContext);
   const { id } = useParams();
 
   useEffect(() => {
@@ -31,24 +33,52 @@ const TailorProfile = () => {
       } catch (error) {
         console.error("Error fetching tailor data:", error);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Stop loading once data is fetched or an error occurs
       }
     };
 
     fetchTailorData();
   }, [id]);
 
-  const handleReviewSubmit = () => {
-    setIsSubmitting(true);
-    console.log("Review submitted:", review);
-    setTimeout(() => {
+  const handleReviewSubmit = async () => {
+    if (!userLoggedIn) {
+      router.push("/login");
+      return;
+    }
+
+    // User is logged in; proceed with review submission
+    const userId = userData.uid;
+
+    try {
+      setIsSubmitting(true);
+      console.log("Submitting review with userId:", userId);
+
+      // Mock API call or Firebase logic for submitting the review
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call delay
+
+      alert("Review submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      alert("Failed to submit review. Please try again later.");
+    } finally {
       setIsSubmitting(false);
-      setReview("");
-    }, 2000);
+    }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-700 backdrop-blur-md bg-opacity-30">
+        <ClipLoader size={60} color="#ffffff" />
+      </div>
+    );
+  }
+
   if (!tailorData) {
-    return <div>No tailor data found.</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        No tailor data found.
+      </div>
+    );
   }
 
   const rating = tailorData?.rating || 0;
@@ -58,17 +88,24 @@ const TailorProfile = () => {
   const numberOfReviews = totalRating > 0 ? Math.floor(totalRating / 6) : 0;
 
   return (
-    <div className={`max-w-[97%] mx-auto my-2 rounded-xl overflow-hidden ${theme.colorBorder} p-12 ${theme.mainTheme}`}>
+    <div
+      className={`max-w-[97%] mx-auto my-2 rounded-xl overflow-hidden ${theme.colorBorder} p-12 ${theme.mainTheme}`}
+    >
       <div>
         <div className="flex flex-col sm:flex-row items-center space-x-6 mb-6">
           <img
-            src={"../../" + tailorData.businessPictureUrl || "/images/profile/business/default.png"}
+            src={
+              "../../" + tailorData.businessPictureUrl ||
+              "/images/profile/business/default.png"
+            }
             alt={tailorData.businessName}
             className="w-[16rem] h-[10rem] object-cover rounded-lg shadow-md"
           />
           <div className="flex w-full flex-col mt-4 sm:mt-0">
             <div className="flex w-full justify-between items-center mb-6">
-              <h1 className={`border-b-[1px] pb-1 w-full text-3xl font-bold ${theme.colorText}`}>
+              <h1
+                className={`border-b-[1px] pb-1 w-full text-3xl font-bold ${theme.colorText}`}
+              >
                 {tailorData.businessName}
               </h1>
             </div>
@@ -85,7 +122,9 @@ const TailorProfile = () => {
         </div>
 
         <div className="mb-6">
-          <p className={`text-xl mb-2 border-b-[1px] pb-1 font-semibold ${theme.colorText}`}>
+          <p
+            className={`text-xl mb-2 border-b-[1px] pb-1 font-semibold ${theme.colorText}`}
+          >
             Description
           </p>
           <p className={`text-lg ${theme.colorText}`}>
@@ -143,7 +182,9 @@ const TailorProfile = () => {
             rows={4}
           />
           <SimpleButton
-            btnText={isSubmitting ? <LoadingSpinner size={24} /> : "Submit Review"}
+            btnText={
+              isSubmitting ? <LoadingSpinner size={24} /> : "Submit Review"
+            }
             type="primary-submit"
             extraclasses={"w-full"}
             disabled={isSubmitting}
