@@ -11,7 +11,6 @@ import QuickView from "../../components/QuickView";
 
 const TailorListPage = () => {
   const { theme } = useContext(UserContext);
-  
 
   const specialities = [
     "Men Specialist",
@@ -57,7 +56,12 @@ const TailorListPage = () => {
       let q = query(tailorCollectionRef);
 
       const querySnapshot = await getDocs(q);
-      let tailors = querySnapshot.docs.map((doc) => doc.data());
+
+      // Include the document ID along with the data
+      let tailors = querySnapshot.docs.map((doc) => ({
+        id: doc.id, // Document ID
+        ...doc.data(), // Document data
+      }));
 
       if (appliedFilters.length > 0) {
         tailors = tailors.filter((tailor) =>

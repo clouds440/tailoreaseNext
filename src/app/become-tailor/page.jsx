@@ -135,7 +135,7 @@ const BecomeTailor = () => {
         }
 
         const { url } = await response.json();
-        businessPictureUrl = url; // Public URL of the uploaded image
+        businessPictureUrl = "/" + url; // Public URL of the uploaded image
       }
 
       // 2. Add business details to the "tailors" collection in Firestore
