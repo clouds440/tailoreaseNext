@@ -120,7 +120,7 @@ Yes, you can reschedule or cancel an order through your account. Simply navigate
           parts: [
             {
               text:
-                "You're an AI assistant for a website called TailorEase. Please use the following content of the website so you can answer user questions accordingly. And DONOT respond anything outside the scope of this information. Content Link:" +
+                "You're an AI assistant for a website called TailorEase. Please use the following content of the website so you can answer user questions accordingly. And DONOT respond anything outside the scope of this information. Content:" +
                 websiteContent +
                 "The user says: " +
                 userInput,
