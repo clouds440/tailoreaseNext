@@ -90,7 +90,7 @@ const DialogBox = ({
             className={`bg-black bg-opacity-70 fixed inset-0 rounded-3xl`}
           ></div>
           <motion.div
-            className={`bg-white rounded-xl shadow-lg w-11/12 max-w-md z-50 ${theme.mainTheme}`}
+            className={`rounded-xl shadow-lg w-11/12 max-w-md z-50 ${theme.mainTheme}`}
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.8 }}
