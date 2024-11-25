@@ -130,7 +130,7 @@ const TailorProfile = () => {
 
   return tailorData ? (
     <div
-      className={`max-w-[97%] mx-auto mt-8 my-2 rounded-xl overflow-hidden p-12 ${theme.mainTheme}`}
+      className={`max-w-[97%] mx-auto mt-8 my-2 rounded-xl overflow-hidden p-12 ${theme.mainTheme} ${theme.colorText}`}
     >
       <div className="flex flex-col sm:flex-row items-center space-x-6 mb-6">
         <img
@@ -146,13 +146,11 @@ const TailorProfile = () => {
         />
         <div className="flex w-full flex-col mt-4 sm:mt-0">
           <div className="flex w-full justify-between items-center mb-6">
-            <h1
-              className={`border-b-[1px] pb-1 w-full text-3xl font-bold ${theme.colorText}`}
-            >
+            <h1 className={`border-b-[1px] pb-1 w-full text-3xl font-bold `}>
               {tailorData.businessName}
             </h1>
           </div>
-          <p className={`text-lg ${theme.colorText}`}>
+          <p className={`text-lg `}>
             Experience:{" "}
             {tailorData.experience ? (
               tailorData.experience + " years"
@@ -160,66 +158,56 @@ const TailorProfile = () => {
               <i className="text-sm">Not specified</i>
             )}
           </p>
-          <p className={`text-lg ${theme.colorText}`}>
+          <p className={`text-lg `}>
             Working Hours: {tailorData.openTime} - {tailorData.closeTime}
           </p>
-          <p className={`text-lg ${theme.colorText}`}>
+          <p className={`text-lg `}>
             Address: {tailorData.businessAddress || "Not provided"}
           </p>
         </div>
       </div>
 
       <div className="mb-6">
-        <p
-          className={`text-xl mb-2 border-b-[1px] pb-1 font-semibold ${theme.colorText}`}
-        >
+        <p className={`text-xl mb-2 border-b-[1px] pb-1 font-semibold `}>
           Description
         </p>
-        <p className={`text-lg ${theme.colorText}`}>
+        <p className={`text-lg `}>
           {tailorData.description || <sub>No description available</sub>}
         </p>
       </div>
 
       <div className="mb-6">
-        <p className={`text-xl mb-2 pb-1 font-semibold ${theme.colorText}`}>
-          Specialties
-        </p>
+        <p className={`text-xl mb-2 pb-1 font-semibold `}>Specialties</p>
         <div className="flex flex-wrap gap-2">
           {tailorData.specialities?.length > 0 ? (
             tailorData.specialities.map((speciality, index) => (
               <span
                 key={index}
-                className={`px-4 py-2 rounded-lg text-sm ${theme.colorText} ${theme.mainTheme} ${theme.colorBorder}`}
+                className={`px-4 py-2 rounded-lg text-sm  ${theme.mainTheme} ${theme.colorBorder}`}
               >
                 {speciality}
               </span>
             ))
           ) : (
-            <span className={`${theme.colorText}`}>No specialties listed</span>
+            <span className={``}>No specialties listed</span>
           )}
         </div>
       </div>
 
       <div className="mb-6">
-        <p className={`text-xl font-semibold ${theme.colorText}`}>Rating</p>
+        <p className={`text-xl font-semibold `}>Rating</p>
         <div className="flex items-center space-x-2">
           <span className="text-yellow-500 font-bold text-xl">
             {"★".repeat(Math.floor(calculatedRating))}
             {"☆".repeat(5 - Math.floor(calculatedRating))}
           </span>
-          <span className={`text-sm ${theme.colorText}`}>
-            ({calculatedRating.toFixed(1)})
-          </span>
+          <span className={`text-sm `}>({calculatedRating.toFixed(1)})</span>
         </div>
-        <p className={`text-sm ${theme.colorText}`}>
-          Reviews: {numberOfReviews}
-        </p>
+        <p className={`text-sm `}>Reviews: {numberOfReviews}</p>
       </div>
 
       <div className="mb-6">
-        <p className={`text-xl font-semibold ${theme.colorText}`}>
-          Leave a Review
-        </p>
+        <p className={`text-xl font-semibold `}>Leave a Review</p>
 
         <div className="flex items-center space-x-2 my-2">
           {[...Array(5)].map((_, index) => (
@@ -241,7 +229,7 @@ const TailorProfile = () => {
             id="review"
             name="review"
             onChange={(e) => setReview(e.target.value)}
-            className={`${inputStyles} ${theme.colorText} rounded-sm min-h-[100px] max-h-[150px]`}
+            className={`${inputStyles}  rounded-sm min-h-[100px] max-h-[150px]`}
             rows={4}
             placeholder=""
           />
