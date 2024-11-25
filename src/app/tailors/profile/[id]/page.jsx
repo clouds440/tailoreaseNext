@@ -11,11 +11,12 @@ import Link from "next/link";
 
 const TailorProfile = () => {
   const [tailorData, setTailorData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Set initial loading state to true
   const [review, setReview] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const db = getFirestore();
-  const { theme, inputStyles, placeHolderStyles } = useContext(UserContext);
+  const router = useRouter();
+  const { theme, userLoggedIn, userData  } = useContext(UserContext);
   const { id } = useParams();
 
   useEffect(() => {
@@ -33,21 +34,45 @@ const TailorProfile = () => {
       } catch (error) {
         console.error("Error fetching tailor data:", error);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Stop loading once data is fetched or an error occurs
       }
     };
 
     fetchTailorData();
   }, [id]);
 
-  const handleReviewSubmit = () => {
-    setIsSubmitting(true);
-    console.log("Review submitted:", review);
-    setTimeout(() => {
+  const handleReviewSubmit = async () => {
+    if (!userLoggedIn) {
+      router.push("/login");
+      return;
+    }
+
+    // User is logged in; proceed with review submission
+    const userId = userData.uid;
+
+    try {
+      setIsSubmitting(true);
+      console.log("Submitting review with userId:", userId);
+
+      // Mock API call or Firebase logic for submitting the review
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call delay
+
+      alert("Review submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      alert("Failed to submit review. Please try again later.");
+    } finally {
       setIsSubmitting(false);
-      setReview("");
-    }, 2000);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-700 backdrop-blur-md bg-opacity-30">
+        <ClipLoader size={60} color="#ffffff" />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
