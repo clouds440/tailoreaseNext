@@ -1,21 +1,30 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { ClipLoader } from "react-spinners";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SimpleButton from "@/components/SimpleButton";
 import UserContext from "../../../../utils/UserContext";
 import Link from "next/link";
+import UpdateTailorRating from "@/components/UpdateTailorRating";
 
 const TailorProfile = () => {
   const [tailorData, setTailorData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [review, setReview] = useState("");
+  const [rating, setRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const db = getFirestore();
-  const { theme, inputStyles, placeHolderStyles } = useContext(UserContext);
+  const router = useRouter();
+  const {
+    theme,
+    userLoggedIn,
+    userData,
+    setShowMessage,
+    setPopUpMessageTrigger,
+  } = useContext(UserContext);
   const { id } = useParams();
 
   useEffect(() => {
@@ -28,7 +37,11 @@ const TailorProfile = () => {
         if (docSnap.exists()) {
           setTailorData(docSnap.data());
         } else {
-          console.log("No such document!");
+          setShowMessage({
+            type: "warning",
+            message: "No Such Tailor",
+          });
+          setPopUpMessageTrigger(true);
         }
       } catch (error) {
         console.error("Error fetching tailor data:", error);
@@ -40,26 +53,74 @@ const TailorProfile = () => {
     fetchTailorData();
   }, [id]);
 
-  const handleReviewSubmit = () => {
-    setIsSubmitting(true);
-    console.log("Review submitted:", review);
-    setTimeout(() => {
-      setIsSubmitting(false);
+  const handleReviewSubmit = async () => {
+    if (!userLoggedIn) {
+      router.push("/login");
+      return;
+    }
+
+    if (rating === 0) {
+      setShowMessage({
+        type: "warning",
+        message: "Please select a star rating",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+
+    if (review.split(" ").length < 5) {
+      setShowMessage({
+        type: "warning",
+        message: "Please write at least 5 words in the review",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+
+    const userId = userData.uid;
+
+    try {
+      setIsSubmitting(true);
+
+      const statusMessage = await UpdateTailorRating({
+        message: review,
+        stars: rating,
+        userId,
+        tailorId: id,
+      });
+
+      setShowMessage({
+        type: statusMessage.type || "success",
+        message: statusMessage.message || "Review submitted successfully",
+      });
+      setPopUpMessageTrigger(true);
+      setRating(0);
       setReview("");
-    }, 2000);
+
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      setShowMessage({
+        type: "error",
+        message: "Failed to submit review. Please try again later.",
+      });
+      setPopUpMessageTrigger(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30">
+      <div className="flex justify-center items-center h-screen bg-gray-700 backdrop-blur-md bg-opacity-30">
         <ClipLoader size={60} color="#ffffff" />
       </div>
-    ); // Loading indicator while checking
+    );
   }
 
-  const rating = tailorData?.rating || 0;
+  const ratingValue = tailorData?.rating || 0;
   const totalRating = tailorData?.total_rating || 0;
-  const calculatedRating = totalRating > 0 ? (rating / totalRating) * 5 : 0;
+  const calculatedRating =
+    totalRating > 0 ? (ratingValue / totalRating) * 5 : 0;
 
   const numberOfReviews = totalRating > 0 ? Math.floor(totalRating / 6) : 0;
 
@@ -106,13 +167,13 @@ const TailorProfile = () => {
           Description
         </p>
         <p className={`text-lg ${theme.colorText}`}>
-          {tailorData.description || <sub>No discription available</sub>}
+          {tailorData.description || <sub>No description available</sub>}
         </p>
       </div>
 
       <div className="mb-6">
         <p className={`text-xl mb-2 pb-1 font-semibold ${theme.colorText}`}>
-          Specialities
+          Specialties
         </p>
         <div className="flex flex-wrap gap-2">
           {tailorData.specialities?.length > 0 ? (
@@ -125,7 +186,7 @@ const TailorProfile = () => {
               </span>
             ))
           ) : (
-            <span className={`${theme.colorText}`}>No specialities listed</span>
+            <span className={`${theme.colorText}`}>No specialties listed</span>
           )}
         </div>
       </div>
@@ -150,6 +211,21 @@ const TailorProfile = () => {
         <p className={`text-xl font-semibold ${theme.colorText}`}>
           Leave a Review
         </p>
+
+        <div className="flex items-center space-x-2 my-2">
+          {[...Array(5)].map((_, index) => (
+            <span
+              key={index}
+              onClick={() => setRating(index + 1)}
+              className={`text-2xl cursor-pointer ${
+                index < rating ? "text-yellow-500" : "text-gray-300"
+              }`}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+
         <textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
