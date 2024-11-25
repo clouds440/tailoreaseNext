@@ -4,6 +4,7 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
   collection,
   addDoc,
   updateDoc,
@@ -83,7 +84,7 @@ const UpdateTailorRating = async ({
 
       setStatusMessage({
         type: "sucess",
-        message: "Rating and review updated successfully",
+        message: "Review added successfully",
       });
     } else {
       throw new Error("Tailor document not found!");
