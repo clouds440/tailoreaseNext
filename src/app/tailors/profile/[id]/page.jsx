@@ -153,7 +153,12 @@ const TailorProfile = () => {
             </h1>
           </div>
           <p className={`text-lg ${theme.colorText}`}>
-            Experience: {tailorData.experience} years
+            Experience:{" "}
+            {tailorData.experience ? (
+              tailorData.experience + " years"
+            ) : (
+              <i className="text-sm">Not specified</i>
+            )}
           </p>
           <p className={`text-lg ${theme.colorText}`}>
             Working Hours: {tailorData.openTime} - {tailorData.closeTime}
