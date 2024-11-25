@@ -24,6 +24,8 @@ const TailorProfile = () => {
     userData,
     setShowMessage,
     setPopUpMessageTrigger,
+    inputStyles,
+    placeHolderStyles,
   } = useContext(UserContext);
   const { id } = useParams();
   const [statusMessage, setStatusMessage] = useState({
@@ -227,20 +229,27 @@ const TailorProfile = () => {
             </span>
           ))}
         </div>
-
-        <textarea
-          value={review}
-          onChange={(e) => setReview(e.target.value)}
-          placeholder="Write your review here"
-          className={`${theme.mainTheme} ${theme.colorText} ${theme.hoverShadow} my-3 w-full p-4 border rounded-lg text-lg focus:outline-none`}
-          rows={4}
-        />
+        <div className="relative my-4 max-w-96">
+          <textarea
+            value={review}
+            maxLength={250}
+            id="review"
+            name="review"
+            onChange={(e) => setReview(e.target.value)}
+            className={`${inputStyles} ${theme.colorText} rounded-sm min-h-[100px] max-h-[150px]`}
+            rows={4}
+            placeholder=""
+          />
+          <label className={`${placeHolderStyles}`} htmlFor="review">
+            Write your review here
+          </label>
+        </div>
         <SimpleButton
           btnText={
             isSubmitting ? <LoadingSpinner size={24} /> : "Submit Review"
           }
           type="primary-submit"
-          extraclasses={"w-full"}
+          extraclasses={"w-96"}
           disabled={isSubmitting}
           onClick={handleReviewSubmit}
         />
