@@ -1,11 +1,22 @@
-import React from "react";
 import axios from "axios";
-import { db } from "../utils/firebaseConfig";
-import { doc, addDoc, collection, getDoc, updateDoc } from "firebase/firestore";
+import {
+  db,
+  query,
+  where,
+  getDocs,
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+} from "@/utils/firebaseConfig";
 
-const UpdateTailorRating = async ({ message, stars, userId, tailorId }) => {
-  let statusMessage = "";
-
+const UpdateTailorRating = async ({
+  message,
+  stars,
+  userId,
+  tailorId,
+  setStatusMessage,
+}) => {
   try {
     // Step 1: Store the review in "tailor_reviews"
     const reviewData = {
@@ -15,7 +26,25 @@ const UpdateTailorRating = async ({ message, stars, userId, tailorId }) => {
       user_id: userId,
     };
 
-    await addDoc(collection(db, "tailor_reviews"), reviewData);
+    const reviewsRef = collection(db, "tailor_reviews");
+
+    const q = query(
+      reviewsRef,
+      where("tailor_id", "==", tailorId),
+      where("user_id", "==", userId)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      setStatusMessage({
+        type: "warning",
+        message: "You have already given a review to this tailor",
+      });
+      return;
+    }
+
+    // Add the new review if no existing review is found
+    await addDoc(reviewsRef, reviewData);
 
     // Step 2: Analyze sentiment score using API
     const options = {
@@ -39,7 +68,7 @@ const UpdateTailorRating = async ({ message, stars, userId, tailorId }) => {
 
     if (tailorSnapshot.exists()) {
       const currentData = tailorSnapshot.data();
-      const currentRating = currentData.rating || 0; 
+      const currentRating = currentData.rating || 0;
       const currentTotalRating = currentData.total_rating || 0;
 
       // Calculate updated values
@@ -52,16 +81,22 @@ const UpdateTailorRating = async ({ message, stars, userId, tailorId }) => {
         total_rating: updatedTotalRating,
       });
 
-      statusMessage = "Rating and review updated successfully.";
+      setStatusMessage({
+        type: "sucess",
+        message: "Rating and review updated successfully",
+      });
     } else {
       throw new Error("Tailor document not found!");
     }
   } catch (error) {
     console.error("Error updating rating:", error);
-    statusMessage = "Failed to update rating and review.";
+    setStatusMessage({
+      type: "danger",
+      message: "Failed to add review",
+    });
   }
 
-  return statusMessage;
+  return;
 };
 
 export default UpdateTailorRating;

@@ -26,6 +26,10 @@ const TailorProfile = () => {
     setPopUpMessageTrigger,
   } = useContext(UserContext);
   const { id } = useParams();
+  const [statusMessage, setStatusMessage] = useState({
+    type: "",
+    message: "",
+  });
 
   useEffect(() => {
     const fetchTailorData = async () => {
@@ -38,7 +42,7 @@ const TailorProfile = () => {
           setTailorData(docSnap.data());
         } else {
           setShowMessage({
-            type: "warning",
+            type: "info",
             message: "No Such Tailor",
           });
           setPopUpMessageTrigger(true);
@@ -61,7 +65,7 @@ const TailorProfile = () => {
 
     if (rating === 0) {
       setShowMessage({
-        type: "warning",
+        type: "info",
         message: "Please select a star rating",
       });
       setPopUpMessageTrigger(true);
@@ -70,7 +74,7 @@ const TailorProfile = () => {
 
     if (review.split(" ").length < 5) {
       setShowMessage({
-        type: "warning",
+        type: "info",
         message: "Please write at least 5 words in the review",
       });
       setPopUpMessageTrigger(true);
@@ -82,25 +86,23 @@ const TailorProfile = () => {
     try {
       setIsSubmitting(true);
 
-      const statusMessage = await UpdateTailorRating({
+      await UpdateTailorRating({
         message: review,
         stars: rating,
         userId,
         tailorId: id,
-      });
-
-      setShowMessage({
-        type: statusMessage.type || "success",
-        message: statusMessage.message || "Review submitted successfully",
+        setStatusMessage: (status) => {
+          setStatusMessage(status); // Update local state
+          setShowMessage(status); // Immediately show the status message
+        },
       });
       setPopUpMessageTrigger(true);
       setRating(0);
       setReview("");
-
     } catch (error) {
       console.error("Error submitting review:", error);
       setShowMessage({
-        type: "error",
+        type: "danger",
         message: "Failed to submit review. Please try again later.",
       });
       setPopUpMessageTrigger(true);

@@ -2,9 +2,6 @@
 
 import React, { useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  getFirestore,
-} from "firebase/firestore";
 import SimpleButton from "../components/SimpleButton";
 import { useRouter } from "next/navigation";
 
