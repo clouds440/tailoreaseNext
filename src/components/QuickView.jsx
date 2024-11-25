@@ -1,13 +1,9 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   getFirestore,
-  collection,
-  query,
-  where,
-  getDocs,
 } from "firebase/firestore";
 import SimpleButton from "../components/SimpleButton";
 import { useRouter } from "next/navigation";
@@ -15,7 +11,6 @@ import { useRouter } from "next/navigation";
 const QuickView = ({ theme, tailor, onClose }) => {
   const popupRef = useRef(null);
   const router = useRouter();
-  const db = getFirestore();
 
   const rating = tailor?.rating || 0;
   const totalRating = tailor?.total_rating || 0;
