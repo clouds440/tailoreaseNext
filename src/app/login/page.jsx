@@ -33,6 +33,14 @@ const LoginForm = () => {
   const [isResetLoading, setIsResetLoading] = useState(false);
   const router = useRouter();
 
+  const handleGoogleLogin = () => {
+    const clientId =
+      "347972565408-l5i6o2vifc4k8vur6qgj4d5niu73lnlr.apps.googleusercontent.com";
+    const redirectUri = "http://localhost:3000/google-login";
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=email+profile+phone`;
+    window.location.href = authUrl;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -174,6 +182,19 @@ const LoginForm = () => {
             extraclasses={"w-full"}
             disabled={isLoading}
           />
+          <div className="my-4 flex items-center justify-center">
+            <SimpleButton
+              btnText={
+                <div className="flex items-center justify-center gap-2">
+                  <i className="fab fa-google"></i>
+                  <span>Continue with Google</span>
+                </div>
+              }
+              type={"simple"}
+              extraclasses={`w-full bg-rose-500`}
+              onClick={handleGoogleLogin}
+            />
+          </div>
           <div className="items-center justify-center flex flex-row mt-8">
             <span>Forgot Password? &nbsp;</span>
             {isResetLoading ? (
