@@ -22,7 +22,7 @@ const ShiftingBounceLoader = ({ size }) => {
       "rgba(20, 189, 52, 1)", // Green
     ];
 
-    const transitionDuration = 1000; // 2 seconds for each transition
+    const transitionDuration = 1500; // 1.5 seconds for each transition
     const frameRate = 50; // Update every 50ms
     const steps = transitionDuration / frameRate; // Total steps per transition
 
@@ -53,7 +53,7 @@ const ShiftingBounceLoader = ({ size }) => {
 
     return () => clearInterval(transitionColors); // Cleanup on component unmount
   }, [step]);
-  return <BounceLoader size={size} color={color} />;
+  return <BounceLoader size={size} color={color} speedMultiplier={0.6} />;
 };
 
 export { ShiftingBounceLoader, LoadingSpinner };

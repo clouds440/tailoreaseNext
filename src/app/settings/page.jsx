@@ -187,7 +187,7 @@ function AccountSettings() {
     { value: "systemDefault", label: "System Default" },
     { value: "midnightWhisper", label: "Midnight Whisper" },
     { value: "lunarGlow", label: "Lunar Glow" },
-    { value: "oceanHaze", label: "Ocean Haze" },
+    { value: "neonPunk", label: "Neon Punk" },
   ];
 
   const handleThemeChange = (e) => {

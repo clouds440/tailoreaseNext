@@ -44,11 +44,6 @@ const TailorListPage = () => {
     setPopupVisible(true);
   };
 
-  const closePopup = () => {
-    setPopupVisible(false);
-    setSelectedTailor(null);
-  };
-
   const fetchTailors = async () => {
     setLoading(true);
     try {
@@ -238,7 +233,12 @@ const TailorListPage = () => {
       </div>
 
       {popupVisible && (
-        <QuickView theme={theme} tailor={selectedTailor} onClose={closePopup} />
+        <QuickView
+          theme={theme}
+          tailor={selectedTailor}
+          setPopupVisible={setPopupVisible}
+          popupVisible={popupVisible}
+        />
       )}
       <AnimatePresence>
         {dropdownOpen && (

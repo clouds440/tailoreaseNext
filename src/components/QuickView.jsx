@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import React, { useRef, useEffect, useState } from "react";
+import { AnimatePresence, easeIn, motion } from "framer-motion";
 import SimpleButton from "../components/SimpleButton";
 import { useRouter } from "next/navigation";
 
-const QuickView = ({ theme, tailor, onClose }) => {
+const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
+  const [showPopUp, setShowPopUp] = useState(popupVisible);
   const popupRef = useRef(null);
   const router = useRouter();
+
+  useEffect(() => {
+    setShowPopUp(popupVisible);
+  }, [popupVisible]);
 
   const rating = tailor?.rating || 0;
   const totalRating = tailor?.total_rating || 0;
@@ -15,11 +20,32 @@ const QuickView = ({ theme, tailor, onClose }) => {
   const normalizedRating = totalRating ? (rating / totalRating) * 5 : 0;
   const reviewCount = totalRating ? Math.floor(totalRating / 6) : 0;
 
+  const handleClose = () => {
+    setShowPopUp(false);
+    setTimeout(() => {
+      setPopupVisible(false);
+    }, 300);
+  };
+
   const handleOutsideClick = (e) => {
     if (popupRef.current && !popupRef.current.contains(e.target)) {
-      onClose();
+      handleClose();
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        handleClose(); // Trigger the Cancel button on Esc key press
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleClose]);
 
   useEffect(() => {
     if (tailor) {
@@ -36,30 +62,35 @@ const QuickView = ({ theme, tailor, onClose }) => {
 
   const popupVariants = {
     hidden: {
-      scale: 0,
-      opacity: 0,
+      scale: 0.7,
+      opacity: 0.5,
     },
     visible: {
       scale: 1,
       opacity: 1,
       transition: {
-        type: "spring",
-        stiffness: 300,
+        type: "linear",
+        ease: "linear",
+        stiffness: 100,
         damping: 30,
+        duration: 0.2,
       },
     },
     exit: {
-      scale: 0,
+      scale: 0.7,
       opacity: 0,
       transition: {
-        duration: 0.3,
+        duration: 0.1,
+        type: "linear",
+        ease: "linear",
+        stiffness: 200,
       },
     },
   };
 
   return (
     <AnimatePresence>
-      {tailor && (
+      {showPopUp && (
         <>
           {/* Backdrop */}
           <motion.div
@@ -86,7 +117,7 @@ const QuickView = ({ theme, tailor, onClose }) => {
                   {tailor.businessName}
                 </h3>
                 <button
-                  onClick={onClose}
+                  onClick={handleClose}
                   className={`text-2xl ${theme.colorText} ${theme.hoverText} rounded-full p-2`}
                 >
                   <i className="fas fa-times"></i>

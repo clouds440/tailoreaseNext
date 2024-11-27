@@ -23,23 +23,23 @@ module.exports = {
           "-webkit-text-fill-color": "transparent",
         },
         ".midnight-whisper": {
-          backgroundColor: "rgba(31, 41, 55, 0.75)", // bg-gray-800 bg-opacity-70
-          backdropFilter: "blur(24px)", // backdrop-blur-xl
-          boxShadow: "0 1px 2px 0 #fde047", // shadow-yellow-300 shadow-sm
+          backgroundColor: "rgba(0, 25, 30, 0.85)", // bg-gray-800 bg-opacity-70
+          backdropFilter: "blur(30px)", // backdrop-blur-xl
+          boxShadow: "0 1px 3px 0 #fde047", // shadow-yellow-300 shadow-sm
           color: "#ffffff", // Set all text to white
           borderColor: "#ffffff", // White border color
         },
         ".lunar-glow": {
-          backgroundColor: "rgba(220, 231, 235, 0.8)", // Lighter background
-          backdropFilter: "blur(24px)", // backdrop-blur-xl
-          boxShadow: "0 1px 2px 0 #546e7a", // gray shadow color
+          backgroundColor: "rgba(240, 235, 240, 0.8)", // Lighter background
+          backdropFilter: "blur(30px)", // backdrop-blur-xl
+          boxShadow: "0 2px 5px 2px #546e7a", // gray shadow color
           color: "#000000", // Set all text to black
           borderColor: "#000000", // Black border color
         },
-        ".ocean-haze": {
+        ".neon-punk": {
           backgroundColor: "rgba(13, 71, 161, 0.75)", // sky background
-          backdropFilter: "blur(40px)", // backdrop-blur-xl
-          boxShadow: "0 1px 2px 0 #5dade2", // light blue shadow color
+          backdropFilter: "blur(30px)", // backdrop-blur-xl
+          boxShadow: "0 1px 6px 2px #8b5cf6", // violet-500
           color: "#bae6fd", // Set all text to sky-200
           borderColor: "#1e88e5", // Bluish border color
         },

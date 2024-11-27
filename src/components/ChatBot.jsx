@@ -11,7 +11,13 @@ const ChatBot = () => {
   const { theme } = useContext(UserContext);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      text: "Hi, how can I help you with your TailorEase experience today!?",
+      sender: "bot",
+      isHTML: true,
+    },
+  ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [animatedMessage, setAnimatedMessage] = useState("");
@@ -107,7 +113,7 @@ const ChatBot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping, animatedMessage]);
+  }, [messages, isTyping]);
 
   const chatBoxVariants = {
     hidden: {
@@ -138,11 +144,11 @@ const ChatBot = () => {
     <>
       {/* ChatBot Trigger Icon */}
       <div
-        className={`fixed bottom-8 right-8 w-14 h-14 flex items-center justify-center rounded-full shadow-lg cursor-pointer hover:scale-105 z-[9999] ${theme.mainTheme}`}
+        className={`fixed bottom-8 right-8 w-14 h-14 flex items-center justify-center rounded-full border-2 shadow-lg cursor-pointer hover:scale-105 z-[9999] ${theme.mainTheme}`}
         onClick={() => setIsOpen(true)}
       >
         {isOpen ? (
-          <ShiftingBounceLoader size={35} color="white" /> // sort of a thinking animation when the chatbox is open
+          <ShiftingBounceLoader size={47} color="white" /> // sort of a thinking animation when the chatbox is open
         ) : (
           <i className={`fas fa-robot text-2xl ${theme.iconColor}`}></i>
         )}

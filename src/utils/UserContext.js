@@ -26,7 +26,7 @@ export const UserProvider = ({ children }) => {
       iconColor: "text-blue-500",
       hoverText: "hover:text-blue-400",
       hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
-      hoverShadow: "hover:shadow-md hover:shadow-amber-400",
+      hoverShadow: "hover:shadow-md hover:shadow-amber-300",
     },
     lunarGlow: {
       themeName: "lunarGlow",
@@ -35,18 +35,18 @@ export const UserProvider = ({ children }) => {
       colorBorder: "border-black",
       iconColor: "text-blue-600",
       hoverText: "hover:text-gray-600",
-      hoverBg: "hover:bg-gray-300 hover:bg-opacity-70",
+      hoverBg: "hover:bg-gray-500 hover:bg-opacity-70",
       hoverShadow: "hover:shadow-md hover:shadow-gray-800",
     },
-    oceanHaze: {
-      themeName: "oceanHaze",
-      mainTheme: "ocean-haze",
+    neonPunk: {
+      themeName: "neonPunk",
+      mainTheme: "neon-punk",
       colorText: "text-sky-200",
-      colorBorder: "border-sky-200",
-      iconColor: "text-amber-400",
-      hoverText: "hover:text-amber-300",
-      hoverBg: "hover:bg-amber-300 hover:bg-opacity-50",
-      hoverShadow: "hover:shadow-md hover:shadow-cyan-400",
+      colorBorder: "border-violet-500",
+      iconColor: "text-rose-500",
+      hoverText: "hover:text-rose-500",
+      hoverBg: "hover:bg-rose-400 hover:bg-opacity-50",
+      hoverShadow: "hover:shadow-md hover:shadow-violet-500",
     },
   };
 
