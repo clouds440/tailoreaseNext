@@ -30,7 +30,7 @@ const QuickView = ({ theme, tailor, onClose }) => {
     };
   }, [tailor]);
 
-  const handleViewProfile = async () => {
+  const handleViewProfile = () => {
     router.push(`/tailors/profile/${tailor.id}`);
   };
 
