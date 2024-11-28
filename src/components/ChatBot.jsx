@@ -6,6 +6,7 @@ import { SyncLoader } from "react-spinners";
 import UserContext from "@/utils/UserContext";
 import { ShiftingBounceLoader } from "./LoadingSpinner";
 import { marked } from "marked";
+import { Filter } from "profanity-check";
 
 const ChatBot = () => {
   const { theme } = useContext(UserContext);
@@ -20,7 +21,6 @@ const ChatBot = () => {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [animatedMessage, setAnimatedMessage] = useState("");
   const chatBoxRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -67,8 +67,20 @@ const ChatBot = () => {
     return result.response.text();
   }
 
+  const detector = new Filter();
+
   const handleSendMessage = async () => {
     if (!input.trim()) return;
+
+    if (detector.isProfane(input)) {
+      const systemMessage = {
+        text: "Warning! Your message contains explicit language. Refrain from this behavior or you'll be suspended",
+        sender: "system",
+      };
+      setMessages((prev) => [...prev, systemMessage]);
+      setInput("");
+      return;
+    }
 
     const userMessage = { text: input, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
@@ -101,7 +113,9 @@ const ChatBot = () => {
   useEffect(() => {
     if (isOpen) {
       document.addEventListener("click", handleClickOutside);
-      scrollToBottom(); // Scroll when chat opens
+      setTimeout(() => {
+        scrollToBottom(); // Scroll when chat opens
+      }, 350); // timeout to allow the messagesEndRef to be set before scrolling
     } else {
       document.removeEventListener("click", handleClickOutside);
     }
@@ -173,7 +187,7 @@ const ChatBot = () => {
                 <i className={`fas fa-robot text-4xl ${theme.iconColor}`}></i>
                 <div>
                   <h3 className={`text-lg font-bold ${theme.colorText}`}>
-                    VT-AI ChatBot
+                    TE-AI ASSISTANT
                   </h3>
                   <p className="text-sm font-semibold text-green-600">Online</p>
                 </div>
@@ -190,20 +204,21 @@ const ChatBot = () => {
                 <div
                   key={index}
                   className={`flex ${
-                    msg.sender === "user" ? "justify-end" : "justify-start"
+                    msg.sender === "bot" ? "justify-start" : "justify-end"
                   }`}
                 >
                   <div
-                    className={`p-3 rounded-lg text-white ${
+                    className={`p-3 rounded-lg text-white animated-message ${
                       msg.sender === "user"
                         ? "bg-blue-600"
-                        : `${theme.mainTheme}`
+                        : msg.sender === "bot"
+                        ? `${theme.mainTheme}`
+                        : "bg-rose-500 italic"
                     }`}
                   >
                     {msg.isHTML ? (
                       // Render HTML using dangerouslySetInnerHTML
                       <div
-                        className="animated-message"
                         dangerouslySetInnerHTML={{
                           __html: msg.text,
                         }}
@@ -218,14 +233,11 @@ const ChatBot = () => {
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="p-3 rounded-lg flex items-center">
-                    <SyncLoader size={8} speedMultiplier={0.5} color="white" />
-                  </div>
-                </div>
-              )}
-              {animatedMessage && (
-                <div className="flex justify-start">
-                  <div className={`p-3 rounded-lg ${theme.colorText}`}>
-                    {animatedMessage}
+                    <SyncLoader
+                      size={8}
+                      speedMultiplier={0.5}
+                      color={`${theme.colorText}`}
+                    />
                   </div>
                 </div>
               )}
