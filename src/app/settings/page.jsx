@@ -93,6 +93,14 @@ function AccountSettings() {
           setPopUpMessageTrigger("true");
           return;
         }
+        if (newValue.length < 7) {
+          setShowMessage({
+            type: "warning",
+            message: "Please enter a valid phone number",
+          });
+          setPopUpMessageTrigger("true");
+          return;
+        }
       }
 
       // Query Firestore to find the document with the matching UID
@@ -333,7 +341,11 @@ function AccountSettings() {
                 message: "Are you sure you want to discard all changes?",
                 type: "warning",
                 buttons: [
-                  { label: "Yes, Discard", onClick: handleDiscardChanges },
+                  {
+                    label: "Yes, Discard",
+                    onClick: handleDiscardChanges,
+                    type: "danger",
+                  },
                 ],
               });
             }}
@@ -372,7 +384,7 @@ function AccountSettings() {
       {showDialog && (
         <DialogBox
           title={DialogBoxInfo.title}
-          message={DialogBoxInfo.message}
+          body={DialogBoxInfo.message}
           type={DialogBoxInfo.type}
           showDialog={showDialog}
           setShowDialog={setShowDialog}

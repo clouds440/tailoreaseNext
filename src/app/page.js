@@ -7,7 +7,7 @@ import SimpleButton from "../components/SimpleButton";
 import Link from "next/link";
 
 export default function Home() {
-  const { theme, inputStyles, placeHolderStyles } = useContext(UserContext); // Access theme from UserContext
+  const { theme, inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
     <>
@@ -30,7 +30,7 @@ export default function Home() {
               Join the platform where tailors create virtual shops and users
               try-on outfits and place orders instantly!
             </p>
-            <Link href={"/signup"}>
+            <Link href={"#"}>
               <SimpleButton
                 btnText="Get Started Now"
                 extraclasses="mt-4 py-3"

@@ -5,6 +5,7 @@ import SimpleButton from "./SimpleButton";
 import { auth, signOut } from "@/utils/firebaseConfig";
 import UserContext from "@/utils/UserContext";
 import { useRouter } from "next/navigation";
+import DialogBox from "./DialogBox";
 import {
   SettingsIcon,
   LogoutIcon,
@@ -15,8 +16,9 @@ import {
   ContactIcon,
   LoginIcon,
   InfoIcon,
-  ShirtIcon,
   TailorIcon,
+  ThemeIcon,
+  UserIcon,
 } from "../../public/icons/svgIcons";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -26,11 +28,13 @@ const Navbar = () => {
     theme,
     userLoggedIn,
     setUserLoggedIn,
-    setShowmessage,
+    setShowMessage,
     setPopUpMessageTrigger,
+    handleSetTheme,
   } = useContext(UserContext);
   const [userFullName, setUserFullName] = useState(userData.fullName);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const dropdownRef = useRef(null);
   const router = useRouter();
 
@@ -43,7 +47,7 @@ const Navbar = () => {
       setDropdownOpen(false);
       router.push("/");
     } catch (error) {
-      setShowmessage({
+      setShowMessage({
         type: "danger",
         message: "Couldn't log out. Please try again!",
       });
@@ -73,21 +77,85 @@ const Navbar = () => {
     setUserFullName(userData.fullName);
   }, [userData]);
 
-  const dropdownOptions = [
+  const themeOptions = [
     {
-      text: "Settings",
-      icon: <SettingsIcon size={"5"} color={`${theme.iconColor}`} />,
+      value: "systemDefault",
+      label: "System Default",
+      style:
+        "background-gradient text-white shadow-md shadow-gray-800 hover:bg-gray-700 hover:bg-opacity-90",
+    },
+    {
+      value: "midnightWhisper",
+      label: "Midnight Whisper",
+      style: "midnight-whisper hover:bg-gray-700 hover:bg-opacity-90",
+    },
+    {
+      value: "lunarGlow",
+      label: "Lunar Glow",
+      style: "lunar-glow hover:bg-gray-400 hover:bg-opacity-90",
+    },
+    {
+      value: "neonPunk",
+      label: "Neon Punk",
+      style: "neon-punk hover:bg-rose-400 hover:bg-opacity-90",
+    },
+  ];
+
+  const handleThemeChange = (themeName) => {
+    handleSetTheme(themeName);
+  };
+
+  const handleSaveTheme = () => {
+    localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName)); // Assume theme is available
+    setShowMessage({
+      type: "success",
+      message: "Changes saved!",
+    });
+    setPopUpMessageTrigger(true);
+    setShowDialog(false);
+  };
+
+  const dialogButtons = [
+    {
+      label: "Save Theme",
+      onClick: handleSaveTheme,
+      type: "primary",
+    },
+  ];
+
+  const dropdownOptions = [
+    ...(userLoggedIn
+      ? [
+          {
+            text: "Settings",
+            icon: <SettingsIcon size={"5"} color={`${theme.iconColor}`} />,
+            onClick: () => {
+              router.push("settings");
+              setDropdownOpen(false);
+            },
+          },
+          {
+            text: "Profile",
+            icon: <UserIcon size={"5"} color={`${theme.iconColor}`} />,
+            onClick: () => {
+              router.push("profile");
+              setDropdownOpen(false);
+            },
+          },
+          {
+            text: "Logout",
+            icon: <LogoutIcon size={"5"} color={`${theme.iconColor}`} />,
+            onClick: handleLogout,
+          },
+        ]
+      : []),
+    {
+      text: "Theme",
+      icon: <ThemeIcon size={"5"} color={`${theme.iconColor}`} />,
       onClick: () => {
-        router.push("/settings");
-        setDropdownOpen(false);
+        setShowDialog(true);
       },
     },
-    {
-      text: "Logout",
-      icon: <LogoutIcon size={"5"} color={`${theme.iconColor}`} />,
-      onClick: handleLogout,
-    },
-    // Add more options here as needed
   ];
 
   const [windowWidth, setWindowWidth] = useState(undefined);
@@ -127,10 +195,10 @@ const Navbar = () => {
             >
               <Logo
                 fontSize={"text-2xl"}
-                classes={`md:my-5 md:pb-5 mx-5 pr-4 md:mx-0 md:pr-0 items-center justify-center ${theme.colorBorder}`}
+                classes={`md:my-5 md:pb-5 mx-1 sm:mx-5 md:mx-0 pr-0 sm:pr-4 md:pr-0 items-center justify-center ${theme.colorBorder}`}
               />
               {userLoggedIn ? (
-                <div className="py-1 mt-3 text-center mx-5 md:mx-0 select-none">
+                <div className="py-1 mt-3 text-center mx-1 sm:mx-5 md:mx-0 select-none">
                   <span>{userFullName}</span>
                 </div>
               ) : (
@@ -173,9 +241,7 @@ const Navbar = () => {
                 {userLoggedIn && (
                   <li
                     onClick={() => router.push("/become-tailor")}
-                    className={`${
-                      windowHeight >= 420 ? "" : "md:hidden"
-                    } ${linkStyles}`}
+                    className={`${linkStyles}`}
                   >
                     <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
                     <span className={"hidden md:inline-block md:ml-2"}>
@@ -185,9 +251,7 @@ const Navbar = () => {
                 )}
                 <li
                   onClick={() => router.push("/contact-us")}
-                  className={`${
-                    windowHeight >= 470 ? "" : "md:hidden"
-                  } ${linkStyles}`}
+                  className={`${linkStyles}`}
                 >
                   <ContactIcon size={"5"} color={`${theme.iconColor}`} />
                   <span className={"hidden md:inline-block md:ml-2"}>
@@ -197,9 +261,7 @@ const Navbar = () => {
                 {!userLoggedIn && (
                   <li
                     onClick={() => router.push("/about-us")}
-                    className={`${
-                      windowHeight >= 420 ? "" : "md:hidden"
-                    } ${linkStyles}`}
+                    className={`${linkStyles}`}
                   >
                     <InfoIcon size={"5"} color={`${theme.iconColor}`} />
                     <span className={"hidden md:inline-block md:ml-2"}>
@@ -207,26 +269,24 @@ const Navbar = () => {
                     </span>
                   </li>
                 )}
-                {userLoggedIn && (
-                  <div>
-                    <div className="relative md:absolute md:bottom-1 w-full">
-                      <div
-                        className={linkStyles}
-                        ref={dropdownRef}
-                        onClick={() => setDropdownOpen(!dropdownOpen)}
-                      >
-                        <div className="flex">
-                          <span className="flex items-center select-none">
-                            <MenuIcon size={"5"} color={"text-yellow-600"} />
-                            <span className={"hidden md:inline-block ml-2"}>
-                              Menu
-                            </span>
+                <div>
+                  <div className="relative md:absolute md:bottom-1 w-full">
+                    <div
+                      className={linkStyles}
+                      ref={dropdownRef}
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                      <div className="flex">
+                        <span className="flex items-center select-none">
+                          <MenuIcon size={"5"} color={"text-yellow-600"} />
+                          <span className={"hidden md:inline-block ml-2"}>
+                            Menu
                           </span>
-                        </div>
+                        </span>
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
               </ul>
             </div>
           </div>
@@ -235,11 +295,11 @@ const Navbar = () => {
       <AnimatePresence>
         {dropdownOpen && (
           <motion.div
-            className={`absolute w-auto md:w-40 z-50 ${
+            className={`absolute w-auto md:w-40 z-50 py-2 rounded-md ${
               windowWidth >= 768
-                ? "md:pt-4 md:bottom-14"
-                : "right-1 top-[100px] px-2 py-2 rounded-md " + theme.mainTheme
-            }`}
+                ? "md:bottom-[45px]"
+                : "right-1 top-[100px] px-2 py-2 " + theme.mainTheme
+            } ${windowHeight <= 650 && theme.colorBg}`}
             initial={{ opacity: 0, y: animate }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: animate }}
@@ -266,6 +326,26 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <DialogBox
+        showDialog={showDialog}
+        setShowDialog={setShowDialog}
+        title="Choose Theme"
+        body={
+          <div className="flex">
+            {themeOptions.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => handleThemeChange(option.value)}
+                className={`mx-1 rounded-md ${option.style}`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        }
+        type="info"
+        buttons={dialogButtons}
+      />
     </div>
   );
 };

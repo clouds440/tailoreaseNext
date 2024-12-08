@@ -6,11 +6,9 @@ function SimpleButton({
   disabled,
   icon = null,
 }) {
-  const primary =
-    "bg-sky-500 bg-opacity-80 text-white hover:bg-sky-400 " + extraclasses;
-  const simple =
-    "bg-gray-100 opacity-85 text-gray-900 hover:bg-gray-300 " + extraclasses;
-  const danger = "bg-red-700 text-white hover:bg-rose-500 " + extraclasses;
+  const primary = "bg-sky-500 bg-opacity-80 text-white hover:bg-sky-400";
+  const simple = "bg-gray-100 opacity-85 text-gray-900 hover:bg-gray-300";
+  const danger = "bg-red-700 text-white hover:bg-rose-500";
 
   let style;
   switch (type) {
@@ -28,9 +26,9 @@ function SimpleButton({
   return (
     <button
       type={type === "primary-submit" ? "submit" : "button"}
-      className={`${
-        disabled && "cursor-not-allowed"
-      } flex items-center justify-center px-4 py-1 rounded-md duration-500 select-none ${style}`}
+      className={`flex items-center justify-center px-4 py-1 rounded-md duration-500 select-none ${style} ${extraclasses} ${
+        disabled ? "cursor-not-allowed" : ""
+      }`}
       onClick={onClick}
       disabled={disabled}
     >

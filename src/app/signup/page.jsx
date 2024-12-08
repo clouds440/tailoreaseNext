@@ -83,6 +83,14 @@ const SignUpForm = () => {
       setPopUpMessageTrigger("true");
       return;
     }
+    if (newValue.length < 7) {
+      setShowMessage({
+        type: "warning",
+        message: "Please enter a valid phone number",
+      });
+      setPopUpMessageTrigger("true");
+      return;
+    }
 
     try {
       setIsLoading(true);

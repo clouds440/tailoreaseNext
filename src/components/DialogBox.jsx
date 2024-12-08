@@ -6,7 +6,7 @@ import UserContext from "@/utils/UserContext";
 import SimpleButton from "./SimpleButton";
 
 const DialogBox = ({
-  message,
+  body,
   title,
   type = "info",
   buttons = [],
@@ -86,9 +86,7 @@ const DialogBox = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div
-            className={`bg-black bg-opacity-70 fixed inset-0 rounded-3xl`}
-          ></div>
+          <div className={`bg-black bg-opacity-30 fixed inset-0`}></div>
           <motion.div
             className={`rounded-xl shadow-lg w-11/12 max-w-md z-50 ${theme.mainTheme}`}
             initial={{ scale: 0.8 }}
@@ -100,21 +98,21 @@ const DialogBox = ({
               {icon}
               <span className="ml-3 text-white font-medium">{title}</span>
             </div>
-            <div className={`p-4 ${theme.colorText}`}>
-              <p>{message}</p>
+            <div className={`p-4 h-auto w-auto ${theme.colorText}`}>
+              {typeof body === "function" ? body() : body}
             </div>
             <div className={`p-4 flex justify-end space-x-3`}>
               <SimpleButton
                 onClick={handleClose}
                 type={"simple"}
-                btnText={"Close Dialog"}
+                btnText={"Close"}
               />
               {buttons.map(({ label, onClick, type }, index) => (
                 <SimpleButton
                   key={index}
                   onClick={onClick}
                   btnText={label}
-                  type={"danger"}
+                  type={type}
                 />
               ))}
             </div>

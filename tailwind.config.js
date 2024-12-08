@@ -17,10 +17,10 @@ module.exports = {
         ".text-shadow-lg": {
           textShadow: "2px 2px 18px rgba(90, 250, 50, 1)",
         },
-        ".text-gradient": {
-          background: "linear-gradient(to right, cyan, yellow)",
-          "-webkit-background-clip": "text",
-          "-webkit-text-fill-color": "transparent",
+        ".background-gradient": {
+          background:
+            "linear-gradient(to right, rgba(0, 10, 10, 0.9), rgba(20, 50, 60, 0.9), rgba(220, 225, 220, 0.9))",
+          "-webkit-background-clip": "background",
         },
         ".midnight-whisper": {
           backgroundColor: "rgba(0, 25, 30, 0.85)", // bg-gray-800 bg-opacity-70
