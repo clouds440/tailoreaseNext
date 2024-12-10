@@ -113,7 +113,7 @@ const Navbar = () => {
     localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName)); // Assume theme is available
     setShowMessage({
       type: "success",
-      message: "Changes saved!",
+      message: "Theme applied!",
     });
     setPopUpMessageTrigger(true);
     setShowDialog(false);

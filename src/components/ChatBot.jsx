@@ -6,7 +6,7 @@ import { SyncLoader } from "react-spinners";
 import UserContext from "@/utils/UserContext";
 import { ShiftingBounceLoader } from "./LoadingSpinner";
 import { marked } from "marked";
-import { Filter } from "profanity-check";
+import { Filter } from "bad-words";
 
 const ChatBot = () => {
   const { theme } = useContext(UserContext);
