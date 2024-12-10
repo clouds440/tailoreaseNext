@@ -15,7 +15,7 @@ import SimpleButton from "@/components/SimpleButton";
 import Link from "next/link";
 import UserContext from "@/utils/UserContext";
 import { BarLoader } from "react-spinners";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const LoginForm = () => {
   const {
@@ -32,6 +32,7 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isResetLoading, setIsResetLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleGoogleLogin = () => {
     const clientId =
@@ -78,7 +79,6 @@ const LoginForm = () => {
         // set the user logged in state to true
         setUserLoggedIn(true);
         setUserData(userData);
-        router.push("/");
       }
     } catch (error) {
       let errorMessage = "An error occurred: " + ` ${error.message}`;
@@ -102,6 +102,18 @@ const LoginForm = () => {
       setIsLoading(false);
     }
   };
+
+  // Check for redirect parameter and navigate accordingly
+  useEffect(() => {
+    if (userLoggedIn) {
+      const redirectUrl = searchParams.get("redirect");
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.push("/");
+      }
+    }
+  }, [userLoggedIn, router, searchParams]);
 
   const handlePasswordReset = async () => {
     if (!formData.email || !/^\S+@\S+\.\S+$/.test(formData.email)) {
@@ -132,12 +144,6 @@ const LoginForm = () => {
       setIsResetLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (userLoggedIn) {
-      router.push("/");
-    }
-  }, [userLoggedIn, router]);
 
   return (
     <div className="flex items-center justify-center mt-8 max-w-2xl w-auto mx-auto p-6 rounded-md select-none">

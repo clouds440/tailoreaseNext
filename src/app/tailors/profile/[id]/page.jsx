@@ -9,6 +9,7 @@ import SimpleButton from "@/components/SimpleButton";
 import UserContext from "../../../../utils/UserContext";
 import Link from "next/link";
 import UpdateTailorRating from "@/components/UpdateTailorRating";
+import DialogBox from "@/components/DialogBox";
 
 const TailorProfile = () => {
   const [tailorData, setTailorData] = useState(null);
@@ -31,6 +32,14 @@ const TailorProfile = () => {
   const [statusMessage, setStatusMessage] = useState({
     type: "",
     message: "",
+  });
+
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogBoxInfo, setDialogBoxInfo] = useState({
+    title: "",
+    body: "",
+    type: "",
+    buttons: [],
   });
 
   useEffect(() => {
@@ -61,7 +70,20 @@ const TailorProfile = () => {
 
   const handleReviewSubmit = async () => {
     if (!userLoggedIn) {
-      router.push("/login");
+      setDialogBoxInfo({
+        body: "You must be logged in to submit a review. Go to log in page now?",
+        title: "Login Required!",
+        type: "info",
+        buttons: [
+          {
+            label: "Login Now",
+            onClick: () =>
+              router.push(`/login?redirect=/tailors/profile/${id}`),
+            type: "primary",
+          },
+        ],
+      });
+      setShowDialog(true);
       return;
     }
 
@@ -189,7 +211,7 @@ const TailorProfile = () => {
               </span>
             ))
           ) : (
-            <span className={``}>No specialties listed</span>
+            <span className={`italic`}>No specialties listed</span>
           )}
         </div>
       </div>
@@ -247,6 +269,16 @@ const TailorProfile = () => {
           onClick={handleReviewSubmit}
         />
       </div>
+      {showDialog && (
+        <DialogBox
+          body={dialogBoxInfo.body}
+          title={dialogBoxInfo.title}
+          type={dialogBoxInfo.type}
+          buttons={dialogBoxInfo.buttons}
+          showDialog={showDialog}
+          setShowDialog={setShowDialog}
+        />
+      )}
     </div>
   ) : (
     <div

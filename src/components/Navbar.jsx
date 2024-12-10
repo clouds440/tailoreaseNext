@@ -45,7 +45,11 @@ const Navbar = () => {
       sessionStorage.removeItem("userData");
       setUserLoggedIn(false);
       setDropdownOpen(false);
-      router.push("/");
+      setShowMessage({
+        type: "success",
+        message: "Logged out!",
+      });
+      setPopUpMessageTrigger("true");
     } catch (error) {
       setShowMessage({
         type: "danger",
@@ -130,7 +134,7 @@ const Navbar = () => {
             text: "Settings",
             icon: <SettingsIcon size={"5"} color={`${theme.iconColor}`} />,
             onClick: () => {
-              router.push("settings");
+              router.push("/settings");
               setDropdownOpen(false);
             },
           },
@@ -138,7 +142,7 @@ const Navbar = () => {
             text: "Profile",
             icon: <UserIcon size={"5"} color={`${theme.iconColor}`} />,
             onClick: () => {
-              router.push("profile");
+              router.push("/profile");
               setDropdownOpen(false);
             },
           },
@@ -336,7 +340,7 @@ const Navbar = () => {
               <button
                 key={index}
                 onClick={() => handleThemeChange(option.value)}
-                className={`mx-1 rounded-md ${option.style}`}
+                className={`mx-1 rounded-md w-1/4 py-6 ${option.style}`}
               >
                 {option.label}
               </button>
