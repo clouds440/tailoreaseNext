@@ -1,12 +1,20 @@
 "use client";
-
 import { useState, useEffect, useContext } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { db } from "@/utils/firebaseConfig";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
+
 import { ClipLoader } from "react-spinners";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SimpleButton from "@/components/SimpleButton";
-import UserContext from "../../../../utils/UserContext";
+import UserContext from "@/utils/UserContext";
 import Link from "next/link";
 import UpdateTailorRating from "@/components/UpdateTailorRating";
 import DialogBox from "@/components/DialogBox";
@@ -14,10 +22,9 @@ import DialogBox from "@/components/DialogBox";
 const TailorProfile = () => {
   const [tailorData, setTailorData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [review, setReview] = useState("");
+  const [userReview, setUserReview] = useState("");
   const [rating, setRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const db = getFirestore();
   const router = useRouter();
   const {
     theme,
@@ -33,6 +40,7 @@ const TailorProfile = () => {
     type: "",
     message: "",
   });
+  const [fetchedReviews, setFetchedReviews] = useState([]);
 
   const [showDialog, setShowDialog] = useState(false);
   const [dialogBoxInfo, setDialogBoxInfo] = useState({
@@ -46,11 +54,49 @@ const TailorProfile = () => {
     const fetchTailorData = async () => {
       try {
         setIsLoading(true);
-        const tailorDocRef = doc(db, "tailors", id);
-        const docSnap = await getDoc(tailorDocRef);
+
+        // Fetch the tailor data
+        const tailorDocRef = doc(db, "tailors", id); // Reference to the tailor document
+        const docSnap = await getDoc(tailorDocRef); // Get the document snapshot
 
         if (docSnap.exists()) {
-          setTailorData(docSnap.data());
+          setTailorData(docSnap.data()); // Update tailorData state with the fetched data
+
+          // Fetch reviews related to this tailor
+          const reviewsRef = collection(db, "tailor_reviews");
+          const reviewsQuery = query(reviewsRef, where("tailor_id", "==", id)); // Query to get reviews for the tailor
+          const reviewsSnap = await getDocs(reviewsQuery); // Get all matching reviews
+
+          const reviewsData = [];
+          const userPromises = [];
+
+          reviewsSnap.forEach((reviewDoc) => {
+            const reviewData = { ...reviewDoc.data(), userName: null }; // Initialize userName as null
+            reviewsData.push(reviewData); // Push the reviewData into the reviewsData array
+
+            // Fetch the user data
+            userPromises.push(
+              getDocs(
+                query(
+                  collection(db, "users"),
+                  where("uid", "==", reviewData.user_id)
+                )
+              )
+                .then((userSnap) => {
+                  if (!userSnap.empty) {
+                    const userData = userSnap.docs[0].data(); // Assuming user_id is unique
+                    reviewData.userName = userData.fullName || "Unknown User";
+                  }
+                })
+                .catch((err) => console.error("Error fetching user:", err))
+            );
+          });
+
+          // Wait for all user fetches to complete
+          await Promise.all(userPromises);
+
+          // At this point, reviewsData contains all reviews with userNames populated
+          setFetchedReviews(reviewsData);
         } else {
           setShowMessage({
             type: "info",
@@ -96,7 +142,7 @@ const TailorProfile = () => {
       return;
     }
 
-    if (review.split(" ").length < 5) {
+    if (userReview.split(" ").length < 5) {
       setShowMessage({
         type: "info",
         message: "Please write at least 5 words in the review",
@@ -111,7 +157,7 @@ const TailorProfile = () => {
       setIsSubmitting(true);
 
       await UpdateTailorRating({
-        message: review,
+        message: userReview,
         stars: rating,
         userId,
         tailorId: id,
@@ -122,7 +168,7 @@ const TailorProfile = () => {
       });
       setPopUpMessageTrigger(true);
       setRating(0);
-      setReview("");
+      setUserReview("");
     } catch (error) {
       console.error("Error submitting review:", error);
       setShowMessage({
@@ -152,7 +198,7 @@ const TailorProfile = () => {
 
   return tailorData ? (
     <div
-      className={`max-w-[97%] mx-auto mt-8 my-2 rounded-xl overflow-hidden p-12 ${theme.mainTheme} ${theme.colorText}`}
+      className={`max-w-[97%] mx-auto mt-6 my-2 rounded-xl overflow-hidden py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
     >
       <div className="flex flex-col sm:flex-row items-center space-x-6 mb-6">
         <img
@@ -173,7 +219,7 @@ const TailorProfile = () => {
             </h1>
           </div>
           <p className={`text-lg `}>
-            Experience:{" "}
+            Experience:
             {tailorData.experience ? (
               tailorData.experience + " years"
             ) : (
@@ -225,50 +271,80 @@ const TailorProfile = () => {
           </span>
           <span className={`text-sm `}>({calculatedRating.toFixed(1)})</span>
         </div>
-        <p className={`text-sm `}>Reviews: {numberOfReviews}</p>
+        <p className={`text-sm `}>Total Reviews: {numberOfReviews}</p>
+      </div>
+      <div className="mb-6 flex flex-col md:flex-row justify-between gap-6">
+        {/* Left Section: Reviews */}
+        <div className="w-full md:w-2/3 overflow-y-auto">
+          <p className={`text-xl mb-2 border-b-[1px] pb-1 font-semibold`}>
+            Reviews
+          </p>
+          {fetchedReviews.length > 0 ? (
+            fetchedReviews.map((fetchedReview, index) => (
+              <div key={index} className="mb-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-yellow-500 font-bold text-xl">
+                    {"★".repeat(fetchedReview.stars)}
+                    {"☆".repeat(5 - fetchedReview.stars)}
+                  </span>
+                  <span className="text-sm">{fetchedReview.userName}</span>
+                </div>
+                <p className="text-sm">{fetchedReview.message}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm italic">No reviews yet</p>
+          )}
+        </div>
+
+        {/* Right Section: Leave a Review */}
+        <div className="w-full md:w-1/3">
+          <div className="mb-6">
+            <p className={`text-xl font-semibold`}>Leave a Review</p>
+
+            <div className="flex items-center space-x-2 my-2">
+              {[...Array(5)].map((_, index) => (
+                <span
+                  key={index}
+                  onClick={() => setRating(index + 1)}
+                  className={`text-2xl cursor-pointer ${
+                    index < rating ? "text-yellow-500" : "text-gray-300"
+                  }`}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+
+            <div className="relative my-4 w-full">
+              <textarea
+                value={userReview}
+                maxLength={250}
+                id="userReview"
+                name="userReview"
+                onChange={(e) => setUserReview(e.target.value)}
+                className={`${inputStyles}  rounded-sm min-h-[100px] max-h-[150px]`}
+                rows={4}
+                placeholder=""
+              />
+              <label className={`${placeHolderStyles}`} htmlFor="userReview">
+                Write your review here
+              </label>
+            </div>
+
+            <SimpleButton
+              btnText={
+                isSubmitting ? <LoadingSpinner size={24} /> : "Submit Review"
+              }
+              type="primary-submit"
+              extraclasses={"w-full"}
+              disabled={isSubmitting}
+              onClick={handleReviewSubmit}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="mb-6">
-        <p className={`text-xl font-semibold `}>Leave a Review</p>
-
-        <div className="flex items-center space-x-2 my-2">
-          {[...Array(5)].map((_, index) => (
-            <span
-              key={index}
-              onClick={() => setRating(index + 1)}
-              className={`text-2xl cursor-pointer ${
-                index < rating ? "text-yellow-500" : "text-gray-300"
-              }`}
-            >
-              ★
-            </span>
-          ))}
-        </div>
-        <div className="relative my-4 max-w-96">
-          <textarea
-            value={review}
-            maxLength={250}
-            id="review"
-            name="review"
-            onChange={(e) => setReview(e.target.value)}
-            className={`${inputStyles}  rounded-sm min-h-[100px] max-h-[150px]`}
-            rows={4}
-            placeholder=""
-          />
-          <label className={`${placeHolderStyles}`} htmlFor="review">
-            Write your review here
-          </label>
-        </div>
-        <SimpleButton
-          btnText={
-            isSubmitting ? <LoadingSpinner size={24} /> : "Submit Review"
-          }
-          type="primary-submit"
-          extraclasses={"w-96"}
-          disabled={isSubmitting}
-          onClick={handleReviewSubmit}
-        />
-      </div>
       {showDialog && (
         <DialogBox
           body={dialogBoxInfo.body}
