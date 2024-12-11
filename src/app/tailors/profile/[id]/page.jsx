@@ -24,6 +24,7 @@ const TailorProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userReview, setUserReview] = useState("");
   const [rating, setRating] = useState(0);
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const {
@@ -274,24 +275,64 @@ const TailorProfile = () => {
         <p className={`text-sm `}>Total Reviews: {numberOfReviews}</p>
       </div>
       <div className="mb-6 flex flex-col md:flex-row justify-between gap-6">
-        {/* Left Section: Reviews */}
-        <div className="w-full md:w-2/3 overflow-y-auto">
+        {/* Reviews Section */}
+        <div className="mb-6 w-[70%]">
           <p className={`text-xl mb-2 border-b-[1px] pb-1 font-semibold`}>
             Reviews
           </p>
           {fetchedReviews.length > 0 ? (
-            fetchedReviews.map((fetchedReview, index) => (
-              <div key={index} className="mb-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-yellow-500 font-bold text-xl">
-                    {"★".repeat(fetchedReview.stars)}
-                    {"☆".repeat(5 - fetchedReview.stars)}
-                  </span>
-                  <span className="text-sm">{fetchedReview.userName}</span>
+            <>
+              <div
+                key={fetchedReviews[currentReviewIndex].userName}
+                className={`mb-4 w-full mt-10 border relative p-4 rounded-lg ${theme.mainTheme}`}
+              >
+                <div
+                  className={`absolute top-0 w-14 flex rounded-full overflow-hidden justify-center items-center h-14 ${theme.mainTheme} -translate-y-[50%] -translate-x-[50%] left-[50%] m-0 `}
+                >
+                  <i className={`fas fa-user ${theme.colorText} text-4xl`}></i>
                 </div>
-                <p className="text-sm">{fetchedReview.message}</p>
+                <div className="flex flex-col mt-6 items-center mb-2">
+                  <p className="font-bold text-center text-xl">
+                    {fetchedReviews[currentReviewIndex].userName}
+                  </p>
+                  <span className="text-yellow-500 text-small">
+                    {"★".repeat(fetchedReviews[currentReviewIndex].stars)}
+                    {"☆".repeat(5 - fetchedReviews[currentReviewIndex].stars)}
+                  </span>
+                </div>
+                <p className="text-lg text-center">
+                  {fetchedReviews[currentReviewIndex].message}
+                </p>
               </div>
-            ))
+
+              {/* Navigation buttons */}
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => {
+                    setCurrentReviewIndex((prevIndex) =>
+                      prevIndex === 0
+                        ? fetchedReviews.length - 1
+                        : prevIndex - 1
+                    );
+                  }}
+                  className={`p-2 w-10 h-10 ${theme.mainTheme} ${theme.colorText} ${theme.hoverShadow} rounded-full`}
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+                <button
+                  onClick={() => {
+                    setCurrentReviewIndex((prevIndex) =>
+                      prevIndex === fetchedReviews.length - 1
+                        ? 0
+                        : prevIndex + 1
+                    );
+                  }}
+                  className={`p-2 w-10 h-10 ${theme.mainTheme} ${theme.colorText} ${theme.hoverShadow} rounded-full`}
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </>
           ) : (
             <p className="text-sm italic">No reviews yet</p>
           )}
