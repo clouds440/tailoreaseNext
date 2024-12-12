@@ -227,7 +227,10 @@ const Navbar = () => {
                   <HomeIcon size={"5"} color={`${theme.iconColor}`} />
                   <span className={"hidden md:inline-block md:ml-2"}>Home</span>
                 </li>
-                <li className={linkStyles}>
+                <li
+                  className={linkStyles}
+                  onClick={() => router.push("/market")}
+                >
                   <CartIcon size={"5"} color={`${theme.iconColor}`} />
                   <span className={"hidden md:inline-block md:ml-2"}>
                     Market

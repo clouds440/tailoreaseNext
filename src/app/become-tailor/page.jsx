@@ -252,9 +252,7 @@ const BecomeTailor = () => {
         </div>
       </div>
     ) : (
-      <div className="items-center justify-center text-3xl text-white flex h-full">
-        Your business dashboard is not ready
-      </div>
+      router.push(`/business-dashboard/${userData.bId}`)
     )
   ) : (
     <div className="h-full relative overflow-y-auto overflow-x-hidden">
