@@ -24,6 +24,7 @@ const TailorProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userReview, setUserReview] = useState("");
   const [rating, setRating] = useState(0);
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const {
@@ -56,23 +57,23 @@ const TailorProfile = () => {
         setIsLoading(true);
 
         // Fetch the tailor data
-        const tailorDocRef = doc(db, "tailors", id); // Reference to the tailor document
-        const docSnap = await getDoc(tailorDocRef); // Get the document snapshot
+        const tailorDocRef = doc(db, "tailors", id); 
+        const docSnap = await getDoc(tailorDocRef); 
 
         if (docSnap.exists()) {
-          setTailorData(docSnap.data()); // Update tailorData state with the fetched data
+          setTailorData(docSnap.data()); 
 
           // Fetch reviews related to this tailor
           const reviewsRef = collection(db, "tailor_reviews");
-          const reviewsQuery = query(reviewsRef, where("tailor_id", "==", id)); // Query to get reviews for the tailor
-          const reviewsSnap = await getDocs(reviewsQuery); // Get all matching reviews
+          const reviewsQuery = query(reviewsRef, where("tailor_id", "==", id)); 
+          const reviewsSnap = await getDocs(reviewsQuery); 
 
           const reviewsData = [];
           const userPromises = [];
 
           reviewsSnap.forEach((reviewDoc) => {
-            const reviewData = { ...reviewDoc.data(), userName: null }; // Initialize userName as null
-            reviewsData.push(reviewData); // Push the reviewData into the reviewsData array
+            const reviewData = { ...reviewDoc.data(), userName: null }; 
+            reviewsData.push(reviewData);
 
             // Fetch the user data
             userPromises.push(
@@ -84,7 +85,7 @@ const TailorProfile = () => {
               )
                 .then((userSnap) => {
                   if (!userSnap.empty) {
-                    const userData = userSnap.docs[0].data(); // Assuming user_id is unique
+                    const userData = userSnap.docs[0].data();
                     reviewData.userName = userData.fullName || "Unknown User";
                   }
                 })
@@ -92,10 +93,8 @@ const TailorProfile = () => {
             );
           });
 
-          // Wait for all user fetches to complete
           await Promise.all(userPromises);
 
-          // At this point, reviewsData contains all reviews with userNames populated
           setFetchedReviews(reviewsData);
         } else {
           setShowMessage({
@@ -162,8 +161,8 @@ const TailorProfile = () => {
         userId,
         tailorId: id,
         setStatusMessage: (status) => {
-          setStatusMessage(status); // Update local state
-          setShowMessage(status); // Immediately show the status message
+          setStatusMessage(status); 
+          setShowMessage(status);
         },
       });
       setPopUpMessageTrigger(true);
@@ -273,74 +272,120 @@ const TailorProfile = () => {
         </div>
         <p className={`text-sm `}>Total Reviews: {numberOfReviews}</p>
       </div>
-      <div className="mb-6 flex flex-col md:flex-row justify-between gap-6">
-        {/* Left Section: Reviews */}
-        <div className="w-full md:w-2/3 overflow-y-auto">
-          <p className={`text-xl mb-2 border-b-[1px] pb-1 font-semibold`}>
-            Reviews
+
+      <div className="mb-6">
+        {/* Common Heading */}
+        <div className=" w-full text-center md:text-left md:w-auto md:mb-0">
+          <p className="mb-6 text-2xl font-bold border-b-2 border-gray-300 pb-1">
+            Reviews & Feedback
           </p>
-          {fetchedReviews.length > 0 ? (
-            fetchedReviews.map((fetchedReview, index) => (
-              <div key={index} className="mb-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-yellow-500 font-bold text-xl">
-                    {"★".repeat(fetchedReview.stars)}
-                    {"☆".repeat(5 - fetchedReview.stars)}
-                  </span>
-                  <span className="text-sm">{fetchedReview.userName}</span>
-                </div>
-                <p className="text-sm">{fetchedReview.message}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-sm italic">No reviews yet</p>
-          )}
         </div>
 
-        {/* Right Section: Leave a Review */}
-        <div className="w-full md:w-1/3">
-          <div className="mb-6">
-            <p className={`text-xl font-semibold`}>Leave a Review</p>
-
-            <div className="flex items-center space-x-2 my-2">
-              {[...Array(5)].map((_, index) => (
-                <span
-                  key={index}
-                  onClick={() => setRating(index + 1)}
-                  className={`text-2xl cursor-pointer ${
-                    index < rating ? "text-yellow-500" : "text-gray-300"
-                  }`}
+        <div className="w-full flex flex-col md:flex-row justify-between gap-6">
+          {/* Reviews Section */}
+          <div className="w-full md:w-[65%] lg:w-[70%]">
+            {fetchedReviews.length > 0 ? (
+              <>
+                <div
+                  key={fetchedReviews[currentReviewIndex].userName}
+                  className={`relative w-full mt-8 border p-6 rounded-lg shadow-md ${theme.mainTheme}`}
                 >
-                  ★
-                </span>
-              ))}
-            </div>
+                  <div
+                    className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center w-16 h-16 rounded-full overflow-hidden ${theme.mainTheme}`}
+                  >
+                    <i
+                      className={`fas fa-user ${theme.colorText} text-3xl`}
+                    ></i>
+                  </div>
+                  <div className="mt-8 flex flex-col items-center">
+                    <p className="font-bold text-lg text-center">
+                      {fetchedReviews[currentReviewIndex].userName}
+                    </p>
+                    <span className="text-yellow-500 text-base">
+                      {"★".repeat(fetchedReviews[currentReviewIndex].stars)}
+                      {"☆".repeat(5 - fetchedReviews[currentReviewIndex].stars)}
+                    </span>
+                  </div>
+                  <p className={`text-center ${theme.colorText} mt-4`}>
+                    {fetchedReviews[currentReviewIndex].message}
+                  </p>
+                </div>
 
-            <div className="relative my-4 w-full">
-              <textarea
-                value={userReview}
-                maxLength={250}
-                id="userReview"
-                name="userReview"
-                onChange={(e) => setUserReview(e.target.value)}
-                className={`${inputStyles}  rounded-sm min-h-[100px] max-h-[150px]`}
-                rows={4}
-                placeholder=""
+                {/* Navigation buttons */}
+                <div className="flex justify-center mt-6 space-x-4">
+                  <button
+                    onClick={() => {
+                      setCurrentReviewIndex((prevIndex) =>
+                        prevIndex === 0
+                          ? fetchedReviews.length - 1
+                          : prevIndex - 1
+                      );
+                    }}
+                    className={`p-3 w-12 h-12 ${theme.mainTheme} ${theme.colorText} ${theme.hoverShadow} rounded-full flex justify-center items-center`}
+                  >
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCurrentReviewIndex((prevIndex) =>
+                        prevIndex === fetchedReviews.length - 1
+                          ? 0
+                          : prevIndex + 1
+                      );
+                    }}
+                    className={`p-3 w-12 h-12 ${theme.mainTheme} ${theme.colorText} ${theme.hoverShadow} rounded-full flex justify-center items-center`}
+                  >
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm italic text-gray-500">No reviews yet</p>
+            )}
+          </div>
+
+          {/* Right Section: Leave a Review */}
+          <div className="w-full md:w-[35%] lg:w-[30%]">
+            <div className={`${theme.mainTheme} p-6 rounded-lg shadow-md`}>
+              <p className="text-xl font-semibold mb-4">Leave a Review</p>
+              <div className="flex items-center space-x-2 mb-4">
+                {[...Array(5)].map((_, index) => (
+                  <span
+                    key={index}
+                    onClick={() => setRating(index + 1)}
+                    className={`text-2xl cursor-pointer transition-colors duration-200 ${
+                      index < rating ? "text-yellow-500" : "text-gray-300"
+                    }`}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <div className="relative mb-4">
+                <textarea
+                  value={userReview}
+                  maxLength={250}
+                  id="userReview"
+                  name="userReview"
+                  onChange={(e) => setUserReview(e.target.value)}
+                  className={`${inputStyles}  rounded-sm min-h-[100px] max-h-[150px]`}
+                  rows={4}
+                  placeholder=""
+                />
+                <label className={`${placeHolderStyles}`} htmlFor="userReview">
+                  Write your review here
+                </label>
+              </div>
+              <SimpleButton
+                btnText={
+                  isSubmitting ? <LoadingSpinner size={24} /> : "Submit Review"
+                }
+                type="primary-submit"
+                extraclasses="w-full"
+                disabled={isSubmitting}
+                onClick={handleReviewSubmit}
               />
-              <label className={`${placeHolderStyles}`} htmlFor="userReview">
-                Write your review here
-              </label>
             </div>
-
-            <SimpleButton
-              btnText={
-                isSubmitting ? <LoadingSpinner size={24} /> : "Submit Review"
-              }
-              type="primary-submit"
-              extraclasses={"w-full"}
-              disabled={isSubmitting}
-              onClick={handleReviewSubmit}
-            />
           </div>
         </div>
       </div>
