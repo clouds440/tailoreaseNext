@@ -5,6 +5,7 @@ import UserContext from "@/utils/UserContext";
 import Logo from "../components/Logo";
 import SimpleButton from "../components/SimpleButton";
 import Link from "next/link";
+import RotatingJacket from "@/components/RotatingJacket";
 
 export default function Home() {
   const { theme, inputStyles, placeHolderStyles } = useContext(UserContext);
@@ -40,12 +41,8 @@ export default function Home() {
 
           {/* Right Section */}
           <div className="relative" data-aos="fade-left">
-            <img
-              className="tailor"
-              src="graphics/animation.gif"
-              alt="This is the 3D animation of a tailor."
-            />
-            <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 rounded-2xl text-[#00000017] text-[22rem] font-extrabold -z-10">
+            <RotatingJacket />
+            <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 rounded-2xl text-[#00000040] text-[22rem] font-extrabold -z-10">
               VT
             </p>
           </div>
