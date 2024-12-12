@@ -1,11 +1,10 @@
 "use client";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useContext } from "react";
 import UserContext from "@/utils/UserContext";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import SimpleButton from "@/components/SimpleButton";
 
 const BusinessDashboard = () => {
-  const { id } = useParams();
   const {
     theme,
     userLoggedIn,
@@ -22,35 +21,22 @@ const BusinessDashboard = () => {
         message: "Log in to continue to your business dashboard",
       });
       setPopUpMessageTrigger(true);
-      router.push(`/login?redirect=/business-dashboard/${id}`);
+      router.push(`/login?redirect=/business-dashboard`);
       return;
     }
   }, [userLoggedIn, router]);
 
-  return id === userData.bId ? (
+  // when the business data is being fetched, the "Approved" status will be checked each time and the below userData.bId will be changed with approved ?
+  return userData.bId ? (
     <div
       className={`items-center p-6 mx-auto my-4 rounded-3xl max-w-[97%] max-h-[96%] h-[96%] overflow-hidden select-none justify-center text-3xl text-white flex ${theme.mainTheme}`}
     >
-      <div className="flex flex-col mr-3">{id}:</div>
+      {/* Business content displayed here */}
+      <div className="flex flex-col mr-3">Business Name:</div>
       <div className="flex">Your business dashboard is not ready</div>
     </div>
   ) : (
-    <div
-      className={`items-center p-6 mx-auto my-4 rounded-3xl max-w-[97%] max-h-[96%] h-[96%] overflow-hidden select-none justify-center text-3xl text-white flex ${theme.mainTheme}`}
-    >
-      <div>
-        <span className={`mr-3 ${theme.colorText}`}>
-          This business does NOT belong to you
-        </span>
-      </div>
-      <div>
-        <SimpleButton
-          btnText={"Go Home"}
-          type={"primary"}
-          onClick={() => router.push("/")}
-        />
-      </div>
-    </div>
+    router.push("/become-tailor")
   );
 };
 

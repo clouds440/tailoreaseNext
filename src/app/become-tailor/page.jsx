@@ -24,8 +24,13 @@ import SimpleButton from "@/components/SimpleButton";
 
 const BecomeTailor = () => {
   const [step, setStep] = useState(1);
-  const { userData, userLoggedIn, setPopUpMessageTrigger, setShowMessage } =
-    useContext(UserContext);
+  const {
+    theme,
+    userData,
+    userLoggedIn,
+    setPopUpMessageTrigger,
+    setShowMessage,
+  } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({});
   const [disableResendButton, setDisableResendButton] = useState(false);
@@ -35,7 +40,7 @@ const BecomeTailor = () => {
 
   useEffect(() => {
     const checkBusinessAccount = async () => {
-      if (!userLoggedIn || !userData?.uid) {
+      if (!userLoggedIn) {
         router.push("/signup");
         return; // Exit if the user is not logged in or `uid` is not available
       }
@@ -174,7 +179,10 @@ const BecomeTailor = () => {
           "A verification email has been sent. Please verify to activate your business account.",
       });
       setPopUpMessageTrigger(true);
-      router.push("/");
+      setHasBusinessAccount({
+        approved: false,
+        exists: true,
+      });
     } catch (error) {
       console.error("Error submitting business application:", error);
       setShowMessage({
@@ -202,7 +210,7 @@ const BecomeTailor = () => {
     } catch (error) {
       setShowMessage({
         type: "danger",
-        message: "Couldn't set verification email: " + error,
+        message: "Couldn't send verification email: " + error,
       });
       setPopUpMessageTrigger(true);
     } finally {
@@ -220,39 +228,56 @@ const BecomeTailor = () => {
 
   return hasBusinessAccount.exists ? (
     !hasBusinessAccount.approved ? (
-      <div className="flex flex-col justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30">
-        <div className="text-white max-w-xl mb-4 flex flex-col items-center text-center">
-          <span className="text-2xl">You already have a business account!</span>
+      <div
+        className={`flex flex-col justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30`}
+      >
+        <div
+          className={`mb-4 max-w-[95%] flex p-5 rounded-lg flex-col items-center text-center ${theme.mainTheme}`}
+        >
+          <span className="text-2xl">Your business account is pending!</span>
           <span>
-            If you don't see your business dashboard, please check your email
-            for a confirmation email from TailorEase.
+            Please check your email for a confirmation email from TailorEase to
+            continue to your business dashboard.
           </span>
-        </div>
-        <div className="flex space-x-3">
-          <Link href={"/"}>
+          <span className="my-5">
+            If you have verified your email and you still see this message, your
+            Business Account might be suspended. Please
+            <Link
+              href={"/contact-us"}
+              className={`font-bold text-xl ${theme.iconColor} ${theme.hoverText}`}
+            >
+              {" "}
+              contact us here{" "}
+            </Link>
+            for customer support
+          </span>
+
+          <div className="flex space-x-3">
+            <Link href={"/"}>
+              <SimpleButton
+                btnText={"Go Home"}
+                type={"primary"}
+                extraclasses={"py-2 px-5 text-xl"}
+              />
+            </Link>
             <SimpleButton
-              btnText={"Go Home"}
+              btnText={
+                isLoading ? (
+                  <LoadingSpinner size={26} />
+                ) : (
+                  "Resend Confirmation Email"
+                )
+              }
               type={"primary"}
-              extraclasses={"py-2 px-5 text-xl"}
+              extraclasses={"py-2 px-5 text-xl min-w-[298px]"}
+              onClick={handleResendEmail}
+              disabled={disableResendButton}
             />
-          </Link>
-          <SimpleButton
-            btnText={
-              isLoading ? (
-                <LoadingSpinner size={26} />
-              ) : (
-                "Resend Confirmation Email"
-              )
-            }
-            type={"primary"}
-            extraclasses={"py-2 px-5 text-xl min-w-[298px]"}
-            onClick={handleResendEmail}
-            disabled={disableResendButton}
-          />
+          </div>
         </div>
       </div>
     ) : (
-      router.push(`/business-dashboard/${userData.bId}`)
+      router.push(`/business-dashboard`)
     )
   ) : (
     <div className="h-full relative overflow-y-auto overflow-x-hidden">

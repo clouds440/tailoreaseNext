@@ -247,7 +247,7 @@ const Navbar = () => {
                 </li>
                 {userLoggedIn && (
                   <li
-                    onClick={() => router.push("/become-tailor")}
+                    onClick={() => router.push("/business-dashboard")}
                     className={`${linkStyles}`}
                   >
                     <ServicesIcon size={"5"} color={`${theme.iconColor}`} />

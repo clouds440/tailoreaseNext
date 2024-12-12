@@ -46,7 +46,7 @@ export const UserProvider = ({ children }) => {
       colorText: "text-sky-200",
       colorBorder: "border-violet-500",
       iconColor: "text-rose-500",
-      hoverText: "hover:text-rose-500",
+      hoverText: "hover:text-rose-600",
       colorBg: "bg-sky-700 backdrop-blur-xl bg-opacity-90",
       hoverBg: "hover:bg-rose-400 hover:bg-opacity-50",
       hoverShadow: "hover:shadow-md hover:shadow-violet-500",
