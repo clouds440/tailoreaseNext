@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import SimpleButton from "./SimpleButton";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { EditIcon } from "../../public/icons/svgIcons";
@@ -74,12 +74,12 @@ function ChangePasswordModal({
     onSave(formData);
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsVisible(false);
     setTimeout(() => {
       setIsPasswordModalOpen(false);
     }, 300);
-  };
+  }, [setIsVisible, setIsPasswordModalOpen]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

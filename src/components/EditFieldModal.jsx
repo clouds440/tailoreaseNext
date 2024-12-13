@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import SimpleButton from "./SimpleButton";
 import { EditIcon } from "../../public/icons/svgIcons";
 import { LoadingSpinner } from "./LoadingSpinner";
@@ -70,12 +70,12 @@ function EditFieldModal({
     onSave(field, inputValue);
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsVisible(false);
     setTimeout(() => {
       setModalInfo({ isOpen: false, field: "", value: "" });
     }, 300);
-  };
+  }, [setIsVisible, setModalInfo]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

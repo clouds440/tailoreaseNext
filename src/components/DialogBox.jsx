@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "./SimpleButton";
@@ -56,12 +56,12 @@ const DialogBox = ({
     </svg>
   );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsVisible(false);
     setTimeout(() => {
       setShowDialog(false);
     }, 300);
-  };
+  }, [setIsVisible, setShowDialog]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

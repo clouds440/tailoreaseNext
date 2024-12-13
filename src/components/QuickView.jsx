@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { AnimatePresence, easeIn, motion } from "framer-motion";
 import SimpleButton from "../components/SimpleButton";
 import { useRouter } from "next/navigation";
@@ -20,12 +20,12 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
   const normalizedRating = totalRating ? (rating / totalRating) * 5 : 0;
   const reviewCount = totalRating ? Math.floor(totalRating / 6) : 0;
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setShowPopUp(false);
     setTimeout(() => {
       setPopupVisible(false);
     }, 300);
-  };
+  }, [setShowPopUp, setPopupVisible]);
 
   const handleOutsideClick = (e) => {
     if (popupRef.current && !popupRef.current.contains(e.target)) {
