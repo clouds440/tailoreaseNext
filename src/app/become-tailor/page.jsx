@@ -149,6 +149,7 @@ const BecomeTailor = () => {
         ...dataWithoutPicture,
         businessPictureUrl: businessPictureUrl,
         approved: false,
+        status: "active",
         ownerId: userData.uid,
         rating: 0,
         total_rating: 0,

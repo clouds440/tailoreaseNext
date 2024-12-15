@@ -7,7 +7,7 @@ function SimpleButton({
   icon = null,
 }) {
   const primary = "bg-sky-500 bg-opacity-80 text-white hover:bg-sky-400";
-  const simple = "bg-gray-100 opacity-85 text-gray-900 hover:bg-gray-300";
+  const simple = "bg-gray-200 opacity-85 text-gray-900 hover:bg-gray-400";
   const danger = "bg-red-700 text-white hover:bg-rose-500";
 
   let style;
