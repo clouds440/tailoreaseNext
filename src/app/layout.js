@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
       <body
         className="relative flex h-screen w-screen"
         style={{
-          backgroundImage: "url(/background_mages/backgroundDefaultBlue.jpg)",
+          backgroundImage: "url(/background_images/backgroundDefaultBlue.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
