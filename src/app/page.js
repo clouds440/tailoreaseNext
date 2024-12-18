@@ -57,11 +57,11 @@ export default function Home() {
           <h2 className={`text-4xl font-bold ${theme.colorText}`}>
             Why Choose Us
           </h2>
-          <p
+          {/* <p
             className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-[10rem] font-extrabold -z-10 ${theme.colorText} opacity-[2%] `}
           >
             Benefits
-          </p>
+          </p> */}
 
           {/* Features */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 w-full max-w-4xl">
@@ -143,11 +143,11 @@ export default function Home() {
       <div
         className={`mt-4 mb-10 w-[97%] mx-auto py-12 px-6 rounded-3xl ${theme.mainTheme} ${theme.colorBorder}`}
       >
-        <p
+        {/* <p
           className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-[10rem] font-extrabold -z-10 ${theme.colorText} opacity-[2%] `}
         >
           Footer
-        </p>
+        </p> */}
         {/* Footer Box Wrapper */}
         <div
           className={`w-full flex flex-wrap justify-between space-y-8 md:space-y-0 p-6 rounded-3xl`}
