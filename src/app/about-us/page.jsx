@@ -141,7 +141,9 @@ const AboutUs = () => {
               className="rounded-full mb-4"
             />
             <h3 className="text-xl font-bold mb-2">Ahmed Zahid</h3>
-            <p className="text-sm italic mb-4">"Passion drives perfection."</p>
+            <p className="text-sm italic mb-4">
+              &ldquo;Passion drives perfection.&rdquo;
+            </p>
             <p className="mb-2">
               <span className="font-semibold">Role:</span> Team Lead / Project
               Manager
