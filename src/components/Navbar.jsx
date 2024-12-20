@@ -277,7 +277,11 @@ const Navbar = () => {
                   </li>
                 )}
                 <div>
-                  <div className="relative md:absolute md:bottom-1 w-full">
+                  <div
+                    className={`relative md:absolute md:bottom-1 w-full rounded-xl ${
+                      windowWidth >= 768 && windowHeight <= 400 && theme.colorBg
+                    }`}
+                  >
                     <div
                       className={linkStyles}
                       ref={dropdownRef}

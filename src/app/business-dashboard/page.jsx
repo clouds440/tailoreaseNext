@@ -28,10 +28,12 @@ const BusinessDashboard = () => {
         router.push(`/login?redirect=/business-dashboard`);
         return;
       }
+
       if (!userData.bId) {
         router.push("/become-tailor");
         return;
       }
+
       try {
         const userQuery = query(
           collection(db, "tailors"),
@@ -41,12 +43,16 @@ const BusinessDashboard = () => {
 
         if (!querySnapshot.empty) {
           const tailorDoc = querySnapshot.docs[0];
-          setBusinessData(tailorDoc.data());
-          const { approved } = tailorDoc.data();
-          if (!approved) {
+          const tailorData = tailorDoc.data();
+          setBusinessData(tailorData);
+
+          if (!tailorData || !tailorData.approved) {
             router.push("/become-tailor");
-            return null;
+            return;
           }
+        } else {
+          router.push("/become-tailor");
+          return;
         }
       } catch (error) {
         console.error("Error checking business account:", error);
@@ -60,10 +66,16 @@ const BusinessDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30">
+      <div
+        className={`flex justify-center mx-2 items-center h-full ${theme.mainTheme}`}
+      >
         <ClipLoader size={60} color="#ffffff" />
       </div>
     ); // Loading indicator while checking
+  }
+
+  if (!businessData) {
+    return null; // To prevent rendering issues
   }
 
   return businessData.status === "active" ? (
