@@ -20,7 +20,7 @@ function PopupMessage() {
 
       return () => clearTimeout(timer);
     }
-  }, [popUpMessageTrigger]);
+  }, [popUpMessageTrigger, setPopUpMessageTrigger]);
 
   let iconPath, bgColor;
 

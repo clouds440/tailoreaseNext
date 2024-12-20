@@ -8,6 +8,7 @@ import UserContext from "@/utils/UserContext";
 import SimpleButton from "@/components/SimpleButton";
 import { AnimatePresence, motion } from "framer-motion";
 import QuickView from "@/components/QuickView";
+import Image from "next/image";
 
 const TailorListPage = () => {
   const { theme } = useContext(UserContext);
@@ -111,6 +112,7 @@ const TailorListPage = () => {
 
   useEffect(() => {
     fetchTailors();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedFilters]);
 
   useEffect(() => {
@@ -192,17 +194,20 @@ const TailorListPage = () => {
               onClick={() => handleTailorClick(tailor)} // Trigger popup
             >
               <div className="flex items-center space-x-4">
-                <img
-                  src={tailor.businessPictureUrl}
-                  className="w-32 h-24 object-cover rounded-lg"
-                  alt={tailor.businessName}
-                  onError={(e) => {
-                    if (!e.target.dataset.fallback) {
-                      e.target.dataset.fallback = true;
-                      e.target.src = "/images/profile/business/default.png";
-                    }
-                  }}
+                <Image
+                  src={
+                    tailor.businessPictureUrl ||
+                    "/images/profile/business/default.png"
+                  }
+                  width={192} // Adjust dimensions as needed
+                  height={144}
+                  alt={`Image of ${tailor.businessName}`}
+                  className={`object-cover rounded-lg lg:rounded-xl shadow-md max-h-32 border ${theme.colorBorder}`}
+                  priority={false} // Use `priority={true}` if this image is above the fold
+                  placeholder="blur" // Optional, for placeholder loading effects
+                  blurDataURL="/images/profile/business/default.png" // Add a low-res placeholder image
                 />
+
                 <div className="flex flex-col">
                   <h3 className={`text-lg font-bold ${theme.colorText}`}>
                     {tailor.businessName}

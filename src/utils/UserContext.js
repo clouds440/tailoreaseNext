@@ -85,6 +85,7 @@ export const UserProvider = ({ children }) => {
       // Mark app as ready
       setIsReady(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Runs only once after the initial render
 
   // Show a loader until the app is ready

@@ -87,36 +87,38 @@ const DialogBox = ({
           exit={{ opacity: 0 }}
         >
           <div className={`bg-black bg-opacity-30 fixed inset-0`}></div>
-          <motion.div
-            className={`rounded-xl shadow-lg w-auto max-w-[65%] z-50 ${theme.mainTheme}`}
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.8 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className={`${bgColor} p-4 flex items-center rounded-t-xl`}>
-              {icon}
-              <span className="ml-3 text-white font-medium">{title}</span>
-            </div>
-            <div className={`p-4 h-auto w-auto ${theme.colorText}`}>
-              {typeof body === "function" ? body() : body}
-            </div>
-            <div className={`p-4 flex justify-end space-x-3`}>
-              <SimpleButton
-                onClick={handleClose}
-                type={"simple"}
-                btnText={"Close"}
-              />
-              {buttons.map(({ label, onClick, type }, index) => (
+          <div className="w-auto max-w-[85%] -translate-y-48">
+            <motion.div
+              className={`rounded-xl shadow-lg w-auto z-50 ${theme.mainTheme}`}
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className={`${bgColor} p-4 flex items-center rounded-t-xl`}>
+                {icon}
+                <span className="ml-3 text-white font-medium">{title}</span>
+              </div>
+              <div className={`p-8 h-auto w-full ${theme.colorText}`}>
+                {typeof body === "function" ? body() : body}
+              </div>
+              <div className={`p-4 flex justify-end space-x-3`}>
                 <SimpleButton
-                  key={index}
-                  onClick={onClick}
-                  btnText={label}
-                  type={type}
+                  onClick={handleClose}
+                  type={"simple"}
+                  btnText={"Close"}
                 />
-              ))}
-            </div>
-          </motion.div>
+                {buttons.map(({ label, onClick, type }, index) => (
+                  <SimpleButton
+                    key={index}
+                    onClick={onClick}
+                    btnText={label}
+                    type={type}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

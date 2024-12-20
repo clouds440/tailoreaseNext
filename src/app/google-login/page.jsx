@@ -94,7 +94,14 @@ const GoogleLogin = () => {
     };
 
     handleGoogleLogin();
-  }, [searchParams, router, setUserLoggedIn, setUserData]);
+  }, [
+    searchParams,
+    router,
+    setUserLoggedIn,
+    setUserData,
+    setShowMessage,
+    setPopUpMessageTrigger,
+  ]);
 
   if (isLoading) {
     return (

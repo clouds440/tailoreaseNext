@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import { AnimatePresence, easeIn, motion } from "framer-motion";
 import SimpleButton from "../components/SimpleButton";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
   const [showPopUp, setShowPopUp] = useState(popupVisible);
@@ -54,6 +55,7 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
     return () => {
       document.removeEventListener("click", handleOutsideClick);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tailor]);
 
   const handleViewProfile = () => {
@@ -124,13 +126,18 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
                 </button>
               </div>
               <div className="flex flex-col sm:flex-row items-center space-x-6 mb-6">
-                <img
-                  src={tailor.businessPictureUrl}
-                  alt={tailor.businessName}
-                  className="w-[10rem] h-[10rem] object-cover rounded-lg shadow-md"
-                  onError={(e) => {
-                    e.target.src = "/images/profile/business/default.png";
-                  }}
+                <Image
+                  src={
+                    tailor.businessPictureUrl ||
+                    "/images/profile/business/default.png"
+                  }
+                  width={192} // Adjust dimensions as needed
+                  height={144}
+                  alt={`Image of ${tailor.businessName}`}
+                  className={`object-cover rounded-lg lg:rounded-xl shadow-md max-h-32 border ${theme.colorBorder}`}
+                  priority={false} // Use `priority={true}` if this image is above the fold
+                  placeholder="blur" // Optional, for placeholder loading effects
+                  blurDataURL="/images/profile/business/default.png" // Add a low-res placeholder image
                 />
                 <div className="flex flex-col space-y-2">
                   <p className={`text-sm ${theme.colorText}`}>

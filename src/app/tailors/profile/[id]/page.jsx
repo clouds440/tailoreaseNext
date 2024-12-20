@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useContext } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "@/utils/firebaseConfig";
 import {
@@ -111,7 +112,7 @@ const TailorProfile = () => {
     };
 
     fetchTailorData();
-  }, [id]);
+  }, [id, setPopUpMessageTrigger, setShowMessage]);
 
   const handleReviewSubmit = async () => {
     if (!userLoggedIn) {
@@ -202,16 +203,17 @@ const TailorProfile = () => {
       className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg overflow-hidden py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
     >
       <div className="flex flex-col sm:flex-row items-center space-x-6 mb-6">
-        <img
-          src={tailorData.businessPictureUrl}
-          alt={tailorData.businessName}
-          className="w-[16rem] h-[14rem] object-cover rounded-lg shadow-md"
-          onError={(e) => {
-            if (!e.target.dataset.fallback) {
-              e.target.dataset.fallback = true;
-              e.target.src = "/images/profile/business/default.png";
-            }
-          }}
+        <Image
+          src={
+            tailorData.businessPictureUrl ||
+            "/images/profile/business/default.png"
+          }
+          alt={tailorData.businessName || "Business Name"}
+          width={256} // 16rem = 256px
+          height={224} // 14rem = 224px
+          className={`object-cover rounded-lg lg:rounded-xl shadow-md max-h-32 border ${theme.colorBorder}`}
+          placeholder="blur"
+          blurDataURL="/images/profile/business/default.png" // For fallback blur effect
         />
         <div className="flex w-full flex-col mt-4 sm:mt-0">
           <div className="flex w-full justify-between items-center mb-6">
