@@ -178,23 +178,17 @@ export default function Home() {
               Quick Links
             </h3>
             <div className="flex w-auto">
-              <Link
-                href="/about-us"
-                className={`text-lg ${theme.subTextColor}`}
-              >
+              <Link href="/about-us" className={`text-lg ${theme.hoverText}`}>
                 About Us
               </Link>
             </div>
             <div className="flex w-auto">
-              <Link
-                href="/contact-us"
-                className={`text-lg ${theme.subTextColor}`}
-              >
+              <Link href="/contact-us" className={`text-lg ${theme.hoverText}`}>
                 Contact Us
               </Link>
             </div>
             <div className="flex w-auto">
-              <Link href="/faq" className={`text-lg ${theme.subTextColor}`}>
+              <Link href="/faq" className={`text-lg ${theme.hoverText}`}>
                 Frequently Asked Questions
               </Link>
             </div>

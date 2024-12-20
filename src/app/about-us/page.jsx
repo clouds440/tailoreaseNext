@@ -2,6 +2,7 @@
 import { useContext } from "react";
 import { motion } from "framer-motion";
 import UserContext from "@/utils/UserContext";
+import Image from "next/image";
 
 const AboutUs = () => {
   const { theme } = useContext(UserContext);
@@ -132,10 +133,12 @@ const AboutUs = () => {
           <div
             className={`${theme.colorBg} p-6 rounded-lg shadow-lg flex flex-col items-center`}
           >
-            <img
+            <Image
               src="/team_data/zahid.jpg"
               alt="Ahmed Zahid"
-              className="w-24 h-24 rounded-full mb-4"
+              width={96}
+              height={96}
+              className="rounded-full mb-4"
             />
             <h3 className="text-xl font-bold mb-2">Ahmed Zahid</h3>
             <p className="text-sm italic mb-4">"Passion drives perfection."</p>
@@ -153,10 +156,12 @@ const AboutUs = () => {
           <div
             className={`${theme.colorBg} p-6 rounded-lg shadow-lg flex flex-col items-center`}
           >
-            <img
+            <Image
               src="/team_data/ali.jpg"
               alt="Syed Ali Abbas Naqvi"
-              className="w-24 h-24 rounded-full mb-4"
+              width={96}
+              height={96}
+              className="rounded-full mb-4"
             />
             <h3 className="text-xl font-bold mb-2">Syed Ali Abbas Naqvi</h3>
             <p className="mb-2">
@@ -172,10 +177,12 @@ const AboutUs = () => {
           <div
             className={`${theme.colorBg} p-6 rounded-lg shadow-lg flex flex-col items-center`}
           >
-            <img
+            <Image
               src="/team_data/abdul_rehman.jpg"
               alt="Abdul Rehman"
-              className="w-24 h-24 rounded-full mb-4"
+              width={96}
+              height={96}
+              className="rounded-full mb-4"
             />
             <h3 className="text-xl font-bold mb-2">Abdul Rehman</h3>
             <p className="mb-2">
