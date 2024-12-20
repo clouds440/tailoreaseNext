@@ -23,7 +23,7 @@ const AboutUs = () => {
 
   return (
     <div
-      className={`${theme.mainTheme} mx-4 my-4 min-h-screen py-8 px-4 md:px-16 text-gray-100 rounded-3xl`}
+      className={`${theme.mainTheme} max-w-[99.5%] mx-auto my-4 md:my-1 min-h-screen py-8 px-4 md:px-16 rounded-lg`}
     >
       <header className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4">About Us</h1>
@@ -98,7 +98,7 @@ const AboutUs = () => {
         </section>
 
         <section className="mb-10 lg:mb-0">
-          <h2 className="text-3xl font-semibold mb-4">Why Choose Us?</h2>
+          <h2 className="text-3xl font-semibold mb-4">Why Choose Us</h2>
           <motion.ul
             initial="hidden"
             animate="visible"

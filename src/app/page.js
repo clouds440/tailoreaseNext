@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       <div
-        className={`max-w-[97%] p-6 mx-auto my-4 rounded-3xl flex flex-col items-center overflow-hidden select-none ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto p-6 mt-3 md:mt-1 mb-2 rounded-lg flex flex-col items-center overflow-hidden select-none ${theme.mainTheme}`}
       >
         {/* Top Section */}
         <div
@@ -141,7 +141,7 @@ export default function Home() {
       </div>
 
       <div
-        className={`mt-4 mb-10 w-[97%] mx-auto py-12 px-6 rounded-3xl ${theme.mainTheme} ${theme.colorBorder}`}
+        className={`max-w-[99.5%] mx-auto mb-2 md:mb-1 py-12 px-6 rounded-lg overflow-x-hidden ${theme.mainTheme} ${theme.colorBorder}`}
       >
         <p
           className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-[10rem] font-extrabold -z-10 ${theme.colorText} opacity-[2%] `}
@@ -153,10 +153,10 @@ export default function Home() {
           className={`w-full flex flex-wrap justify-between space-y-8 md:space-y-0 p-6 rounded-3xl`}
         >
           {/* Left - Logo and Social Links */}
-          <div className="flex flex-col space-y-6 w-full md:w-1/3">
+          <div className="flex flex-col space-y-6 w-full lg:w-1/3">
             <Logo fontSize={"text-2xl"} />
-            <h3 className={`text-3xl font-bold ${theme.colorText}`}>
-              Virtual Tailor
+            <h3 className={`text-2xl font-bold ${theme.colorText}`}>
+              Follow us
             </h3>
             <div className="flex space-x-4">
               {["facebook", "twitter", "linkedin", "instagram", "youtube"].map(
@@ -173,8 +173,10 @@ export default function Home() {
           </div>
 
           {/* Center - Quick Links */}
-          <div className="flex flex-col space-y-4 w-full md:w-1/3">
-            <h3 className={`text-3xl font-bold ${theme.colorText}`}>
+          <div className="flex flex-col space-y-4 w-full lg:w-1/3">
+            <h3
+              className={`text-2xl mt-4 lg:mt-0 font-bold ${theme.colorText}`}
+            >
               Quick Links
             </h3>
             <div className="flex w-auto">
@@ -195,8 +197,10 @@ export default function Home() {
           </div>
 
           {/* Right - Newsletter Subscription */}
-          <div className="flex flex-col space-y-6 w-full md:w-1/3">
-            <h3 className={`text-3xl font-bold ${theme.colorText}`}>
+          <div className="flex flex-col space-y-6 w-full lg:w-1/3">
+            <h3
+              className={`text-3xl font-bold mt-4 lg:mt-0 ${theme.colorText}`}
+            >
               Subscribe to our Newsletter
             </h3>
             <form className="flex items-center space-x-4">

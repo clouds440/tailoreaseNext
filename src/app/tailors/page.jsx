@@ -161,8 +161,10 @@ const TailorListPage = () => {
   };
 
   return (
-    <div className={`w-full overflow-hidden mx-auto p-6 select-none`}>
-      <div className={`mb-4 p-4 ${theme.mainTheme} rounded-lg`}>
+    <div
+      className={`max-w-[99.5%] mx-auto my-4 md:my-1 overflow-hidden select-none`}
+    >
+      <div className={`p-4 ${theme.mainTheme} rounded-lg`}>
         <h2 className={`text-2xl font-bold mb-6 ${theme.colorText}`}>
           All Registered Tailors
         </h2>
@@ -177,11 +179,9 @@ const TailorListPage = () => {
           </div>
         </div>
       </div>
-      <div
-        className={`mt-4 rounded-lg z-0 overflow-hidden p-6 ${theme.mainTheme}`}
-      >
+      <div className={`my-2 rounded-lg overflow-hidden p-6 ${theme.mainTheme}`}>
         {loading ? (
-          <div className="flex justify-center items-center h-40">
+          <div className="flex justify-center items-center h-screen">
             <PropagateLoader color="#1976d2" />
           </div>
         ) : (

@@ -154,7 +154,7 @@ const SignUpForm = () => {
   }, [userLoggedIn, router]);
 
   return (
-    <div className="flex items-center justify-center mt-8 max-w-2xl w-auto mx-auto p-6 rounded-md select-none">
+    <div className="max-w-[99.5%] mx-auto flex items-center justify-center w-auto p-6 rounded-lg select-none">
       <div
         className={`p-6 rounded-lg ${theme.mainTheme} w-full max-w-md relative`}
       >

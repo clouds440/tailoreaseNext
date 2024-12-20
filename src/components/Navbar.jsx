@@ -349,7 +349,7 @@ const Navbar = () => {
                 onClick={() => handleThemeChange(option.value)}
                 className={`mx-1 rounded-md w-1/4 py-6 ${option.style}`}
               >
-                {option.label}
+                <span className="hidden md:inline">{option.label}</span>
               </button>
             ))}
           </div>

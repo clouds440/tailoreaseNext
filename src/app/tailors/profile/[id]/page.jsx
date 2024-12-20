@@ -57,22 +57,22 @@ const TailorProfile = () => {
         setIsLoading(true);
 
         // Fetch the tailor data
-        const tailorDocRef = doc(db, "tailors", id); 
-        const docSnap = await getDoc(tailorDocRef); 
+        const tailorDocRef = doc(db, "tailors", id);
+        const docSnap = await getDoc(tailorDocRef);
 
         if (docSnap.exists()) {
-          setTailorData(docSnap.data()); 
+          setTailorData(docSnap.data());
 
           // Fetch reviews related to this tailor
           const reviewsRef = collection(db, "tailor_reviews");
-          const reviewsQuery = query(reviewsRef, where("tailor_id", "==", id)); 
-          const reviewsSnap = await getDocs(reviewsQuery); 
+          const reviewsQuery = query(reviewsRef, where("tailor_id", "==", id));
+          const reviewsSnap = await getDocs(reviewsQuery);
 
           const reviewsData = [];
           const userPromises = [];
 
           reviewsSnap.forEach((reviewDoc) => {
-            const reviewData = { ...reviewDoc.data(), userName: null }; 
+            const reviewData = { ...reviewDoc.data(), userName: null };
             reviewsData.push(reviewData);
 
             // Fetch the user data
@@ -161,7 +161,7 @@ const TailorProfile = () => {
         userId,
         tailorId: id,
         setStatusMessage: (status) => {
-          setStatusMessage(status); 
+          setStatusMessage(status);
           setShowMessage(status);
         },
       });
@@ -182,7 +182,9 @@ const TailorProfile = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-700 backdrop-blur-md bg-opacity-30">
+      <div
+        className={`flex justify-center items-center h-screen ${theme.mainTheme}`}
+      >
         <ClipLoader size={60} color="#ffffff" />
       </div>
     );
@@ -197,7 +199,7 @@ const TailorProfile = () => {
 
   return tailorData ? (
     <div
-      className={`max-w-[97%] mx-auto mt-6 my-2 rounded-xl overflow-hidden py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
+      className={`max-w-[99.5%] mx-auto my-4 rounded-lg overflow-hidden py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
     >
       <div className="flex flex-col sm:flex-row items-center space-x-6 mb-6">
         <img
@@ -403,7 +405,7 @@ const TailorProfile = () => {
     </div>
   ) : (
     <div
-      className={`max-w-[97%] mt-8 mx-auto my-2 rounded-xl p-12 ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg p-10 h-screen ${theme.mainTheme}`}
     >
       <div className="flex flex-col sm:flex-row items-center justify-center space-x-6 mb-6">
         <div className="flex flex-col items-center">

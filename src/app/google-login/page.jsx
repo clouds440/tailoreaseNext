@@ -106,7 +106,7 @@ const GoogleLogin = () => {
   if (isLoading) {
     return (
       <div
-        className={`flex flex-col justify-center items-center text-2xl h-full bg-gray-700 backdrop-blur-md bg-opacity-30 ${theme.colorText}`}
+        className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg flex flex-col justify-center items-center text-2xl h-full ${theme.mainTheme} ${theme.colorText}`}
       >
         <i className="fab fa-google text-6xl mb-4"></i>
         <div className="flex items-center space-x-2">

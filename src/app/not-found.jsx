@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
+import React, { useContext } from "react";
 import Link from "next/link";
+import UserContext from "@/utils/UserContext";
 
 const funkySentences = [
   "Oops! You seem lost. How about you you go back where you came from?",
@@ -19,9 +20,10 @@ const getRandomSentence = () => {
 };
 
 const NotFoundPage = () => {
+  const { theme } = useContext(UserContext);
   return (
     <main
-      className={`h-screen w-full flex flex-col justify-center items-center text-white bg-gray-700 bg-opacity-85`}
+      className={`max-w-[99.5%] mx-auto h-screen my-4 md:my-1 rounded-lg w-full flex flex-col justify-center items-center ${theme.mainTheme}`}
     >
       <h1 className={"text-9xl font-extrabold tracking-widest"}>404</h1>
       <div className={"px-2 rounded rotate-12 absolute text-red-700"}>

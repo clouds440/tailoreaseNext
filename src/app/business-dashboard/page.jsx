@@ -80,19 +80,23 @@ const BusinessDashboard = () => {
 
   return businessData.status === "active" ? (
     <div
-      className={`items-center p-6 mx-auto my-4 rounded-3xl max-w-[97%] max-h-[96%] h-[96%] overflow-hidden select-none justify-center text-3xl text-white flex ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-screen overflow-hidden select-none justify-center flex ${theme.mainTheme}`}
     >
       {/* Business account is approved and active. Dashboard content displayed here */}
-      <div className="flex flex-col mr-3">{businessData.businessName}:</div>
-      <div className="flex">Your business dashboard is not ready</div>
+      <div className="flex flex-col mr-3 text-3xl">
+        {businessData.businessName}:
+      </div>
+      <div className="flex text-3xl">Your business dashboard is not ready</div>
     </div>
   ) : (
     <div
-      className={`items-center p-6 mx-auto my-4 rounded-3xl max-w-[97%] max-h-[96%] h-[96%] overflow-hidden select-none justify-center text-3xl text-white flex ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-screen overflow-hidden select-none justify-center flex ${theme.mainTheme}`}
     >
       {/* Business account is suspended */}
-      <div className="flex flex-col mr-3">{businessData.businessName}:</div>
-      <div className="flex">
+      <div className="flex flex-col mr-3 text-3xl">
+        {businessData.businessName}:
+      </div>
+      <div className="flex text-3xl">
         Your business account is suspended. Please contact customer support for
         more information
       </div>
