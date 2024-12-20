@@ -2,6 +2,7 @@
 import React, { useContext } from "react";
 import Link from "next/link";
 import UserContext from "@/utils/UserContext";
+import SimpleButton from "@/components/SimpleButton";
 
 const funkySentences = [
   "Oops! You seem lost. How about you you go back where you came from?",
@@ -31,9 +32,11 @@ const NotFoundPage = () => {
       </div>
       <p className={"mt-5"}>{getRandomSentence()}</p>
       <Link href="/">
-        <button className="mt-5 px-8 py-3 rounded-md border border-white bg-gray-950 hover:bg-slate-900">
-          Go Home
-        </button>
+        <SimpleButton
+          btnText={"Go Home"}
+          type={"primary"}
+          extraclasses={"mt-8 py-3"}
+        />
       </Link>
     </main>
   );
