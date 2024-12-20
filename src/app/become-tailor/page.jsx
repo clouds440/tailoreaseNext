@@ -8,18 +8,17 @@ import { ClipLoader } from "react-spinners";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { db } from "@/utils/firebaseConfig";
 import {
-  db,
-  auth,
   collection,
   query,
   where,
   getDocs,
   addDoc,
-  updateDoc,
   doc,
-  sendEmailVerification,
-} from "@/utils/firebaseConfig";
+  updateDoc,
+} from "firebase/firestore";
+import { sendEmailVerification } from "firebase/auth";
 import SimpleButton from "@/components/SimpleButton";
 
 const BecomeTailor = () => {
@@ -221,7 +220,9 @@ const BecomeTailor = () => {
 
   if (hasBusinessAccount === null) {
     return (
-      <div className="flex justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30">
+      <div
+        className={`max-w-[99.5%] mx-auto my-4 md:my-1 flex justify-center items-center h-full ${theme.mainTheme}`}
+      >
         <ClipLoader size={60} color="#ffffff" />
       </div>
     ); // Loading indicator while checking
@@ -230,7 +231,7 @@ const BecomeTailor = () => {
   return hasBusinessAccount.exists ? (
     !hasBusinessAccount.approved ? (
       <div
-        className={`flex flex-col justify-center items-center h-full bg-gray-700 backdrop-blur-md bg-opacity-30`}
+        className={`flex flex-col justify-center items-center h-full ${theme.mainTheme}`}
       >
         <div
           className={`mb-4 max-w-[95%] flex p-5 rounded-lg flex-col items-center text-center ${theme.mainTheme}`}

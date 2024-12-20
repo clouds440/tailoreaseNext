@@ -1,15 +1,8 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import {
-  auth,
-  db,
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  where,
-} from "@/utils/firebaseConfig";
+import { auth, db } from "@/utils/firebaseConfig";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { signInWithCredential, GoogleAuthProvider } from "firebase/auth";
 import UserContext from "@/utils/UserContext";
 import { ClipLoader } from "react-spinners";

@@ -1,15 +1,15 @@
 import axios from "axios";
+import { db } from "@/utils/firebaseConfig";
 import {
-  db,
+  collection,
   query,
   where,
   getDocs,
-  getDoc,
-  collection,
   addDoc,
-  updateDoc,
   doc,
-} from "@/utils/firebaseConfig";
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
 
 const UpdateTailorRating = async ({
   message,
@@ -55,8 +55,8 @@ const UpdateTailorRating = async ({
         text: message,
       },
       headers: {
-        "x-rapidapi-key": "81513d3818msh58072953e50b553p1aa3f6jsn0c617c2823cf",
-        "x-rapidapi-host": "twinword-sentiment-analysis.p.rapidapi.com",
+        "x-rapidapi-key": process.env.NEXT_PUBLIC_RAPIDAPI_KEY,
+        "x-rapidapi-host": process.env.NEXT_PUBLIC_RAPIDAPI_HOST,
       },
     };
 

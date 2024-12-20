@@ -5,13 +5,9 @@ import SimpleButton from "@/components/SimpleButton";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import UserContext from "@/utils/UserContext";
-import {
-  auth,
-  db,
-  createUserWithEmailAndPassword,
-  collection,
-  addDoc,
-} from "@/utils/firebaseConfig";
+import { auth, db } from "@/utils/firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
 
 const SignUpForm = () => {
   const {
@@ -40,9 +36,11 @@ const SignUpForm = () => {
   };
 
   const handleGoogleLogin = () => {
-    const clientId =
-      "347972565408-l5i6o2vifc4k8vur6qgj4d5niu73lnlr.apps.googleusercontent.com";
-    const redirectUri = "https://tailorease.vercel.app/google-login";
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri = encodeURIComponent(
+      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
+    );
+
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=email+profile+phone`;
     window.location.href = authUrl;
   };

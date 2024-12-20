@@ -1,17 +1,18 @@
 "use client";
+import { auth, db } from "@/utils/firebaseConfig";
 import {
-  auth,
-  db,
   reauthenticateWithCredential,
   EmailAuthProvider,
   updatePassword,
-  updateDoc,
+} from "firebase/auth";
+import {
   collection,
   query,
   where,
   getDocs,
   doc,
-} from "@/utils/firebaseConfig";
+  updateDoc,
+} from "firebase/firestore";
 
 import React, { useContext, useState, useEffect } from "react";
 import EditFieldModal from "@/components/EditFieldModal";

@@ -3,7 +3,8 @@ import { useEffect, useContext, useState } from "react";
 import UserContext from "@/utils/UserContext";
 import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
-import { db, collection, query, where, getDocs } from "@/utils/firebaseConfig";
+import { db } from "@/utils/firebaseConfig";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 const BusinessDashboard = () => {
   const {
@@ -67,7 +68,7 @@ const BusinessDashboard = () => {
   if (isLoading) {
     return (
       <div
-        className={`flex justify-center mx-2 items-center h-full ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto my-4 md:my-1 flex justify-center items-center h-full ${theme.mainTheme}`}
       >
         <ClipLoader size={60} color="#ffffff" />
       </div>

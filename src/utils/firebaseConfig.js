@@ -1,65 +1,19 @@
 import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  doc,
-  updateDoc,
-  setDoc,
-  getDoc,
-} from "firebase/firestore";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-  updatePassword,
-  sendPasswordResetEmail,
-  sendEmailVerification,
-} from "firebase/auth";
-import { getStorage, uploadBytes } from "firebase/storage";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDlgnmzqwtxUjeirfRA20IcYMi7-KThPfk",
-  authDomain: "tailorapp-a6960.firebaseapp.com",
-  databaseURL:
-    "https://tailorapp-a6960-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "tailorapp-a6960",
-  storageBucket: "tailorapp-a6960.appspot.com",
-  messagingSenderId: "347972565408",
-  appId: "1:347972565408:web:1cd9cb376db0dc88920cc5",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const storage = getStorage(app);
 
-export {
-  db,
-  auth,
-  createUserWithEmailAndPassword,
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  doc,
-  onAuthStateChanged,
-  signOut,
-  updateDoc,
-  storage,
-  uploadBytes,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-  updatePassword,
-  setDoc,
-  getDoc,
-  sendPasswordResetEmail,
-  sendEmailVerification,
-};
+export { db, auth };

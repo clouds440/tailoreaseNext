@@ -2,8 +2,8 @@
 
 import React, { useContext } from "react";
 import UserContext from "@/utils/UserContext";
-import Logo from "../components/Logo";
-import SimpleButton from "../components/SimpleButton";
+import Logo from "@/components/Logo";
+import SimpleButton from "@/components/SimpleButton";
 import Link from "next/link";
 import RotatingJacket from "@/components/RotatingJacket";
 

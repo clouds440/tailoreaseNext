@@ -2,7 +2,8 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Logo from "./Logo";
 import SimpleButton from "./SimpleButton";
-import { auth, signOut } from "@/utils/firebaseConfig";
+import { auth } from "@/utils/firebaseConfig";
+import { signOut } from "firebase/auth";
 import UserContext from "@/utils/UserContext";
 import { useRouter } from "next/navigation";
 import DialogBox from "./DialogBox";

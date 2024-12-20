@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef, useContext } from "react";
 import { db } from "@/utils/firebaseConfig";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { PropagateLoader } from "react-spinners";
+import { collection, getDocs, query } from "firebase/firestore";
+import { ClipLoader } from "react-spinners";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "@/components/SimpleButton";
 import { AnimatePresence, motion } from "framer-motion";
-import QuickView from "../../components/QuickView";
+import QuickView from "@/components/QuickView";
 
 const TailorListPage = () => {
   const { theme } = useContext(UserContext);
@@ -182,7 +182,7 @@ const TailorListPage = () => {
       <div className={`my-2 rounded-lg overflow-hidden p-6 ${theme.mainTheme}`}>
         {loading ? (
           <div className="flex justify-center items-center h-screen">
-            <PropagateLoader color="#1976d2" />
+            <ClipLoader color="#ffffff" size={60} />
           </div>
         ) : (
           tailorList.map((tailor, index) => (

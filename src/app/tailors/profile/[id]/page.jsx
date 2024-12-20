@@ -183,7 +183,7 @@ const TailorProfile = () => {
   if (isLoading) {
     return (
       <div
-        className={`flex justify-center items-center h-screen ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto my-4 md:my-1 flex justify-center items-center h-screen ${theme.mainTheme}`}
       >
         <ClipLoader size={60} color="#ffffff" />
       </div>
@@ -199,7 +199,7 @@ const TailorProfile = () => {
 
   return tailorData ? (
     <div
-      className={`max-w-[99.5%] mx-auto my-4 rounded-lg overflow-hidden py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
+      className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg overflow-hidden py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
     >
       <div className="flex flex-col sm:flex-row items-center space-x-6 mb-6">
         <img
