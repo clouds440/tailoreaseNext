@@ -8,7 +8,7 @@ import { ClipLoader } from "react-spinners";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { db } from "@/utils/firebaseConfig";
+import { db, auth } from "@/utils/firebaseConfig";
 import {
   collection,
   query,
@@ -221,7 +221,7 @@ const BecomeTailor = () => {
   if (hasBusinessAccount === null) {
     return (
       <div
-        className={`max-w-[99.5%] mx-auto my-4 md:my-1 flex justify-center items-center h-full ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto my-4 md:my-1 flex justify-center items-center rounded-lg h-full ${theme.mainTheme}`}
       >
         <ClipLoader size={60} color="#ffffff" />
       </div>
@@ -231,10 +231,10 @@ const BecomeTailor = () => {
   return hasBusinessAccount.exists ? (
     !hasBusinessAccount.approved ? (
       <div
-        className={`flex flex-col justify-center items-center h-full ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg flex flex-col justify-center items-center h-full ${theme.mainTheme}`}
       >
         <div
-          className={`mb-4 max-w-[95%] flex p-5 rounded-lg flex-col items-center text-center ${theme.mainTheme}`}
+          className={`flex p-5 rounded-lg flex-col items-center text-center ${theme.colorBg}`}
         >
           <span className="text-2xl">Your business account is pending!</span>
           <span>

@@ -120,7 +120,7 @@ export default function Home() {
           className={`w-full flex flex-wrap justify-between space-y-8 md:space-y-0 p-6 rounded-3xl`}
         >
           <div className="flex flex-col space-y-6 w-full lg:w-1/3">
-            <Logo fontSize={"text-2xl"} />
+            <Logo />
             <h3 className={`text-2xl font-bold ${theme.colorText}`}>
               Follow Us
             </h3>
@@ -181,7 +181,7 @@ export default function Home() {
               <SimpleButton
                 btnText={"Subscribe"}
                 extraclasses="py-2"
-                type="primary-submit"
+                type="primary"
               />
             </form>
           </div>

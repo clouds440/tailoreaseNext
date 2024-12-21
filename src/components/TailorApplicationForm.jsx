@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "./SimpleButton";
 import { LinkIcon } from "../../public/icons/svgIcons";
+import Image from "next/image";
 
 const TailorApplicationForm = ({ onNext }) => {
   const [formData, setFormData] = useState({
@@ -72,99 +73,104 @@ const TailorApplicationForm = ({ onNext }) => {
   };
 
   return (
-    <div className="max-w-[99.5%] min-h-[97%] mx-auto flex items-center justify-center w-auto px-6 rounded-lg select-none">
-  <div
-    className={`p-6 h-full rounded-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
-  >
-    <div className="w-full md:w-1/2 h-auto flex justify-center md:justify-start">
-      <img
-        className="max-w-full p-4 w-[85%]"
-        src="/graphics/business-info.webp"
-        alt="Become a Tailor"
-      />
-    </div>
-    <div className="w-full md:w-1/2 mt-6 md:mt-0">
-      <h2
-        className={`flex text-xl md:text-4xl text-${theme.themeColor} font-bold mb-4`}
+    <div className="max-w-[99.5%] min-h-[97%] h-fit mx-auto flex items-center justify-center w-auto px-6 rounded-lg select-none">
+      <div
+        className={`p-6 h-full rounded-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
       >
-        Become A Tailor
-      </h2>
-      <form className="w-full" onSubmit={handleNext} noValidate>
-        <div className="relative mb-4">
-          <input
-            type="text"
-            id="businessName"
-            name="businessName"
-            value={formData.businessName}
-            onChange={handleChange}
-            className={`${inputStyles}`}
-            placeholder=" "
+        <div className="w-full md:w-1/2 h-auto flex justify-center md:justify-start">
+          <Image
+            className="max-w-full p-4 w-[85%]"
+            src="/graphics/business-info.webp"
+            alt="Become a Tailor"
+            width={600} // Specify the width
+            height={400} // Specify the height
+            priority // Optional: Use for better performance if this is an important image
           />
-          <label className={`${placeHolderStyles}`} htmlFor="businessName">
-            Business Name
-          </label>
         </div>
-        <div className="relative mb-4">
-          <input
-            type="tel"
-            id="businessPhone"
-            name="businessPhone"
-            value={formData.businessPhone}
-            onChange={handleChange}
-            className={`${inputStyles}`}
-            placeholder=" "
-          />
-          <label className={`${placeHolderStyles}`} htmlFor="businessPhone">
-            Business Phone
-          </label>
-        </div>
-        <div className="relative mb-4">
-          <input
-            type="text"
-            id="businessAddress"
-            name="businessAddress"
-            value={formData.businessAddress}
-            onChange={handleChange}
-            className={`${inputStyles}`}
-            placeholder=" "
-          />
-          <label className={`${placeHolderStyles}`} htmlFor="businessAddress">
-            Business Address
-          </label>
-        </div>
-        <div className="relative mb-4">
-          <textarea
-            maxLength={250}
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className={`${inputStyles} min-h-9 max-h-[130px]`}
-            placeholder=" "
-          />
-          <label className={`${placeHolderStyles}`} htmlFor="description">
-            Description <span className="text-xs">(Optional)</span>
-          </label>
-        </div>
-        <SimpleButton
-          btnText={"Next"}
-          type={"primary-submit"}
-          extraclasses={"w-full"}
-        />
-        <div className="items-start justify-start flex flex-row mt-8">
-          <span
-            className={`${theme.iconColor} ${theme.hoverText} flex cursor-pointer`}
-            onClick={() => window.open("/terms/tailors", "_blank")}
+        <div className="w-full md:w-1/2 mt-6 md:mt-0">
+          <h2
+            className={`flex text-xl md:text-4xl text-${theme.themeColor} font-bold mb-4`}
           >
-            Read terms for tailors &nbsp;
-            <LinkIcon color={theme.iconColor} size={"5"} />
-          </span>
+            Become A Tailor
+          </h2>
+          <form className="w-full" onSubmit={handleNext} noValidate>
+            <div className="relative mb-4">
+              <input
+                type="text"
+                id="businessName"
+                name="businessName"
+                value={formData.businessName}
+                onChange={handleChange}
+                className={`${inputStyles}`}
+                placeholder=" "
+              />
+              <label className={`${placeHolderStyles}`} htmlFor="businessName">
+                Business Name
+              </label>
+            </div>
+            <div className="relative mb-4">
+              <input
+                type="tel"
+                id="businessPhone"
+                name="businessPhone"
+                value={formData.businessPhone}
+                onChange={handleChange}
+                className={`${inputStyles}`}
+                placeholder=" "
+              />
+              <label className={`${placeHolderStyles}`} htmlFor="businessPhone">
+                Business Phone
+              </label>
+            </div>
+            <div className="relative mb-4">
+              <input
+                type="text"
+                id="businessAddress"
+                name="businessAddress"
+                value={formData.businessAddress}
+                onChange={handleChange}
+                className={`${inputStyles}`}
+                placeholder=" "
+              />
+              <label
+                className={`${placeHolderStyles}`}
+                htmlFor="businessAddress"
+              >
+                Business Address
+              </label>
+            </div>
+            <div className="relative mb-4">
+              <textarea
+                maxLength={250}
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className={`${inputStyles} min-h-9 max-h-[130px]`}
+                placeholder=" "
+              />
+              <label className={`${placeHolderStyles}`} htmlFor="description">
+                Description <span className="text-xs">(Optional)</span>
+              </label>
+            </div>
+            <SimpleButton
+              btnText={"Next"}
+              type={"primary-submit"}
+              extraclasses={"w-full"}
+            />
+            <div className="items-start justify-start flex flex-row mt-8">
+              <span
+                className={`${theme.iconColor} ${theme.hoverText} flex cursor-pointer`}
+                onClick={() => window.open("/terms/tailors", "_blank")}
+              >
+                Read terms for tailors &nbsp;
+                <LinkIcon color={theme.iconColor} size={"5"} />
+              </span>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
-  </div>
-</div>
-
   );
 };
 

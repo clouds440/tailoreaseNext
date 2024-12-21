@@ -10,6 +10,7 @@ import Link from "next/link";
 import UserContext from "@/utils/UserContext";
 import { BarLoader } from "react-spinners";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 
 const LoginForm = () => {
   const {
@@ -147,15 +148,18 @@ const LoginForm = () => {
         className={`p-6 h-full rounded-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
       >
         <div className="w-full md:w-1/2 h-auto flex justify-center md:justify-start">
-          <img
+          <Image
             className="max-w-full p-12 w-auto"
             src="/graphics/login-image.png"
             alt="This is the login Image."
+            width={500} // Specify the width
+            height={500} // Specify the height
+            priority // Optional: for high-priority images like login
           />
         </div>
         <div className="w-full md:w-1/2 mt-6 md:mt-0">
           <h2
-            className={`flex text-xl md:text-4xl text-${theme.themeColor} font-bold mb-4`}
+            className={`flex text-xl md:text-4xl ${theme.colorText} font-bold mb-4`}
           >
             Login
           </h2>
@@ -202,7 +206,7 @@ const LoginForm = () => {
                     <span>Continue with Google</span>
                   </div>
                 }
-                type={"simple"}
+                type={"danger"}
                 extraclasses={`w-full bg-rose-500`}
                 onClick={handleGoogleLogin}
               />
@@ -221,7 +225,7 @@ const LoginForm = () => {
               )}
             </div>
             <div className="items-start justify-start flex flex-row mt-8">
-              <span>Don't have an account? &nbsp;</span>
+              <span>Don&apos;t have an account? &nbsp;</span>
               <Link href={"/signup"}>
                 <span className={`${theme.iconColor} ${theme.hoverText}`}>
                   Click to Create

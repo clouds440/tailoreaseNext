@@ -199,11 +199,10 @@ const Navbar = () => {
               className={`flex md:block h-12 md:h-auto justify-between mt-1`}
             >
               <Logo
-                fontSize={"text-2xl"}
-                classes={`md:my-5 md:pb-5 mx-1 sm:mx-5 md:mx-0 pr-0 sm:pr-4 md:pr-0 items-center justify-center ${theme.colorBorder}`}
+                classes={`md:my-5 my-1 max-w-16 md:max-w-full items-center justify-center`}
               />
               {userLoggedIn ? (
-                <div className="py-1 mt-3 text-center mx-1 sm:mx-5 md:mx-0 select-none">
+                <div className="py-1 mt-3 text-center mx-3 sm:mx-5 md:mx-0 select-none">
                   <span>{userFullName}</span>
                 </div>
               ) : (

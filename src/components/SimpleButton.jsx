@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import UserContext from "@/utils/UserContext";
+
 function SimpleButton({
   onClick,
   btnText,
@@ -6,33 +9,60 @@ function SimpleButton({
   disabled,
   icon = null,
 }) {
-  const primary = "bg-sky-500 bg-opacity-80 text-white hover:bg-sky-400";
-  const simple = "bg-gray-200 opacity-85 text-gray-900 hover:bg-gray-400";
-  const danger = "bg-red-700 text-white hover:bg-rose-500";
+  const { theme } = useContext(UserContext);
 
-  let style;
-  switch (type) {
-    case "primary":
-    case "primary-submit":
-      style = primary;
-      break;
-    case "danger":
-      style = danger;
-      break;
-    default:
-      style = simple;
-  }
+  const baseStyles =
+    "flex items-center justify-center px-4 py-2 rounded-md font-medium duration-300 select-none focus:outline-none transition-all";
+
+  const themeStyles = {
+    "midnight-whisper": {
+      primary:
+        "bg-gray-700 text-white hover:bg-gray-600 ring-gray-700 hover:ring-2",
+      default:
+        "bg-gray-400 text-black hover:bg-gray-300 ring-gray-500 hover:ring-2",
+    },
+    "lunar-glow": {
+      primary:
+        "bg-sky-800 text-white hover:bg-sky-500 ring-sky-700 hover:ring-2",
+      default:
+        "bg-white text-gray-900 hover:bg-gray-400 ring-white hover:ring-2",
+    },
+    "neon-punk": {
+      primary:
+        "bg-blue-900 text-pink-200 hover:bg-blue-800/75 ring-pink-500 hover:ring-2",
+      default:
+        "bg-pink-700 text-blue-200 hover:bg-pink-600 ring-blue-500 hover:ring-2",
+    },
+  };
+
+  const dangerStyles =
+    "bg-red-700 text-white hover:bg-red-500/75 ring-red-700 hover:ring-2";
+
+  const disabledStyles = "opacity-50 cursor-not-allowed";
+
+  const getButtonStyle = () => {
+    const themeType = themeStyles[theme.mainTheme] || themeStyles["lunar-glow"];
+    switch (type) {
+      case "primary":
+      case "primary-submit":
+        return themeType.primary;
+      case "danger":
+        return dangerStyles;
+      default:
+        return themeType.default;
+    }
+  };
 
   return (
     <button
       type={type === "primary-submit" ? "submit" : "button"}
-      className={`flex items-center justify-center px-4 py-1 rounded-md duration-500 select-none ${style} ${extraclasses} ${
-        disabled ? "cursor-not-allowed" : ""
-      }`}
+      className={`${baseStyles} ${getButtonStyle()} ${
+        disabled ? disabledStyles : ""
+      } ${extraclasses}`}
       onClick={onClick}
       disabled={disabled}
     >
-      {icon && <span className="md:mr-2">{icon}</span>}
+      {icon && <span className="mr-2">{icon}</span>}
       {btnText}
     </button>
   );

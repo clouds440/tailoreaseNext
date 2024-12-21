@@ -23,21 +23,21 @@ module.exports = {
           "-webkit-background-clip": "background",
         },
         ".midnight-whisper": {
-          backgroundColor: "rgba(0, 25, 30, 0.6)", // bg-gray-800 bg-opacity-70
+          backgroundColor: "rgba(2, 15, 30, 0.87)", // bg-gray-800 bg-opacity-70
           backdropFilter: "blur(13px)", // backdrop-blur-xl
           boxShadow: "0 1px 3px 0 #fde047", // shadow-yellow-300 shadow-sm
           color: "#ffffff", // Set all text to white
           borderColor: "#ffffff", // White border color
         },
         ".lunar-glow": {
-          backgroundColor: "rgba(240, 235, 240, 0.8)", // Lighter background
+          backgroundColor: "rgba(240, 235, 240, 0.7)", // Lighter background
           backdropFilter: "blur(30px)", // backdrop-blur-xl
           boxShadow: "0 2px 5px 2px #546e7a", // gray shadow color
           color: "#000000", // Set all text to black
           borderColor: "#000000", // Black border color
         },
         ".neon-punk": {
-          backgroundColor: "rgba(13, 71, 161, 0.75)", // sky background
+          backgroundColor: "rgba(53, 71, 181, 0.7)", // sky background
           backdropFilter: "blur(30px)", // backdrop-blur-xl
           boxShadow: "0 1px 6px 2px #8b5cf6", // violet-500
           color: "#bae6fd", // Set all text to sky-200
