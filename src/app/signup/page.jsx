@@ -152,98 +152,104 @@ const SignUpForm = () => {
   }, [userLoggedIn, router]);
 
   return (
-    <div className="max-w-[99.5%] mx-auto flex items-center justify-center w-auto p-6 rounded-lg select-none">
-      <div
-        className={`p-6 rounded-lg ${theme.mainTheme} w-full max-w-md relative`}
-      >
-        <h2 className={`flex text-xl text-${theme.themeColor} font-bold mb-4`}>
-          Create Account
-        </h2>
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="relative mb-4">
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              className={`${inputStyles}`}
-              placeholder=" "
-            />
-            <label className={`${placeHolderStyles}`} htmlFor="fullName">
-              Full Name
-            </label>
-          </div>
-          <div className="relative mb-4">
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`${inputStyles}`}
-              placeholder=" "
-            />
-            <label className={`${placeHolderStyles}`} htmlFor="email">
-              Email
-            </label>
-          </div>
-          <div className="relative mb-4">
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className={`${inputStyles}`}
-              placeholder=" "
-            />
-            <label className={`${placeHolderStyles}`} htmlFor="password">
-              Password
-            </label>
-          </div>
-          <div className="relative mb-4">
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className={`${inputStyles}`}
-              placeholder=" "
-            />
-            <label className={`${placeHolderStyles}`} htmlFor="phone">
-              Phone <span className="text-xs">(Optional)</span>
-            </label>
-          </div>
-          <SimpleButton
-            btnText={isLoading ? <LoadingSpinner size={24} /> : "Sign Up"}
-            type={"primary-submit"}
-            extraclasses={"w-full"}
-            disabled={isLoading}
-          />
-          <div className="my-4 flex items-center justify-center">
+    <div
+      className={`max-w-[99.5%] mx-auto p-6 my-4 md:my-1 rounded-lg h-screen overflow-hidden select-none justify-center flex ${theme.mainTheme}`}
+    >
+      <div className="flex justify-center w-[95%] md:w-[80%] lg:w-[50%] rounded-lg select-none">
+        <div
+          className={`p-6 rounded-lg ${theme.mainTheme} w-full max-w-md h-full max-h-fit`}
+        >
+          <h2
+            className={`flex text-xl text-${theme.themeColor} font-bold mb-4`}
+          >
+            Create Account
+          </h2>
+          <form onSubmit={handleSubmit} noValidate>
+            <div className="relative mb-4">
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                className={`${inputStyles}`}
+                placeholder=" "
+              />
+              <label className={`${placeHolderStyles}`} htmlFor="fullName">
+                Full Name
+              </label>
+            </div>
+            <div className="relative mb-4">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`${inputStyles}`}
+                placeholder=" "
+              />
+              <label className={`${placeHolderStyles}`} htmlFor="email">
+                Email
+              </label>
+            </div>
+            <div className="relative mb-4">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`${inputStyles}`}
+                placeholder=" "
+              />
+              <label className={`${placeHolderStyles}`} htmlFor="password">
+                Password
+              </label>
+            </div>
+            <div className="relative mb-4">
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className={`${inputStyles}`}
+                placeholder=" "
+              />
+              <label className={`${placeHolderStyles}`} htmlFor="phone">
+                Phone <span className="text-xs">(Optional)</span>
+              </label>
+            </div>
             <SimpleButton
-              btnText={
-                <div className="flex items-center justify-center gap-2">
-                  <i className="fab fa-google"></i>
-                  <span>Continue with Google</span>
-                </div>
-              }
-              type={"simple"}
-              extraclasses={`w-full bg-rose-500`}
-              onClick={handleGoogleLogin}
+              btnText={isLoading ? <LoadingSpinner size={24} /> : "Sign Up"}
+              type={"primary-submit"}
+              extraclasses={"w-full"}
+              disabled={isLoading}
             />
-          </div>
-          <div className="items-center justify-center flex flex-row mt-8">
-            <Link href={"/login"}>
-              <span className={`${theme.iconColor} ${theme.hoverText}`}>
-                Login
-              </span>
-            </Link>
-            <span>&nbsp; to an existing account</span>
-          </div>
-        </form>
+            <div className="my-4 flex items-center justify-center">
+              <SimpleButton
+                btnText={
+                  <div className="flex items-center justify-center gap-2">
+                    <i className="fab fa-google"></i>
+                    <span>Continue with Google</span>
+                  </div>
+                }
+                type={"simple"}
+                extraclasses={`w-full bg-rose-500`}
+                onClick={handleGoogleLogin}
+              />
+            </div>
+            <div className="items-center justify-center flex flex-row mt-8">
+              <Link href={"/login"}>
+                <span className={`${theme.iconColor} ${theme.hoverText}`}>
+                  Login
+                </span>
+              </Link>
+              <span>&nbsp; to an existing account</span>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
