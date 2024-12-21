@@ -101,10 +101,10 @@ function EditFieldModal({
           exit={{ opacity: 0 }}
         >
           <div
-            className={`bg-black bg-opacity-70 fixed inset-0 rounded-3xl`}
+            className={`bg-black bg-opacity-50 fixed inset-0 rounded-lg`}
           ></div>
           <motion.div
-            className={`bg-white rounded-xl shadow-lg w-11/12 max-w-md z-50 ${theme.mainTheme}`}
+            className={`bg-white rounded-lg shadow-lg w-11/12 max-w-md z-50 ${theme.mainTheme}`}
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.8 }}
