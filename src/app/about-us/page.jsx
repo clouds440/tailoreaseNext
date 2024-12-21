@@ -21,6 +21,39 @@ const AboutUs = () => {
     }),
   };
 
+  const sections = [
+    {
+      title: "What We Offer",
+      items: [
+        "Convenient online tailoring solutions.",
+        "Personalized recommendations and services.",
+        "Accurate measurements with 3D visualization tools.",
+        "Enhanced communication and transparency.",
+        "Streamlined processes for tailors and customers alike.",
+      ],
+    },
+    {
+      title: "Our Achievements",
+      items: [
+        "Over 1M satisfied users worldwide.",
+        "Connected hundreds of tailors with loyal customers.",
+        "97% positive feedback from our user base.",
+        "Thousands of customized garments delivered seamlessly.",
+        "Recognized as a leading innovator in online tailoring.",
+      ],
+    },
+    {
+      title: "Why Choose Us",
+      items: [
+        "Unmatched personal and account security for users and tailors.",
+        "Seamless and secure payment methods for a worry-free experience.",
+        "A dedicated support team ensuring your satisfaction every step.",
+        "Transparent processes with real-time order tracking and updates.",
+        "Empowering tailors with efficient tools to manage their businesses.",
+      ],
+    },
+  ];
+
   return (
     <div
       className={`${theme.mainTheme} max-w-[99.5%] mx-auto my-4 md:my-1 min-h-screen py-8 px-4 md:px-16 rounded-lg`}
@@ -45,83 +78,27 @@ const AboutUs = () => {
       </section>
 
       <div className="mb-16 grid grid-cols-1 lg:grid-cols-3 gap-3 text-center lg:text-start">
-        <section className="mb-10 lg:mb-0">
-          <h2 className="text-3xl font-semibold mb-4">What We Offer</h2>
-          <motion.ul
-            initial="hidden"
-            animate="visible"
-            className="list-disc list-inside space-y-4"
-          >
-            {[
-              "Convenient online tailoring solutions.",
-              "Personalized recommendations and services.",
-              "Accurate measurements with 3D visualization tools.",
-              "Enhanced communication and transparency.",
-              "Streamlined processes for tailors and customers alike.",
-            ].map((item, index) => (
-              <motion.li
-                key={index}
-                custom={index}
-                variants={listItemVariants}
-                className="leading-7"
-              >
-                {item}
-              </motion.li>
-            ))}
-          </motion.ul>
-        </section>
-
-        <section className="mb-10 lg:mb-0">
-          <h2 className="text-3xl font-semibold mb-4">Our Achievements</h2>
-          <motion.ul
-            initial="hidden"
-            animate="visible"
-            className="list-disc list-inside space-y-4"
-          >
-            {[
-              "Over 1M satisfied users worldwide.",
-              "Connected hundreds of tailors with loyal customers.",
-              "97% positive feedback from our user base.",
-              "Thousands of customized garments delivered seamlessly.",
-              "Recognized as a leading innovator in online tailoring.",
-            ].map((item, index) => (
-              <motion.li
-                key={index}
-                custom={index}
-                variants={listItemVariants}
-                className="leading-7"
-              >
-                {item}
-              </motion.li>
-            ))}
-          </motion.ul>
-        </section>
-
-        <section className="mb-10 lg:mb-0">
-          <h2 className="text-3xl font-semibold mb-4">Why Choose Us</h2>
-          <motion.ul
-            initial="hidden"
-            animate="visible"
-            className="list-disc list-inside space-y-4"
-          >
-            {[
-              "Unmatched personal and account security for users and tailors.",
-              "Seamless and secure payment methods for a worry-free experience.",
-              "A dedicated support team ensuring your satisfaction every step.",
-              "Transparent processes with real-time order tracking and updates.",
-              "Empowering tailors with efficient tools to manage their businesses.",
-            ].map((item, index) => (
-              <motion.li
-                key={index}
-                custom={index}
-                variants={listItemVariants}
-                className="leading-7"
-              >
-                {item}
-              </motion.li>
-            ))}
-          </motion.ul>
-        </section>
+        {sections.map((section, sectionIndex) => (
+          <section className="mb-10 lg:mb-0" key={sectionIndex}>
+            <h2 className="text-3xl font-semibold mb-4">{section.title}</h2>
+            <motion.ul
+              initial="hidden"
+              animate="visible"
+              className="list-disc list-inside space-y-4"
+            >
+              {section.items.map((item, index) => (
+                <motion.li
+                  key={index}
+                  custom={index}
+                  variants={listItemVariants}
+                  className="leading-7"
+                >
+                  {item}
+                </motion.li>
+              ))}
+            </motion.ul>
+          </section>
+        ))}
       </div>
 
       <section className="mb-12">
