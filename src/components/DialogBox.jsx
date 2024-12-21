@@ -86,7 +86,7 @@ const DialogBox = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div className={`bg-black bg-opacity-30 fixed inset-0`}></div>
+          <div className={`bg-black bg-opacity-50 fixed inset-0`}></div>
           <div className="w-auto max-w-[85%] -translate-y-48">
             <motion.div
               className={`rounded-xl shadow-lg w-auto z-50 ${theme.mainTheme}`}

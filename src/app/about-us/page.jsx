@@ -79,9 +79,9 @@ const AboutUs = () => {
             className="list-disc list-inside space-y-4"
           >
             {[
-              "Over 239,940 satisfied users worldwide.",
+              "Over 1M satisfied users worldwide.",
               "Connected hundreds of tailors with loyal customers.",
-              "95% positive feedback from our user base.",
+              "97% positive feedback from our user base.",
               "Thousands of customized garments delivered seamlessly.",
               "Recognized as a leading innovator in online tailoring.",
             ].map((item, index) => (
