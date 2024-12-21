@@ -105,7 +105,7 @@ const DialogBox = ({
               <div className={`p-4 flex justify-end space-x-3`}>
                 <SimpleButton
                   onClick={handleClose}
-                  type={"simple"}
+                  type={"default"}
                   btnText={"Close"}
                 />
                 {buttons.map(({ label, onClick, type }, index) => (

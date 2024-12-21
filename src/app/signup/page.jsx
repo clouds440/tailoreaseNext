@@ -244,13 +244,13 @@ const SignUpForm = () => {
                     <span>Continue with Google</span>
                   </div>
                 }
-                type={"simple"}
+                type={"danger"}
                 extraclasses={`w-full bg-rose-500`}
                 onClick={handleGoogleLogin}
               />
             </div>
             <div className="items-start justify-start flex flex-row mt-8">
-              <span>Already have an account?&nbsp;</span>
+              <span>Returning user?&nbsp;</span>
               <Link href={"/login"}>
                 <span className={`${theme.iconColor} ${theme.hoverText}`}>
                   Click to Login

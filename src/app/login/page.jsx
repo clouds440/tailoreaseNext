@@ -220,15 +220,15 @@ const LoginForm = () => {
                   className={`cursor-pointer ${theme.iconColor} ${theme.hoverText}`}
                   onClick={handlePasswordReset}
                 >
-                  Reset here
+                  Reset
                 </span>
               )}
             </div>
             <div className="items-start justify-start flex flex-row mt-8">
-              <span>Don&apos;t have an account? &nbsp;</span>
+              <span>Need an account? &nbsp;</span>
               <Link href={"/signup"}>
                 <span className={`${theme.iconColor} ${theme.hoverText}`}>
-                  Click to Create
+                  Singup Now
                 </span>
               </Link>
             </div>
