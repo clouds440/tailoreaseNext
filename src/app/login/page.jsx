@@ -142,19 +142,24 @@ const LoginForm = () => {
   };
 
   return (
-    <div
-      className={`max-w-[99.5%] mx-auto p-6 my-4 md:my-1 rounded-lg h-screen overflow-hidden select-none justify-center flex ${theme.mainTheme}`}
-    >
-      <div className="flex justify-center w-[95%] md:w-[80%] lg:w-[50%] rounded-lg select-none">
-        <div
-          className={`p-6 rounded-lg ${theme.mainTheme} w-full max-w-md h-full max-h-fit`}
-        >
+    <div className="max-w-[99.5%] min-h-[97%] mx-auto flex items-center justify-center w-auto p-6 rounded-lg select-none">
+      <div
+        className={`p-6 h-full rounded-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
+      >
+        <div className="w-full md:w-1/2 h-auto flex justify-center md:justify-start">
+          <img
+            className="max-w-full p-12 w-auto"
+            src="/graphics/login-image.png"
+            alt="This is the login Image."
+          />
+        </div>
+        <div className="w-full md:w-1/2 mt-6 md:mt-0">
           <h2
-            className={`flex text-xl text-${theme.themeColor} font-bold mb-4`}
+            className={`flex text-xl md:text-4xl text-${theme.themeColor} font-bold mb-4`}
           >
             Login
           </h2>
-          <form onSubmit={handleSubmit} noValidate>
+          <form className="w-full" onSubmit={handleSubmit} noValidate>
             <div className="relative mb-4">
               <input
                 type="email"
@@ -202,7 +207,7 @@ const LoginForm = () => {
                 onClick={handleGoogleLogin}
               />
             </div>
-            <div className="items-center justify-center flex flex-row mt-8">
+            <div className="items-start justify-start flex flex-row mt-8">
               <span>Forgot Password? &nbsp;</span>
               {isResetLoading ? (
                 <BarLoader color="#0000ff" width={137} />
@@ -215,11 +220,11 @@ const LoginForm = () => {
                 </span>
               )}
             </div>
-            <div className="items-center justify-center flex flex-row mt-8">
-              <span>Need to create an &nbsp;</span>
+            <div className="items-start justify-start flex flex-row mt-8">
+              <span>Don't have an account? &nbsp;</span>
               <Link href={"/signup"}>
                 <span className={`${theme.iconColor} ${theme.hoverText}`}>
-                  account?
+                  Click to Create
                 </span>
               </Link>
             </div>

@@ -200,7 +200,7 @@ const TailorProfile = () => {
 
   return tailorData ? (
     <div
-      className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg overflow-hidden h-screen py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
+      className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg overflow-hidden min-h-screen py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
     >
       <div className="flex flex-col sm:flex-row items-center space-x-6 mb-6">
         <Image

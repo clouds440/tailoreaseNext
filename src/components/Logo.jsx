@@ -4,8 +4,7 @@ const Logo = ({ classes, fontSize }) => {
     <div className={`flex select-none ${classes}`}>
       <Link href={"/"}>
         <span className="flex">
-          <h1 className={`font-bold ${fontSize} text-cyan-600`}>Tailor</h1>
-          <h1 className={`font-bold ${fontSize} text-yellow-500`}>Ease</h1>
+          <img className="w-24" src="/graphics/logo.png" alt="This is the logo of the platform" />
         </span>
       </Link>
     </div>
