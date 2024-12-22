@@ -143,12 +143,15 @@ const AboutUs = () => {
               className="rounded-full mb-4"
             />
             <h3 className="text-xl font-bold mb-2">Syed Ali Abbas Naqvi</h3>
+            <p className="text-sm text-center italic mb-4">
+              &ldquo;Work silently and let your success speak aloud.&rdquo;
+            </p>
             <p className="mb-2">
-              <span className="font-semibold">Role:</span> Co-Founder / Designer
+              <span className="font-semibold">Role:</span> Co-Founder / Developer
             </p>
             <p>
               <span className="font-semibold">Email:</span>{" "}
-              dummyemail@domain.com
+              aliabbasnaqvii51214@gmail.com
             </p>
           </div>
 
@@ -165,12 +168,11 @@ const AboutUs = () => {
             />
             <h3 className="text-xl font-bold mb-2">Abdul Rehman</h3>
             <p className="mb-2">
-              <span className="font-semibold">Role:</span> Documenter / Internal
-              System Designer
+              <span className="font-semibold">Role:</span> Internal System Designer / Documentator
             </p>
             <p>
               <span className="font-semibold">Email:</span>{" "}
-              dummyemail@domain.com
+              abdulrehman4070411@gmail.com
             </p>
           </div>
         </div>
