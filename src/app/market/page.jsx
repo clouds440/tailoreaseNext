@@ -1,7 +1,7 @@
 "use client";
 import { useContext } from "react";
 import UserContext from "@/utils/UserContext";
-
+import Image from "next/image";
 const Market = () => {
   const { theme } = useContext(UserContext);
 

@@ -181,7 +181,7 @@ const TailorListPage = () => {
           </div>
         </div>
       </div>
-      <div className={`my-2 rounded-lg overflow-hidden p-6 ${theme.mainTheme}`}>
+      <div className={`${theme.mainTheme} w-full rounded-xl overflow-hidden flex flex-wrap justify-evenly items-center h-fit p-8 my-4 mx-auto`}>
         {loading ? (
           <div className="flex justify-center items-center h-screen">
             <ClipLoader color="#ffffff" size={60} />
@@ -190,48 +190,36 @@ const TailorListPage = () => {
           tailorList.map((tailor, index) => (
             <div
               key={index}
-              className={`cursor-pointer relative flex items-center justify-between p-4 mb-4 rounded-lg border transition-all duration-300 transform hover:scale-[1.01] ${theme.hoverShadow} ${theme.colorBorder}`}
-              onClick={() => handleTailorClick(tailor)} // Trigger popup
+              className={`cursor-pointer overflow-hidden my-4 w-[15rem] max-w-full h-[16rem] rounded-2xl border transition-all duration-300 transform hover:scale-[1.01] ${theme.hoverShadow} ${theme.colorBorder}`}
+              onClick={() => handleTailorClick(tailor)}
             >
-              <div className="flex items-center space-x-4">
-                <Image
-                  src={
-                    tailor.businessPictureUrl ||
-                    "/images/profile/business/default.png"
-                  }
-                  width={192} // Adjust dimensions as needed
-                  height={144}
-                  alt={`Image of ${tailor.businessName}`}
-                  className={`object-cover rounded-lg lg:rounded-xl shadow-md max-h-32 border ${theme.colorBorder}`}
-                  priority={false} // Use `priority={true}` if this image is above the fold
-                  placeholder="blur" // Optional, for placeholder loading effects
-                  blurDataURL="/images/profile/business/default.png" // Add a low-res placeholder image
-                />
-
-                <div className="flex flex-col">
-                  <h3 className={`text-lg font-bold ${theme.colorText}`}>
-                    {tailor.businessName}
-                    <span className="text-sm ml-2 text-gray-500">
-                      ({tailor.openTime} - {tailor.closeTime})
-                    </span>
-                  </h3>
-                  <span className="text-yellow-600 text-sm">
-                    {"★".repeat(Math.floor(tailor.normalizedRating))}
-                    {"☆".repeat(5 - Math.floor(tailor.normalizedRating))}
-                  </span>
-                </div>
-              </div>
-              <div className="flex justify-center items-center">
-                <span
-                  className="text-yellow-600 font-bold text-sm px-2 py-3 bg-gray-200 rounded-full shadow-md"
-                  style={{
-                    minWidth: "40px",
-                    textAlign: "center",
-                  }}
-                >
-                  {index + 1}
-                </span>
-              </div>
+              <Image
+                src={
+                  tailor.businessPictureUrl ||
+                  "/images/profile/business/default.png"
+                }
+                width={0}
+                height={0}
+                layout="responsive"
+                alt={`Image of ${tailor.businessName}`}
+                className={`w-full object-cover object-top rounded-lg lg:rounded-xl max-h-32`}
+                priority={false}
+                placeholder="blur"
+                blurDataURL="/images/profile/business/default.png"
+              />
+              <h3 className={`text-lg px-2 pt-2 font-bold ${theme.colorText}`}>
+                {tailor.businessName}
+              </h3>
+              <span className="text-sm block -mb-2 ml-2 text-gray-100">
+                {tailor.openTime} - {tailor.closeTime}
+              </span>
+              <span className="text-yellow-500 text-sm ml-2">
+                {"★".repeat(Math.floor(tailor.normalizedRating))}
+                {"☆".repeat(5 - Math.floor(tailor.normalizedRating))}
+              </span>
+              <h4 className="text-sm text-center ml-2 text-gray-300">
+                Ranked {index + 1} by TailorEase with these selected checks
+              </h4>
             </div>
           ))
         )}
