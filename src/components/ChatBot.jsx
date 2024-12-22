@@ -84,6 +84,15 @@ const ChatBot = () => {
     } else {
       setIsHistoryFetched(true); // Even if no user is logged in, mark history as fetched
     }
+    if (!userLoggedIn) {
+      setMessages([
+        {
+          text: "Hi, how can I help you with your TailorEase experience today!?",
+          sender: "model",
+          isHTML: true,
+        },
+      ]);
+    }
   }, [userLoggedIn, userData?.uid]); // This runs when login status or userData changes
 
   // Save chat history to localStorage only after history is fetched and messages state is updated
