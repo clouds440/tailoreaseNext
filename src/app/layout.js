@@ -5,6 +5,7 @@ import { UserProvider } from "@/utils/UserContext";
 import PopupMessage from "@/components/PopupMessage";
 import { Roboto } from "next/font/google";
 import ChatBot from "../components/ChatBot";
+import BackgroundDiv from "@/components/BackgroundDiv";
 
 const roboto = Roboto({
   weight: "400",
@@ -25,30 +26,25 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body
-        className="relative flex h-screen w-screen"
-        style={{
-          backgroundImage: "url(/background_images/backgroundDefaultBlue.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
+      <body className="relative flex h-screen w-screen">
         <UserProvider>
-          <div className={`relative flex h-screen w-screen font-sans`}>
-            {/* Navbar with fixed position */}
-            <div className="fixed md:relative w-full md:w-40 z-40">
-              <Navbar />
-            </div>
+          <BackgroundDiv>
+            <div className={`relative flex h-screen w-screen font-sans`}>
+              {/* Navbar with fixed position */}
+              <div className="fixed md:relative w-full md:w-40 z-40">
+                <Navbar />
+              </div>
 
-            {/* Main content with scrollable overflow */}
-            <div
-              className={`overflow-y-auto flex-1 mt-[85px] md:mt-0 px-[1px]`}
-            >
-              <PopupMessage />
-              <ChatBot />
-              {children} {/* Renders each page's content */}
+              {/* Main content with scrollable overflow */}
+              <div
+                className={`overflow-y-auto flex-1 mt-[85px] md:mt-0 px-[1px]`}
+              >
+                <PopupMessage />
+                <ChatBot />
+                {children} {/* Renders each page's content */}
+              </div>
             </div>
-          </div>
+          </BackgroundDiv>
         </UserProvider>
       </body>
     </html>

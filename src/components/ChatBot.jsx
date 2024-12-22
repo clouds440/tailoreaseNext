@@ -9,13 +9,13 @@ import { marked } from "marked";
 import { Filter } from "bad-words";
 
 const ChatBot = () => {
-  const { theme } = useContext(UserContext);
+  const { theme, userData, userLoggedIn } = useContext(UserContext);
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       text: "Hi, how can I help you with your TailorEase experience today!?",
-      sender: "bot",
+      sender: "model",
       isHTML: true,
     },
   ]);
@@ -27,7 +27,7 @@ const ChatBot = () => {
   const { GoogleGenerativeAI } = require("@google/generative-ai");
 
   // Initialize the Generative AI Client
-  const apiKey = "AIzaSyD7GNyhfLL0sHivNLaJbLHjmA9FNc_ltMw";
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY;
   const genAI = new GoogleGenerativeAI(apiKey);
 
   const model = genAI.getGenerativeModel({
@@ -69,6 +69,34 @@ const ChatBot = () => {
 
   const detector = new Filter();
 
+  const [isHistoryFetched, setIsHistoryFetched] = useState(false);
+
+  // Load chat history if available for the logged-in user
+  useEffect(() => {
+    if (userLoggedIn && userData?.uid) {
+      const savedChatHistory = localStorage.getItem(
+        `chatHistory.${userData.uid}`
+      );
+      if (savedChatHistory) {
+        setMessages(JSON.parse(savedChatHistory)); // Set chat history if found
+      }
+      setIsHistoryFetched(true); // Mark history as fetched
+    } else {
+      setIsHistoryFetched(true); // Even if no user is logged in, mark history as fetched
+    }
+  }, [userLoggedIn, userData?.uid]); // This runs when login status or userData changes
+
+  // Save chat history to localStorage only after history is fetched and messages state is updated
+  useEffect(() => {
+    if (userLoggedIn && userData?.uid && isHistoryFetched) {
+      // Only save messages to localStorage once history has been fetched
+      localStorage.setItem(
+        `chatHistory.${userData.uid}`,
+        JSON.stringify(messages)
+      );
+    }
+  }, [messages, userLoggedIn, userData?.uid, isHistoryFetched]);
+
   const handleSendMessage = async () => {
     if (!input.trim()) return;
 
@@ -94,7 +122,7 @@ const ChatBot = () => {
     const formattedText = marked.parse(botResponse);
     setMessages((prev) => [
       ...prev,
-      { text: formattedText, sender: "bot", isHTML: true },
+      { text: formattedText, sender: "model", isHTML: true },
     ]);
   };
 
@@ -204,14 +232,14 @@ const ChatBot = () => {
                 <div
                   key={index}
                   className={`flex ${
-                    msg.sender === "bot" ? "justify-start" : "justify-end"
+                    msg.sender === "model" ? "justify-start" : "justify-end"
                   }`}
                 >
                   <div
                     className={`p-3 rounded-lg text-white animated-message ${
                       msg.sender === "user"
                         ? "bg-blue-600"
-                        : msg.sender === "bot"
+                        : msg.sender === "model"
                         ? `${theme.mainTheme}`
                         : "bg-rose-500 italic"
                     }`}
