@@ -23,7 +23,7 @@ module.exports = {
           "-webkit-background-clip": "background",
         },
         ".midnight-whisper": {
-          backgroundColor: "rgba(2, 15, 30, 0.67)", // bg-gray-800 bg-opacity-70
+          backgroundColor: "rgba(2, 15, 30, 0.64)", // bg-gray-800 bg-opacity-70
           backdropFilter: "blur(13px)", // backdrop-blur-xl
           boxShadow: "0 1px 3px 0 #fde047", // shadow-yellow-300 shadow-sm
           color: "#ffffff", // Set all text to white
