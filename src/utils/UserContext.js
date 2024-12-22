@@ -21,6 +21,7 @@ export const UserProvider = ({ children }) => {
     midnightWhisper: {
       themeName: "midnightWhisper",
       mainTheme: "midnight-whisper",
+      bgImage: "url(/background_images/backgroundDefaultBlue.jpg)",
       colorText: "text-gray-100",
       colorBorder: "border-gray-100",
       iconColor: "text-blue-500",
@@ -32,6 +33,7 @@ export const UserProvider = ({ children }) => {
     lunarGlow: {
       themeName: "lunarGlow",
       mainTheme: "lunar-glow",
+      bgImage: "url(/background_images/backgroundBlack.jpg)",
       colorText: "text-black",
       colorBorder: "border-black",
       iconColor: "text-blue-600",
@@ -43,6 +45,7 @@ export const UserProvider = ({ children }) => {
     neonPunk: {
       themeName: "neonPunk",
       mainTheme: "neon-punk",
+      bgImage: "url(/background_images/backgroundRedPurple.jpg)",
       colorText: "text-sky-200",
       colorBorder: "border-pink-500",
       iconColor: "text-rose-500",
