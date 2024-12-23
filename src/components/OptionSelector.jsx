@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 const OptionSelector = ({ options, value, onChange, theme, classes }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,12 +43,14 @@ const OptionSelector = ({ options, value, onChange, theme, classes }) => {
           {options.find((option) => option.value === value)?.label || "Select"}
         </span>
         {options.find((option) => option.value === value)?.img && (
-          <img
+          <Image
             src={options.find((option) => option.value === value).img}
             alt={`${
               options.find((option) => option.value === value).label
             } flag`}
-            className="w-6 h-6 flex"
+            width={24} // Matches w-6 (6 * 4 = 24px)
+            height={24} // Matches h-6 (6 * 4 = 24px)
+            className="flex"
           />
         )}
         <span>{isOpen ? "▲" : "▼"}</span>
@@ -70,10 +73,12 @@ const OptionSelector = ({ options, value, onChange, theme, classes }) => {
               >
                 {option.label}
                 {option.img && (
-                  <img
+                  <Image
                     src={option.img}
                     alt={`${option.label} flag`}
-                    className="w-6 h-6 flex"
+                    width={24} // Matches w-6 (6 * 4 = 24px)
+                    height={24} // Matches h-6 (6 * 4 = 24px)
+                    className="flex"
                   />
                 )}
               </li>
