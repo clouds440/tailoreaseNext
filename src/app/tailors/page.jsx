@@ -181,47 +181,57 @@ const TailorListPage = () => {
           </div>
         </div>
       </div>
-      <div className={`${theme.mainTheme} w-full rounded-xl overflow-hidden flex flex-wrap justify-evenly items-center h-fit p-8 my-4 mx-auto`}>
+      <div
+        className={`${theme.mainTheme} w-full rounded-xl overflow-hidden flex flex-wrap justify-evenly items-center h-screen p-8 mt-1 mb-3 md:mb-1 mx-auto`}
+      >
         {loading ? (
           <div className="flex justify-center items-center h-screen">
             <ClipLoader color="#ffffff" size={60} />
           </div>
         ) : (
-          tailorList.map((tailor, index) => (
-            <div
-              key={index}
-              className={`cursor-pointer overflow-hidden my-4 w-[15rem] max-w-full h-[16rem] rounded-2xl border transition-all duration-300 transform hover:scale-[1.01] ${theme.hoverShadow} ${theme.colorBorder}`}
-              onClick={() => handleTailorClick(tailor)}
-            >
-              <Image
-                src={
-                  tailor.businessPictureUrl ||
-                  "/images/profile/business/default.png"
-                }
-                width={0}
-                height={0}
-                layout="responsive"
-                alt={`Image of ${tailor.businessName}`}
-                className={`w-full object-cover object-top rounded-lg lg:rounded-xl max-h-32`}
-                priority={false}
-                placeholder="blur"
-                blurDataURL="/images/profile/business/default.png"
-              />
-              <h3 className={`text-lg px-2 pt-2 font-bold ${theme.colorText}`}>
-                {tailor.businessName}
-              </h3>
-              <span className="text-sm block -mb-2 ml-2 text-gray-100">
-                {tailor.openTime} - {tailor.closeTime}
-              </span>
-              <span className="text-yellow-500 text-sm ml-2">
-                {"★".repeat(Math.floor(tailor.normalizedRating))}
-                {"☆".repeat(5 - Math.floor(tailor.normalizedRating))}
-              </span>
-              <h4 className="text-sm text-center ml-2 text-gray-300">
-                Ranked {index + 1} by TailorEase with these selected checks
-              </h4>
-            </div>
-          ))
+          <>
+            {tailorList.length <= 0 ? (
+              <span className="bold text-3xl">No tailors to show</span>
+            ) : (
+              tailorList.map((tailor, index) => (
+                <div
+                  key={index}
+                  className={`cursor-pointer overflow-hidden my-4 w-[15rem] max-w-full h-[16rem] rounded-2xl border transition-all duration-300 transform hover:scale-[1.01] ${theme.hoverShadow} ${theme.colorBorder}`}
+                  onClick={() => handleTailorClick(tailor)}
+                >
+                  <Image
+                    src={
+                      tailor.businessPictureUrl ||
+                      "/images/profile/business/default.png"
+                    }
+                    width={0}
+                    height={0}
+                    layout="responsive"
+                    alt={`Image of ${tailor.businessName}`}
+                    className={`w-full object-cover object-top rounded-lg lg:rounded-xl max-h-32`}
+                    priority={false}
+                    placeholder="blur"
+                    blurDataURL="/images/profile/business/default.png"
+                  />
+                  <h3
+                    className={`text-lg px-2 pt-2 font-bold ${theme.colorText}`}
+                  >
+                    {tailor.businessName}
+                  </h3>
+                  <span className="text-sm block -mb-2 ml-2 text-gray-100">
+                    {tailor.openTime} - {tailor.closeTime}
+                  </span>
+                  <span className="text-yellow-500 text-sm ml-2">
+                    {"★".repeat(Math.floor(tailor.normalizedRating))}
+                    {"☆".repeat(5 - Math.floor(tailor.normalizedRating))}
+                  </span>
+                  <h4 className="text-sm text-center ml-2 text-gray-300">
+                    Ranked {index + 1} by TailorEase with these selected checks
+                  </h4>
+                </div>
+              ))
+            )}
+          </>
         )}
       </div>
 

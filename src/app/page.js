@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       <div
-        className={`max-w-[99.5%] mx-auto p-6 mt-3 md:mt-1 mb-2 rounded-lg flex flex-col items-center overflow-hidden select-none ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto p-6 mt-3 md:mt-1 mb-1 rounded-lg flex flex-col items-center overflow-hidden select-none ${theme.mainTheme}`}
       >
         {/* Top Section */}
         <div
@@ -107,7 +107,7 @@ export default function Home() {
       </div>
 
       <div
-        className={`max-w-[99.5%] mx-auto mb-2 md:mb-1 py-12 px-6 rounded-lg overflow-x-hidden ${theme.mainTheme} ${theme.colorBorder}`}
+        className={`max-w-[99.5%] mx-auto mb-3 md:mb-1 py-12 px-6 rounded-lg overflow-x-hidden ${theme.mainTheme} ${theme.colorBorder}`}
       >
         <p
           className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-[10rem] font-extrabold -z-10 ${theme.colorText} opacity-[2%]`}
