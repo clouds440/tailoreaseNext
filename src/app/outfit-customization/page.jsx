@@ -1,17 +1,12 @@
 "use client";
 import { useContext, useState } from "react";
 import UserContext from "@/utils/UserContext";
-import Jacket from "@/components/3d components/Jacket";
+import CustomizationScene from "@/components/3d components/CustomizationScene";
+
 const OutfitCustomization = () => {
   const { theme } = useContext(UserContext);
-
-  const [morphTargets, setMorphTargets] = useState([
-    "Shoulders",
-    "Arms",
-    "Chest",
-    "Length",
-  ]);
-  const [morphValues, setMorphValues] = useState([0, 0, 0, 0]);
+  const [morphTargets, setMorphTargets] = useState([]); // Dynamically set based on outfit
+  const [morphValues, setMorphValues] = useState([]);
 
   const handleMorphChange = (index, value) => {
     const updatedValues = [...morphValues];
@@ -23,7 +18,7 @@ const OutfitCustomization = () => {
     <div
       className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-screen overflow-hidden select-none justify-center flex ${theme.mainTheme}`}
     >
-      {/* Sliders for Morph Targets */}
+      {/* Sliders dynamically adjust to loaded outfit */}
       <div className="absolute top-5 left-5 bg-white p-4 shadow-lg rounded-lg z-10">
         {morphTargets.map((target, index) => (
           <div key={index} className="mb-3">
@@ -50,8 +45,12 @@ const OutfitCustomization = () => {
         ))}
       </div>
 
-      {/* Pass morph values and setter to Jacket */}
-      <Jacket morphValues={morphValues} setMorphTargets={setMorphTargets} />
+      {/* Scene handles outfit selection */}
+      <CustomizationScene
+        morphValues={morphValues}
+        setMorphValues={setMorphValues}
+        setMorphTargets={setMorphTargets}
+      />
     </div>
   );
 };
