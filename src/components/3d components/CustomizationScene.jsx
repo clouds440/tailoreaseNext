@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -5,20 +6,48 @@ import Mannequin from "./Mannequin";
 import Jacket from "./Jacket";
 import Shirt from "./Shirt";
 
+const outfitComponents = {
+  jacket: Jacket,
+  shirt: Shirt,
+};
+
 const CustomizationScene = ({
+  outfitTypes,
   morphValues,
   setMorphValues,
   setMorphTargets,
 }) => {
-  const [morphTargets, localSetMorphTargets] = useState([]);
+  const [selectedOutfits, setSelectedOutfits] = useState([]);
+  const [morphTargets, localSetMorphTargets] = useState({});
 
   useEffect(() => {
-    // Simulating getting morph targets from the outfit
-    const defaultTargets = Jacket.morphTargets;
-    localSetMorphTargets(defaultTargets);
-    setMorphTargets(defaultTargets);
-    setMorphValues(Array(defaultTargets.length).fill(0)); // Reset morphValues when outfit changes
-  }, [setMorphTargets, setMorphValues]);
+    const newOutfits = outfitTypes
+      .map((type) => outfitComponents[type])
+      .filter(Boolean);
+
+    setSelectedOutfits(newOutfits);
+
+    const newMorphTargets = {};
+    newOutfits.forEach((OutfitComponent) => {
+      const targets = OutfitComponent.morphTargets || [];
+      newMorphTargets[OutfitComponent.name] = targets;
+    });
+
+    localSetMorphTargets(newMorphTargets);
+    setMorphTargets(newMorphTargets);
+
+    setMorphValues((prev) => {
+      const updatedMorphValues = { ...prev };
+      newOutfits.forEach((OutfitComponent) => {
+        if (!updatedMorphValues[OutfitComponent.name]) {
+          updatedMorphValues[OutfitComponent.name] = Array(
+            OutfitComponent.morphTargets?.length || 0
+          ).fill(0);
+        }
+      });
+      return updatedMorphValues;
+    });
+  }, [outfitTypes, setMorphTargets, setMorphValues]);
 
   return (
     <Canvas
@@ -32,11 +61,15 @@ const CustomizationScene = ({
       <ambientLight intensity={0.8} />
       <directionalLight position={[10, 10, 5]} />
 
-      {/* Mannequin always present */}
       <Mannequin />
 
-      {/* Outfit (Replace Jacket with other outfits dynamically) */}
-      <Jacket morphValues={morphValues} morphTargets={morphTargets} />
+      {selectedOutfits.map((Outfit, index) => (
+        <Outfit
+          key={index}
+          morphValues={morphValues[Outfit.name] || []}
+          morphTargets={morphTargets[Outfit.name] || []}
+        />
+      ))}
 
       <OrbitControls />
     </Canvas>

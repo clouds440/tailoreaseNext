@@ -10,13 +10,23 @@ const Market = () => {
     <div
       className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-screen overflow-hidden select-none justify-center flex ${theme.mainTheme}`}
     >
-      <Link href={"/outfit-customization"}>
+      <Link href={"/outfit-customization?outfit=jacket"}>
         <Image
           className="max-w-full p-12 w-auto cursor-pointer border"
           src="/thumbnails/jacket-thumbnail.png"
           alt="This is the login Image."
           width={100} // Specify the width
           height={100} // Specify the height
+          priority // Optional: for high-priority images like login
+        />
+      </Link>
+      <Link href={"/outfit-customization?outfit=shirt"}>
+        <Image
+          className="max-w-full p-12 w-auto cursor-pointer border"
+          src="/thumbnails/shirt-thumbnail.png"
+          alt="This is the login Image."
+          width={100} // Specify the width
+          height={110} // Specify the height
           priority // Optional: for high-priority images like login
         />
       </Link>
