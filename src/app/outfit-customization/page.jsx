@@ -16,7 +16,7 @@ const OutfitCustomization = () => {
   const searchParams = useSearchParams();
 
   // Get outfit(s) from URL and convert them into an array
-  const outfitTypes = searchParams.get("outfit")?.split(",") || []; // Default to "jacket"
+  const outfitTypes = searchParams.get("outfit")?.split(",") || [];
 
   const uniqueOutfits = [];
   const usedCategories = new Set();
@@ -46,7 +46,7 @@ const OutfitCustomization = () => {
     >
       {/* Morph sliders for each outfit */}
       <div className="absolute top-5 left-5 bg-white p-4 shadow-lg rounded-lg z-10">
-        {Object.keys(morphTargets).map((outfit, outfitIndex) => (
+        {Object.keys(morphTargets).map((outfit) => (
           <div key={outfit} className="mb-6">
             {" "}
             {/* Added margin-bottom to separate outfits */}
