@@ -2,13 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
-const Jacket = ({ morphValues, morphTargets }) => {
+const Shirt = ({ morphValues, morphTargets }) => {
   const modelRef = useRef();
   const [gltf, setGltf] = useState(null);
 
   useEffect(() => {
     const loader = new GLTFLoader();
-    loader.load("/models/jacket/jacket.glb", (loadedGltf) => {
+    loader.load("/models/shirt/shirt.glb", (loadedGltf) => {
       setGltf(loadedGltf);
     });
   }, []);
@@ -35,6 +35,6 @@ const Jacket = ({ morphValues, morphTargets }) => {
   ) : null;
 };
 
-Jacket.morphTargets = ["Length", "Belly", "Chest"];
+Shirt.morphTargets = ["Belly", "Chest", "Arms", "Length"];
 
-export default Jacket;
+export default Shirt;

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Mannequin from "./Mannequin";
-import Jacket from "./Jacket"; // You can swap this with any other outfit
+import Jacket from "./Jacket";
+import Shirt from "./Shirt";
 
 const CustomizationScene = ({
   morphValues,
@@ -13,7 +14,7 @@ const CustomizationScene = ({
 
   useEffect(() => {
     // Simulating getting morph targets from the outfit
-    const defaultTargets = ["Chest", "Shoulders", "Arms", "Length"];
+    const defaultTargets = Jacket.morphTargets;
     localSetMorphTargets(defaultTargets);
     setMorphTargets(defaultTargets);
     setMorphValues(Array(defaultTargets.length).fill(0)); // Reset morphValues when outfit changes
