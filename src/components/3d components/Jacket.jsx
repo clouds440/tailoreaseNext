@@ -30,7 +30,7 @@ const Jacket = ({ morphValues, morphTargets }) => {
     <primitive
       ref={modelRef}
       object={gltf.scene}
-      position={[-0.03, -2.5, 1]}
+      position={[-0.03, -3.3, 1]}
       scale={[1.7, 1.7, 1.7]}
     />
   ) : null;

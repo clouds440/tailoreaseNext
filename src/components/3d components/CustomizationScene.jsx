@@ -5,10 +5,12 @@ import { OrbitControls } from "@react-three/drei";
 import Mannequin from "./Mannequin";
 import Jacket from "./Jacket";
 import Shirt from "./Shirt";
+import Pants from "./Pants";
 
 const outfitComponents = {
   jacket: Jacket,
   shirt: Shirt,
+  pants: Pants,
 };
 
 const CustomizationScene = ({
@@ -16,6 +18,8 @@ const CustomizationScene = ({
   morphValues,
   setMorphValues,
   setMorphTargets,
+  colorValue,
+  setColorValue,
 }) => {
   const [selectedOutfits, setSelectedOutfits] = useState([]);
   const [morphTargets, localSetMorphTargets] = useState({});
@@ -34,7 +38,14 @@ const CustomizationScene = ({
     });
 
     localSetMorphTargets(newMorphTargets);
-    setMorphTargets(newMorphTargets);
+
+    setMorphTargets((prevTargets) => {
+      // Only update if there's a change
+      if (JSON.stringify(prevTargets) !== JSON.stringify(newMorphTargets)) {
+        return newMorphTargets;
+      }
+      return prevTargets;
+    });
 
     setMorphValues((prev) => {
       const updatedMorphValues = { ...prev };
@@ -45,23 +56,32 @@ const CustomizationScene = ({
           ).fill(0);
         }
       });
-      return updatedMorphValues;
+
+      // Only update if there's a change
+      if (JSON.stringify(prev) !== JSON.stringify(updatedMorphValues)) {
+        return updatedMorphValues;
+      }
+      return prev;
     });
-  }, [outfitTypes, setMorphTargets, setMorphValues]);
+  }, [outfitTypes]); // If the missing dependecies are added, they will cause infinite loop
 
   return (
     <Canvas
       style={{
-        width: "40%",
-        height: "90%",
+        width: "99%",
+        height: "100%",
         border: "solid 1px black",
         background: "gray",
+        borderRadius: "0.375rem",
+        backgroundImage: "url('/images/assets/wardrobe.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
       <ambientLight intensity={0.8} />
       <directionalLight position={[10, 10, 5]} />
 
-      <Mannequin />
+      <Mannequin colorValue={colorValue} />
 
       {selectedOutfits.map((Outfit, index) => (
         <Outfit
@@ -71,9 +91,9 @@ const CustomizationScene = ({
         />
       ))}
 
-      <OrbitControls />
+      <OrbitControls enableZoom={false} />
     </Canvas>
   );
 };
 
-export default CustomizationScene;
+export default React.memo(CustomizationScene);

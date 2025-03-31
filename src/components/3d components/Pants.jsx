@@ -2,14 +2,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import * as THREE from "three";
 
-const Shirt = ({ morphValues, morphTargets }) => {
+const Pants = ({ morphValues, morphTargets }) => {
   const modelRef = useRef();
   const [gltf, setGltf] = useState(null);
 
   useEffect(() => {
     const loader = new GLTFLoader();
-    loader.load("/models/shirt/shirt.glb", (loadedGltf) => {
+    loader.load("/models/pants/pants.glb", (loadedGltf) => {
       setGltf(loadedGltf);
     });
   }, []);
@@ -20,6 +21,11 @@ const Shirt = ({ morphValues, morphTargets }) => {
         if (child.isMesh && child.morphTargetInfluences) {
           morphTargets.forEach((target, index) => {
             child.morphTargetInfluences[index] = morphValues[index] || 0;
+          });
+          child.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0.9, 0.87, 0.87), // color of the pants
+            metalness: 0.1,
+            roughness: 0.6,
           });
         }
       });
@@ -36,6 +42,6 @@ const Shirt = ({ morphValues, morphTargets }) => {
   ) : null;
 };
 
-Shirt.morphTargets = ["Belly", "Chest", "Arms", "Length"];
+Pants.morphTargets = ["Waist", "Length", "Legs"];
 
-export default Shirt;
+export default Pants;
