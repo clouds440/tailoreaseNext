@@ -53,11 +53,15 @@ const TailorListPage = () => {
 
       const querySnapshot = await getDocs(q);
 
-      // Include the document ID along with the data
-      let tailors = querySnapshot.docs.map((doc) => ({
-        id: doc.id, // Document ID
-        ...doc.data(), // Document data
-      }));
+      // Filter out tailors where status is not "active" or approved is false
+      let tailors = querySnapshot.docs
+        .map((doc) => ({
+          id: doc.id, // Document ID
+          ...doc.data(), // Document data
+        }))
+        .filter(
+          (tailor) => tailor.status === "active" && tailor.approved === true
+        );
 
       if (appliedFilters.length > 0) {
         tailors = tailors.filter((tailor) =>
