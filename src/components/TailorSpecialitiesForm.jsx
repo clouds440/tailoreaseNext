@@ -109,6 +109,16 @@ const TailorSpecialitiesForm = ({
       return;
     }
 
+    // Validate experience
+    if (specialitiesData.experience < 0 || specialitiesData.experience > 100) {
+      setShowMessage({
+        type: "warning",
+        message: "Enter experience between 0 and 100 years",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+
     // Validate that at least one speciality is selected
     if (
       !specialitiesData.specialities ||
@@ -227,10 +237,12 @@ const TailorSpecialitiesForm = ({
             {/* Experience */}
             <div className="relative mb-4">
               <input
-                type="text"
+                type="number"
                 id="experience"
                 name="experience"
                 value={specialitiesData.experience}
+                min={0}
+                max={100}
                 onChange={handleChange}
                 className={`${inputStyles}`}
                 placeholder=" "

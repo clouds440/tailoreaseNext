@@ -63,7 +63,7 @@ const CustomizationScene = ({
       }
       return prev;
     });
-  }, [outfitTypes, setMorphTargets, setMorphValues]); // If the missing dependecies are added, they will cause infinite loop
+  }, [outfitTypes, setMorphTargets, setMorphValues]);
 
   return (
     <Canvas
