@@ -133,6 +133,15 @@ const TailorProfile = () => {
       return;
     }
 
+    if (userData.uid === tailorData.ownerId) {
+      setShowMessage({
+        type: "warning",
+        message: "You cannot review your own business account",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+
     if (rating === 0) {
       setShowMessage({
         type: "info",
