@@ -33,7 +33,7 @@ export const UserProvider = ({ children }) => {
     lunarGlow: {
       themeName: "lunarGlow",
       mainTheme: "lunar-glow",
-      bgImage: "url(/background_images/backgroundBlack.jpg)",
+      bgImage: "url(/background_images/ex-backgroundDefaultBlue.jpg)",
       colorText: "text-black",
       colorBorder: "border-black",
       iconColor: "text-blue-600",
@@ -50,7 +50,7 @@ export const UserProvider = ({ children }) => {
       colorBorder: "border-pink-500",
       iconColor: "text-rose-500",
       hoverText: "hover:text-rose-600",
-      colorBg: "bg-sky-700 backdrop-blur-xl bg-opacity-90",
+      colorBg: "bg-sky-800 backdrop-blur-xl bg-opacity-70",
       hoverBg: "hover:bg-rose-400 hover:bg-opacity-50",
       hoverShadow: "hover:shadow-md hover:shadow-violet-500",
     },

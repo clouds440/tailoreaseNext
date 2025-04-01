@@ -25,6 +25,18 @@
   background: linear-gradient(to bottom, #ac0064, #3f0000);
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide number input spinners in Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: none;
+}
+
 .animated-message {
   opacity: 0;
   transform: translateY(20px); /* Starts slightly below */

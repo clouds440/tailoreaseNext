@@ -12,6 +12,7 @@ import {
   getDocs,
   doc,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 
 import React, { useContext, useState, useEffect } from "react";
@@ -20,6 +21,7 @@ import ChangePasswordModal from "@/components/ChangePasswordModal";
 import Optionselector from "@/components/OptionSelector";
 import UserContext from "@/utils/UserContext";
 import { useRouter } from "next/navigation";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import {
   AdjustmentsIcon,
   EditIcon,
@@ -28,6 +30,7 @@ import {
 } from "../../../public/icons/svgIcons";
 import SimpleButton from "@/components/SimpleButton";
 import DialogBox from "@/components/DialogBox";
+import BodyMeasurements from "@/components/BodyMeasurements";
 
 function AccountSettings() {
   const {
@@ -52,6 +55,7 @@ function AccountSettings() {
     type: "",
     buttons: [],
   });
+  const [measurements, setMeasurements] = useState({});
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -204,14 +208,27 @@ function AccountSettings() {
     handleSetTheme(themeName);
   };
 
-  const handleSavePreferences = () => {
-    localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName));
-    setShowMessage({
-      type: "success",
-      message: "Changes saved!",
-    });
-    setPopUpMessageTrigger(true);
-    // Code to save the changes to the account here
+  const handleSavePreferences = async () => {
+    try {
+      setIsLoading(true);
+      localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName));
+
+      const docRef = doc(db, "users", userData.uid, "settings", "measurements");
+      await setDoc(docRef, measurements, { merge: true });
+      setShowMessage({
+        type: "success",
+        message: "Changes saved!",
+      });
+      setPopUpMessageTrigger(true);
+    } catch (error) {
+      setShowMessage({
+        type: "danger",
+        message: "Something went wrong: " + error.message,
+      });
+      setPopUpMessageTrigger(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDiscardChanges = () => {
@@ -226,7 +243,7 @@ function AccountSettings() {
 
   return (
     <div
-      className={`max-w-[99.5%] mx-auto my-4 md:my-1 w-auto h-screen p-6 rounded-lg select-none ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto my-4 md:my-1 w-auto h-auto md:h-full  p-6 rounded-lg select-none ${theme.mainTheme}`}
     >
       <h2
         className={`flex text-2xl font-bold mb-6 pt-6 border-b ${theme.colorBorder}`}
@@ -332,6 +349,13 @@ function AccountSettings() {
           </div>
         </div>
       </div>
+
+      {/*Body measurements component*/}
+      <BodyMeasurements
+        measurements={measurements}
+        setMeasurements={setMeasurements}
+      />
+
       <div className="flex mt-8">
         <div className="flex items-center mx-auto justify-center space-x-3">
           <SimpleButton
@@ -356,9 +380,16 @@ function AccountSettings() {
           />
           <SimpleButton
             onClick={handleSavePreferences}
-            btnText={"Save Changes"}
+            btnText={
+              isLoading ? (
+                <LoadingSpinner size={24} extraClasses={"mx-[38px]"} />
+              ) : (
+                "Save Changes"
+              )
+            }
             type={"primary"}
             extraclasses={"w-auto px-6"}
+            disabled={isLoading}
           />
         </div>
       </div>
