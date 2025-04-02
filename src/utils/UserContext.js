@@ -8,8 +8,8 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   // Initialize the theme
   const [theme, setTheme] = useState(null); // Initialize as `null` to indicate data is loading
-  const [userData, setUserData] = useState(null); // Same for userData
-  const [userLoggedIn, setUserLoggedIn] = useState(false); // Will be determined later
+  const [userData, setUserData] = useState(null);
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [isReady, setIsReady] = useState(false); // Track readiness of app
   const [popUpMessageTrigger, setPopUpMessageTrigger] = useState(false);
   const [showMessage, setShowMessage] = useState({

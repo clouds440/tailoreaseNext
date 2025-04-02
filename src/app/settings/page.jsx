@@ -56,7 +56,6 @@ function AccountSettings() {
     buttons: [],
   });
   const [measurements, setMeasurements] = useState({});
-
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
@@ -213,7 +212,13 @@ function AccountSettings() {
       setIsLoading(true);
       localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName));
 
-      const docRef = doc(db, "users", userData.uid, "settings", "measurements");
+      const docRef = doc(
+        db,
+        "settings",
+        userData.uid,
+        "user_settings",
+        "measurements"
+      );
       await setDoc(docRef, measurements, { merge: true });
       setShowMessage({
         type: "success",
@@ -243,7 +248,7 @@ function AccountSettings() {
 
   return (
     <div
-      className={`max-w-[99.5%] mx-auto my-4 md:my-1 w-auto h-auto md:h-full  p-6 rounded-lg select-none ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto my-4 md:my-1 w-auto h-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
     >
       <h2
         className={`flex text-2xl font-bold mb-6 pt-6 border-b ${theme.colorBorder}`}

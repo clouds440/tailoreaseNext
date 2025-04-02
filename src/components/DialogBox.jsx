@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useContext, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "./SimpleButton";
@@ -77,22 +78,23 @@ const DialogBox = ({
     };
   }, [handleClose]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className={`fixed inset-0 flex items-center justify-center`}
+          className="fixed inset-0 flex items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
         >
-          <div className={`bg-black bg-opacity-50 fixed inset-0`}></div>
-          <div className="w-auto max-w-[85%] -translate-y-48">
+          <div className="bg-black bg-opacity-50 fixed inset-0"></div>
+          <div className="w-auto max-w-[85%] fixed top-1/2 left-1/2 -translate-x-1/2 md:-translate-y-48 -translate-y-32">
             <motion.div
               className={`rounded-xl shadow-lg w-auto z-50 ${theme.mainTheme}`}
-              initial={{ scale: 0.8 }}
+              initial={{ scale: 0.7 }}
               animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
+              exit={{ scale: 0.7 }}
               transition={{ duration: 0.2 }}
             >
               <div className={`${bgColor} p-4 flex items-center rounded-t-xl`}>
@@ -121,7 +123,8 @@ const DialogBox = ({
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body // This ensures the modal is rendered at the top level
   );
 };
 

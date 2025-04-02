@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { db, auth } from "@/utils/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import UserContext from "@/utils/UserContext";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { ClipLoader } from "react-spinners";
 
 const measurementFields = [
   { key: "chest", label: "Chest" },
@@ -24,15 +24,22 @@ const measurementFields = [
 const BodyMeasurements = ({ measurements, setMeasurements }) => {
   const { theme, userData } = useContext(UserContext);
   const [editingField, setEditingField] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch measurements from Firestore
   useEffect(() => {
     try {
       const fetchData = async () => {
+        setIsLoading(true);
         const uid = userData.uid;
 
-        const docRef = doc(db, "users", uid, "settings", "measurements");
+        const docRef = doc(
+          db,
+          "settings",
+          uid,
+          "user_settings",
+          "measurements"
+        );
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setMeasurements(docSnap.data());
@@ -47,7 +54,9 @@ const BodyMeasurements = ({ measurements, setMeasurements }) => {
       });
       setPopUpMessageTrigger(true);
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 3000);
     }
   }, [setMeasurements, userData.uid]);
 
@@ -72,29 +81,25 @@ const BodyMeasurements = ({ measurements, setMeasurements }) => {
           >
             <label className="block text-sm font-medium">{label}</label>
             {editingField === key ? (
-              isLoading ? (
-                <div className="flex justify-center items-center p-2 mt-1">
-                  <LoadingSpinner size={24} />
-                </div>
-              ) : (
-                <input
-                  type="number"
-                  value={measurements[key] || ""}
-                  onChange={(e) => handleChange(e, key)}
-                  className={`w-full p-2 mt-1 rounded-md ${theme.colorBg} ${theme.colorText} ${theme.colorBorder} focus:outline-none focus:ring-2`}
-                  autoFocus
-                  onBlur={() => setEditingField(null)}
-                />
-              )
+              <input
+                type="number"
+                value={measurements[key] || ""}
+                onChange={(e) => handleChange(e, key)}
+                className={`w-full p-2 mt-1 rounded-md ${theme.colorBg} ${theme.colorText} ${theme.colorBorder} focus:outline-none focus:ring-2`}
+                autoFocus
+                onBlur={() => setEditingField(null)}
+              />
+            ) : isLoading ? (
+              <div className="flex justify-center items-center p-2 mt-1">
+                <ClipLoader size={24} color={`${theme.colorText}`} />
+              </div>
             ) : (
-              !isLoading && (
-                <p
-                  className={`cursor-pointer p-2 mt-1 rounded-md ${theme.hoverText}`}
-                  onClick={() => handleEdit(key)}
-                >
-                  {measurements[key] || "Click to enter"}
-                </p>
-              )
+              <p
+                className={`cursor-pointer p-2 mt-1 rounded-md ${theme.hoverText}`}
+                onClick={() => handleEdit(key)}
+              >
+                {measurements[key] || "Click to enter"}
+              </p>
             )}
           </div>
         ))}

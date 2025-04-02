@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
+import { createPortal } from "react-dom";
 import SimpleButton from "./SimpleButton";
 import { EditIcon } from "../../public/icons/svgIcons";
 import { LoadingSpinner } from "./LoadingSpinner";
@@ -91,11 +92,11 @@ function EditFieldModal({
     };
   }, [handleClose]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className={`fixed inset-0 flex items-center justify-center`}
+          className={`fixed inset-0 flex items-center justify-center md:-translate-y-48`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -104,10 +105,10 @@ function EditFieldModal({
             className={`bg-black bg-opacity-50 fixed inset-0 rounded-lg`}
           ></div>
           <motion.div
-            className={`bg-white rounded-lg shadow-lg w-11/12 max-w-md z-50 ${theme.mainTheme}`}
-            initial={{ scale: 0.8 }}
+            className={`rounded-lg shadow-lg w-11/12 max-w-md z-50`}
+            initial={{ scale: 0.7 }}
             animate={{ scale: 1 }}
-            exit={{ scale: 0.8 }}
+            exit={{ scale: 0.7 }}
             transition={{ duration: 0.2 }}
           >
             <div
@@ -157,7 +158,8 @@ function EditFieldModal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body // This ensures the modal is rendered at the top level
   );
 }
 
