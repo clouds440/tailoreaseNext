@@ -142,6 +142,12 @@ const ThemeIcon = ({ size, color, extraClasses }) => (
   </svg>
 );
 
+const AiIcon = ({ size, color, extraClasses }) => (
+  <svg {...svgProps} className={`h-${size} w-${size} ${color} ${extraClasses}`}>
+    <path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm457-560 21-89-71-59 94-8 36-84 36 84 94 8-71 59 21 89-80-47-80 47ZM480-481Z" />
+  </svg> // not working
+);
+
 export {
   EditIcon,
   SettingsIcon,
@@ -160,4 +166,5 @@ export {
   InfoIcon,
   TailorIcon,
   ThemeIcon,
+  AiIcon,
 };

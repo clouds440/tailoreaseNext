@@ -260,7 +260,9 @@ function AccountSettings() {
         />
       </h2>
       {/* Parent Settings div */}
-      <div className="md:flex md:space-x-5 lg:space-x-14">
+      <div
+        className={`md:flex md:space-x-5 lg:space-x-14 pb-6 border-b ${theme.colorBorder}`}
+      >
         {/* Personal Info Section */}
         <div className="space-y-4 w-full md:w-1/2">
           <h2 className="flex text-xl font-semibold  mb-6">
@@ -361,7 +363,7 @@ function AccountSettings() {
         setMeasurements={setMeasurements}
       />
 
-      <div className="flex mt-8">
+      <div className="flex mt-8 pt-6 border-t">
         <div className="flex items-center mx-auto justify-center space-x-3">
           <SimpleButton
             onClick={() => {

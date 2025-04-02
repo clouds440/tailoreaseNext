@@ -20,18 +20,24 @@ function SimpleButton({
         "bg-gray-700 text-white hover:bg-gray-600 ring-gray-700 hover:ring-2",
       default:
         "bg-gray-400 text-black hover:bg-gray-300 ring-gray-500 hover:ring-2",
+      accent:
+        "bg-purple-600 text-white hover:bg-purple-500 ring-purple-400 hover:ring-2",
     },
     "lunar-glow": {
       primary:
         "bg-sky-800 text-white hover:bg-sky-500 ring-sky-700 hover:ring-2",
       default:
         "bg-white text-gray-900 hover:bg-gray-400 ring-white hover:ring-2",
+      accent:
+        "bg-teal-600 text-white hover:bg-teal-500 ring-teal-800 hover:ring-2",
     },
     "neon-punk": {
       primary:
         "bg-blue-900 text-pink-200 hover:bg-blue-800/75 ring-pink-500 hover:ring-2",
       default:
         "bg-pink-700 text-blue-200 hover:bg-pink-600 ring-blue-500 hover:ring-2",
+      accent:
+        "bg-yellow-500 text-black hover:bg-yellow-400 ring-yellow-700 hover:ring-2",
     },
   };
 
@@ -46,6 +52,8 @@ function SimpleButton({
       case "primary":
       case "primary-submit":
         return themeType.primary;
+      case "accent":
+        return themeType.accent;
       case "danger":
         return dangerStyles;
       default:
