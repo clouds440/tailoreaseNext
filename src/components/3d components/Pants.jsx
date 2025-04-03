@@ -12,7 +12,7 @@ const Pants = ({ morphValues, morphTargets, texture, color }) => {
 
   useEffect(() => {
     const loader = new GLTFLoader();
-    loader.load("/models/pants/pants1.glb", (loadedGltf) => {
+    loader.load("/models/pants/pants.glb", (loadedGltf) => {
       setGltf(loadedGltf);
     });
   }, []);
