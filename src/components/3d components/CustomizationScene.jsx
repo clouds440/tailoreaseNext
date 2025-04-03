@@ -19,7 +19,8 @@ const CustomizationScene = ({
   setMorphValues,
   setMorphTargets,
   colorValue,
-  setColorValue,
+  texture,
+  color,
 }) => {
   const [selectedOutfits, setSelectedOutfits] = useState([]);
   const [morphTargets, localSetMorphTargets] = useState({});
@@ -88,6 +89,8 @@ const CustomizationScene = ({
           key={index}
           morphValues={morphValues[Outfit.name] || []}
           morphTargets={morphTargets[Outfit.name] || []}
+          texture={texture[Outfit.name]}
+          color={color[Outfit.name]}
         />
       ))}
 

@@ -4,6 +4,8 @@ import { useSearchParams } from "next/navigation";
 import UserContext from "@/utils/UserContext";
 import CustomizationScene from "@/components/3d components/CustomizationScene";
 import { Resizable } from "re-resizable";
+import ColorPicker from "@/components/ColorPicker";
+import SimpleButton from "@/components/SimpleButton";
 
 const outfitCategories = {
   jacket: "torso",
@@ -35,6 +37,9 @@ const OutfitCustomization = () => {
   const [morphTargets, setMorphTargets] = useState({});
   const [morphValues, setMorphValues] = useState({});
   const [colorValue, setColorValue] = useState(0.5); // Default color brightness
+  const [texture, setTexture] = useState({});
+  const [color, setColor] = useState({});
+  const [selectedOutfit, setSelectedOutfit] = useState(null); // Track the selected outfit for color picker visibility
 
   const handleMorphChange = (outfit, index, value) => {
     setMorphValues((prev) => ({
@@ -51,6 +56,24 @@ const OutfitCustomization = () => {
   const handleSetMorphValues = useCallback((values) => {
     setMorphValues(values);
   }, []);
+
+  const handleTextureUpload = (outfit, e) => {
+    if (e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const objectURL = URL.createObjectURL(file); // Convert file to URL
+      setTexture((prevTextures) => ({
+        ...prevTextures,
+        [outfit]: objectURL, // Store texture per outfit
+      }));
+    }
+  };
+
+  const handleColorPickerChange = (outfit, color) => {
+    setColor((prevColors) => ({
+      ...prevColors,
+      [outfit]: color, // Store texture per outfit
+    }));
+  };
 
   const [isMobile, setIsMobile] = useState(false);
   const [width, setWidth] = useState(30); // Default width for desktop
@@ -77,7 +100,7 @@ const OutfitCustomization = () => {
             ? { width: "100%", height }
             : { width: `${width}%`, height: "full" }
         }
-        minWidth={isMobile ? "100%" : "18%"}
+        minWidth={isMobile ? "100%" : "28%"}
         maxWidth={isMobile ? "100%" : "40%"}
         minHeight={isMobile ? "30vh" : "full"}
         maxHeight={isMobile ? "30vh" : "full"}
@@ -89,8 +112,8 @@ const OutfitCustomization = () => {
             setWidth(width + d.width);
           }
         }}
-        className={`p-4 rounded-lg ${
-          isMobile ? "mb-1 overflow-y-auto" : "broder-r border-double h-[100%]"
+        className={`p-4 rounded-lg overflow-y-auto overflow-x-hidden ${
+          isMobile ? "mb-1" : "broder-r border-double h-[100%]"
         } ${theme.mainTheme}`}
       >
         {/* Morph sliders for each outfit */}
@@ -120,6 +143,47 @@ const OutfitCustomization = () => {
                 />
               </div>
             ))}
+
+            <div className="flex items-center justify-between mb-6">
+              {/* Color Picker Button on the left */}
+              <SimpleButton
+                btnText={selectedOutfit === outfit ? "Hide" : "Color Picker"}
+                type={"primary"}
+                onClick={() => {
+                  if (selectedOutfit === outfit) {
+                    setSelectedOutfit(null); // If the same outfit is clicked, hide the picker
+                  } else {
+                    setSelectedOutfit(outfit); // Show the picker for this outfit
+                  }
+                }}
+              />
+
+              {/* Texture image input on the right */}
+              <div className="flex items-center">
+                <label
+                  htmlFor={`file-input-${outfit}`}
+                  className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.colorBg} ${theme.hoverBg}`}
+                >
+                  {texture[outfit] ? "Change Texture" : "Choose a Texture"}
+                </label>
+                <input
+                  id={`file-input-${outfit}`}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleTextureUpload(outfit, e)}
+                  className="hidden" // Hide the default input element
+                />
+              </div>
+            </div>
+
+            {/* Color Picker */}
+            {selectedOutfit === outfit && (
+              <ColorPicker
+                onColorChange={(color) =>
+                  handleColorPickerChange(outfit, color)
+                } // Pass the outfit name along with the color
+              />
+            )}
           </div>
         ))}
 
@@ -155,7 +219,8 @@ const OutfitCustomization = () => {
           setMorphValues={handleSetMorphValues}
           setMorphTargets={handleSetMorphTargets}
           colorValue={colorValue}
-          setColorValue={setColorValue}
+          texture={texture}
+          color={color}
         />
       </div>
     </div>

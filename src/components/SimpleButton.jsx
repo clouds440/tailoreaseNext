@@ -33,7 +33,7 @@ function SimpleButton({
     },
     "neon-punk": {
       primary:
-        "bg-blue-900 text-pink-200 hover:bg-blue-800/75 ring-pink-500 hover:ring-2",
+        "bg-slate-800 text-pink-200 hover:bg-sky-900/90 ring-pink-500 hover:ring-2",
       default:
         "bg-pink-700 text-blue-200 hover:bg-pink-600 ring-blue-500 hover:ring-2",
       accent:
