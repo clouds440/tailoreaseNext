@@ -12,37 +12,27 @@ function SimpleButton({
   const { theme } = useContext(UserContext);
 
   const baseStyles =
-    "flex items-center justify-center px-4 py-2 rounded-md font-medium duration-300 select-none focus:outline-none transition-all";
+    "flex items-center justify-center px-4 py-2 rounded-md font-medium duration-500 select-none focus:outline-none transition-all hover:ring-2";
 
   const themeStyles = {
     "midnight-whisper": {
-      primary:
-        "bg-gray-700 text-white hover:bg-gray-600 ring-gray-700 hover:ring-2",
-      default:
-        "bg-gray-400 text-black hover:bg-gray-300 ring-gray-500 hover:ring-2",
-      accent:
-        "bg-purple-600 text-white hover:bg-purple-500 ring-purple-400 hover:ring-2",
+      primary: "bg-gray-800 text-white hover:bg-gray-700 ring-gray-900",
+      default: "bg-gray-400 text-black hover:bg-gray-300 ring-gray-700",
+      accent: "bg-purple-600 text-white hover:bg-purple-400 ring-purple-600",
     },
     "lunar-glow": {
-      primary:
-        "bg-sky-800 text-white hover:bg-sky-500 ring-sky-700 hover:ring-2",
-      default:
-        "bg-white text-gray-900 hover:bg-gray-400 ring-white hover:ring-2",
-      accent:
-        "bg-teal-600 text-white hover:bg-teal-500 ring-teal-800 hover:ring-2",
+      primary: "bg-sky-800 text-white hover:bg-sky-500 ring-sky-800",
+      default: "bg-white text-gray-900 hover:bg-gray-400 ring-white",
+      accent: "bg-teal-600 text-white hover:bg-teal-500 ring-teal-800",
     },
     "neon-punk": {
-      primary:
-        "bg-slate-800 text-pink-200 hover:bg-sky-900/90 ring-pink-500 hover:ring-2",
-      default:
-        "bg-pink-700 text-blue-200 hover:bg-pink-600 ring-blue-500 hover:ring-2",
-      accent:
-        "bg-yellow-500 text-black hover:bg-yellow-400 ring-yellow-700 hover:ring-2",
+      primary: "bg-slate-800 text-pink-200 hover:bg-sky-900/75 ring-pink-500",
+      default: "bg-pink-700 text-blue-200 hover:bg-pink-500/75 ring-blue-600",
+      accent: "bg-yellow-600 text-black hover:bg-yellow-300/75 ring-yellow-800",
     },
   };
 
-  const dangerStyles =
-    "bg-red-700 text-white hover:bg-red-500/75 ring-red-700 hover:ring-2";
+  const dangerStyles = "bg-red-700 text-white hover:bg-red-400/75 ring-red-800";
 
   const disabledStyles = "opacity-50 cursor-not-allowed";
 

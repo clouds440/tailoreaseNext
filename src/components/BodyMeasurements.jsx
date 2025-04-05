@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useContext } from "react";
 import { db, auth } from "@/utils/firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import UserContext from "@/utils/UserContext";
 import { ClipLoader } from "react-spinners";
 import SimpleButton from "./SimpleButton";
@@ -18,7 +18,7 @@ const measurementFields = [
   { key: "waist", label: "Waist" },
   { key: "hips", label: "Hips" },
   { key: "legs", label: "Legs Length" },
-  { key: "thigh", label: "Thigh Circumference" }, // Added for pants fit
+  { key: "thigh", label: "Thigh Circumference" },
   { key: "legOpening", label: "Leg Opening Circumference" },
 ];
 
@@ -60,6 +60,17 @@ const BodyMeasurements = ({ measurements, setMeasurements }) => {
       }, 3000);
     }
   }, [setMeasurements, userData.uid]);
+
+  const handleSavePreferences = async () => {
+    const docRef = doc(
+      db,
+      "settings",
+      userData.uid,
+      "user_settings",
+      "measurements"
+    );
+    await setDoc(docRef, measurements, { merge: true });
+  };
 
   // Handle editing
   const handleEdit = (key) => {

@@ -12,7 +12,6 @@ import {
   getDocs,
   doc,
   updateDoc,
-  setDoc,
 } from "firebase/firestore";
 
 import React, { useContext, useState, useEffect } from "react";
@@ -211,15 +210,6 @@ function AccountSettings() {
     try {
       setIsLoading(true);
       localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName));
-
-      const docRef = doc(
-        db,
-        "settings",
-        userData.uid,
-        "user_settings",
-        "measurements"
-      );
-      await setDoc(docRef, measurements, { merge: true });
       setShowMessage({
         type: "success",
         message: "Changes saved!",
@@ -261,15 +251,17 @@ function AccountSettings() {
       </h2>
       {/* Parent Settings div */}
       <div
-        className={`md:flex md:space-x-5 lg:space-x-14 pb-6 border-b ${theme.colorBorder}`}
+        className={`lg:flex lg:space-x-5 xl:space-x-14 pb-6 border-b ${theme.colorBorder}`}
       >
         {/* Personal Info Section */}
-        <div className="space-y-4 w-full md:w-1/2">
+        <div className="space-y-4 w-full lg:w-1/2">
           <h2 className="flex text-xl font-semibold  mb-6">
             Personal Information
             <UserIcon color={`${theme.iconColor}`} extraClasses={"ml-3 mt-1"} />
           </h2>
-          <div className="flex justify-between items-center">
+          <div
+            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+          >
             <span>Full Name</span>
             <span
               className={`flex  cursor-pointer ${theme.hoverText}`}
@@ -282,7 +274,9 @@ function AccountSettings() {
               />
             </span>
           </div>
-          <div className="flex justify-between items-center">
+          <div
+            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+          >
             <span>Email</span>
             <span
               className={`flex  cursor-pointer ${theme.hoverText}`}
@@ -298,7 +292,9 @@ function AccountSettings() {
               {userData.email}
             </span>
           </div>
-          <div className="flex justify-between items-center">
+          <div
+            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+          >
             <span>Phone Number</span>
             <span
               className={`flex  cursor-pointer ${theme.hoverText}`}
@@ -319,7 +315,9 @@ function AccountSettings() {
               />
             </span>
           </div>
-          <div className="flex justify-between items-center">
+          <div
+            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+          >
             <span>Password</span>
             <span
               className={`flex cursor-pointer ${theme.hoverText}`}
@@ -336,7 +334,7 @@ function AccountSettings() {
         {/* divider line */}
         <div className={`w-0 border-r ${theme.colorBorder}`}></div>{" "}
         {/* Preferrences section */}
-        <div className="space-y-4 w-full md:w-1/2 mt-8 md:mt-0">
+        <div className="space-y-4 w-full lg:w-1/2 mt-8 lg:mt-0">
           <h2 className={`flex text-xl font-semibold  mb-6`}>
             Preferrences
             <AdjustmentsIcon
@@ -344,7 +342,9 @@ function AccountSettings() {
               extraClasses={"ml-3 mt-1"}
             />
           </h2>
-          <div className="flex justify-between items-center">
+          <div
+            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+          >
             <label htmlFor="select-options">Theme</label>
             <Optionselector
               options={themeOptions}
@@ -354,6 +354,43 @@ function AccountSettings() {
               classes={"w-40"}
             />
           </div>
+          <div className="flex">
+            <div className="flex items-center mx-auto justify-center sm:space-x-3 space-x-1">
+              <SimpleButton
+                onClick={() => {
+                  setShowDialog(true);
+                  setDialogBoxInfo({
+                    title: "Warning!",
+                    message: "Are you sure you want to discard all changes?",
+                    type: "warning",
+                    buttons: [
+                      {
+                        label: "Yes, Discard",
+                        onClick: handleDiscardChanges,
+                        type: "danger",
+                      },
+                    ],
+                  });
+                }}
+                btnText={"Discard"}
+                type={"danger"}
+                extraclasses={"w-auto"}
+              />
+              <SimpleButton
+                onClick={handleSavePreferences}
+                btnText={
+                  isLoading ? (
+                    <LoadingSpinner size={24} extraClasses={"mx-[38px]"} />
+                  ) : (
+                    "Save Changes"
+                  )
+                }
+                type={"primary"}
+                extraclasses={"w-auto px-6"}
+                disabled={isLoading}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -362,44 +399,6 @@ function AccountSettings() {
         measurements={measurements}
         setMeasurements={setMeasurements}
       />
-
-      <div className="flex mt-8 pt-6 border-t">
-        <div className="flex items-center mx-auto justify-center space-x-3">
-          <SimpleButton
-            onClick={() => {
-              setShowDialog(true);
-              setDialogBoxInfo({
-                title: "Warning!",
-                message: "Are you sure you want to discard all changes?",
-                type: "warning",
-                buttons: [
-                  {
-                    label: "Yes, Discard",
-                    onClick: handleDiscardChanges,
-                    type: "danger",
-                  },
-                ],
-              });
-            }}
-            btnText={"Discard Changes"}
-            type={"simple"}
-            extraclasses={"w-auto"}
-          />
-          <SimpleButton
-            onClick={handleSavePreferences}
-            btnText={
-              isLoading ? (
-                <LoadingSpinner size={24} extraClasses={"mx-[38px]"} />
-              ) : (
-                "Save Changes"
-              )
-            }
-            type={"primary"}
-            extraclasses={"w-auto px-6"}
-            disabled={isLoading}
-          />
-        </div>
-      </div>
 
       {modalInfo.isOpen && (
         <EditFieldModal

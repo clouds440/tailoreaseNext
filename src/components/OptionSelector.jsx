@@ -36,7 +36,7 @@ const OptionSelector = ({ options, value, onChange, theme, classes }) => {
       ref={dropdownRef}
     >
       <div
-        className={`p-2 flex items-center justify-between outline-none rounded-md cursor-pointer ${theme.colorBg} ${theme.hoverBg}`}
+        className={`p-2 flex items-center justify-between outline-none rounded-md cursor-pointer ring-2 ${theme.hoverBg}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>
@@ -58,7 +58,7 @@ const OptionSelector = ({ options, value, onChange, theme, classes }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.ul
-            className={`absolute mt-2 p-2 items-center justify-center rounded-md w-full ${theme.colorBg} z-10`}
+            className={`absolute mt-2 p-2 items-center justify-center rounded-md w-full ${theme.colorBg} z-[999]`}
             initial="hidden"
             animate={isOpen ? "visible" : "hidden"}
             exit="exit"
