@@ -123,7 +123,7 @@ const BodyMeasurements = ({ measurements, setMeasurements, uid }) => {
   });
 
   const measurementsPrompt = `
-Generate estimated body measurements using the given user details.
+Generate estimated body measurements using the given user details (user weight is in KG and height is in centimeters).
 Your response should ONLY contain a raw JavaScript object using this format with one exact value for each:
 
 {
