@@ -144,8 +144,14 @@ const ThemeIcon = ({ size, color, extraClasses }) => (
 
 const AiIcon = ({ size, color, extraClasses }) => (
   <svg {...svgProps} className={`h-${size} w-${size} ${color} ${extraClasses}`}>
-    <path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm457-560 21-89-71-59 94-8 36-84 36 84 94 8-71 59 21 89-80-47-80 47ZM480-481Z" />
-  </svg> // not working
+    <path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+  </svg>
+);
+
+const MeasurementIcon = ({ size, color, extraClasses }) => (
+  <svg {...svgProps} className={`h-${size} w-${size} ${color} ${extraClasses}`}>
+    <path d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-1v3a1 1 0 1 1-2 0v-3h-1v3a1 1 0 1 1-2 0v-3h-1v3a1 1 0 1 1-2 0v-3H7a1 1 0 1 1 0-2h3v-1H7a1 1 0 1 1 0-2h3V8H7a1 1 0 0 1 0-2h3V5a2 2 0 0 0-2-2H5Z" />
+  </svg>
 );
 
 export {
@@ -167,4 +173,5 @@ export {
   TailorIcon,
   ThemeIcon,
   AiIcon,
+  MeasurementIcon,
 };

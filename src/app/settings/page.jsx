@@ -212,7 +212,7 @@ function AccountSettings() {
       localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName));
       setShowMessage({
         type: "success",
-        message: "Changes saved!",
+        message: "Prefererences saved!",
       });
       setPopUpMessageTrigger(true);
     } catch (error) {
@@ -355,7 +355,7 @@ function AccountSettings() {
             />
           </div>
           <div className="flex">
-            <div className="flex items-center mx-auto justify-center sm:space-x-3 space-x-1">
+            <div className="flex items-center mx-auto justify-center mt-8 sm:space-x-3 space-x-1">
               <SimpleButton
                 onClick={() => {
                   setShowDialog(true);
@@ -382,7 +382,7 @@ function AccountSettings() {
                   isLoading ? (
                     <LoadingSpinner size={24} extraClasses={"mx-[38px]"} />
                   ) : (
-                    "Save Changes"
+                    "Save Prefererences"
                   )
                 }
                 type={"primary"}
@@ -398,6 +398,7 @@ function AccountSettings() {
       <BodyMeasurements
         measurements={measurements}
         setMeasurements={setMeasurements}
+        uid={userData.uid}
       />
 
       {modalInfo.isOpen && (

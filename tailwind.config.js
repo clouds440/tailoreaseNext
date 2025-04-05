@@ -30,7 +30,7 @@ module.exports = {
           borderColor: "#ffffff", // White border color
         },
         ".lunar-glow": {
-          backgroundColor: "rgba(240, 235, 240, 0.67)", // Lighter background
+          backgroundColor: "rgba(210, 220, 255, 0.75)", // Lighter background
           backdropFilter: "blur(30px)", // backdrop-blur-xl
           boxShadow: "0 2px 5px 2px #546e7a", // gray shadow color
           color: "#000000", // Set all text to black

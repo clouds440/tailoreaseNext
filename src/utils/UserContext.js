@@ -38,7 +38,7 @@ export const UserProvider = ({ children }) => {
       colorBorder: "border-black",
       iconColor: "text-blue-600",
       hoverText: "hover:text-gray-600",
-      colorBg: "bg-gray-400 backdrop-blur-xl bg-opacity-90",
+      colorBg: "bg-gray-300 backdrop-blur-xl bg-opacity-85",
       hoverBg: "hover:bg-gray-500 hover:bg-opacity-70",
       hoverShadow: "hover:shadow-md hover:shadow-gray-800",
     },
