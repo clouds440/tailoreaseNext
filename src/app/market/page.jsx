@@ -392,7 +392,7 @@ const Market = () => {
                   initial="hidden"
                   animate="visible"
                   transition={{ duration: 0.3, delay: index * 0.05 }}
-                  className={` cursor-pointer overflow-hidden rounded-xl border transition-all duration-300 ${theme.colorBorder} ${theme.hoverShadow} flex flex-col`}
+                  className={`${theme.mainTheme} cursor-pointer overflow-hidden rounded-xl border transition-all duration-300 ${theme.colorBorder} ${theme.hoverShadow} flex flex-col`}
                 >
                   <div className="relative overflow-hidden aspect-square w-full">
                     <Image
