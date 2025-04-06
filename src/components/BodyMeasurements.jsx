@@ -9,6 +9,7 @@ import { LoadingSpinner } from "./LoadingSpinner";
 import DialogBox from "./DialogBox";
 import MeasurementFormAI from "./MeasurementFormAI";
 import { motion, AnimatePresence } from "framer-motion";
+import { AiIcon } from "../../public/icons/svgIcons";
 
 const measurementFields = [
   { key: "chest", label: "Chest", icon: "ruler-vertical" },
@@ -192,7 +193,7 @@ Guidelines:
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -200,18 +201,22 @@ Guidelines:
     >
       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-6">
         <div className="flex items-center mb-4 sm:mb-0">
-          <i className={`fas fa-ruler-combined text-2xl mr-3 ${theme.iconColor}`}></i>
+          <i
+            className={`fas fa-ruler-combined text-2xl mr-3 ${theme.iconColor}`}
+          ></i>
           <h2 className={`text-2xl font-bold ${theme.colorText}`}>
             Body Measurements
-            <span className="block text-sm font-normal opacity-80">All values in centimeters (cm)</span>
+            <span className="block text-sm font-normal opacity-80">
+              All values in centimeters (cm)
+            </span>
           </h2>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <SimpleButton
             btnText="Generate with AI"
             type="accent"
-            icon={<i className="fas fa-robot mr-2"></i>}
+            icon={<AiIcon />}
             onClick={() => setShowDialog(true)}
             extraclasses="w-full sm:w-auto"
           />
@@ -253,13 +258,13 @@ Guidelines:
                 <i className={`fas fa-check text-xs ${theme.iconColor}`}></i>
               )}
             </div>
-            
+
             {editingField === key ? (
               <input
                 type="number"
                 value={measurements[key] || ""}
                 onChange={(e) => handleChange(e, key)}
-                className={`w-full p-2 rounded-md ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className={`w-full p-2 rounded-md ${theme.colorBg} ${theme.colorText} ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 autoFocus
                 onBlur={() => setEditingField(null)}
                 onKeyDown={(e) => e.key === "Enter" && setEditingField(null)}
@@ -276,7 +281,9 @@ Guidelines:
                 <span className={measurements[key] ? "" : "opacity-70"}>
                   {measurements[key] || "Click to edit"}
                 </span>
-                <i className={`fas fa-pencil-alt text-xs ${theme.iconColor}`}></i>
+                <i
+                  className={`fas fa-pencil-alt text-xs ${theme.iconColor}`}
+                ></i>
               </div>
             )}
           </motion.div>
@@ -296,9 +303,9 @@ Guidelines:
             showDialog={showDialog}
             setShowDialog={setShowDialog}
             body={() => (
-              <MeasurementFormAI 
-                userInfo={userInfo} 
-                setUserInfo={setUserInfo} 
+              <MeasurementFormAI
+                userInfo={userInfo}
+                setUserInfo={setUserInfo}
                 theme={theme}
               />
             )}

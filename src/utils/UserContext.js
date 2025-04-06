@@ -48,7 +48,7 @@ export const UserProvider = ({ children }) => {
       bgImage: "url(/background_images/backgroundRedPurple.jpg)",
       colorText: "text-sky-200",
       colorBorder: "border-pink-500",
-      iconColor: "text-rose-500",
+      iconColor: "text-yellow-400",
       hoverText: "hover:text-rose-600",
       colorBg: "bg-sky-800 backdrop-blur-xl bg-opacity-70",
       hoverBg: "hover:bg-rose-400 hover:bg-opacity-50",

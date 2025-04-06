@@ -132,6 +132,11 @@ const Navbar = () => {
     ...(userLoggedIn
       ? [
           {
+            text: "Logout",
+            icon: <LogoutIcon size={"5"} color={`text-red-700`} />,
+            onClick: handleLogout,
+          },
+          {
             text: "Settings",
             icon: <SettingsIcon size={"5"} color={`${theme.iconColor}`} />,
             onClick: () => {
@@ -146,11 +151,6 @@ const Navbar = () => {
               router.push("/profile");
               setDropdownOpen(false);
             },
-          },
-          {
-            text: "Logout",
-            icon: <LogoutIcon size={"5"} color={`${theme.iconColor}`} />,
-            onClick: handleLogout,
           },
         ]
       : []),
@@ -309,7 +309,7 @@ const Navbar = () => {
             className={`absolute w-auto md:w-40 z-50 py-2 rounded-md ${
               windowWidth >= 768
                 ? "md:bottom-[45px]"
-                : "right-1 top-[100px] px-2 py-2 " + theme.mainTheme
+                : "right-1 top-[100px] px-2 py-2 " + theme.colorBg
             } ${windowHeight <= 650 && theme.colorBg}`}
             initial={{ opacity: 0, y: animate }}
             animate={{ opacity: 1, y: 0 }}
@@ -330,7 +330,7 @@ const Navbar = () => {
                   className={`justify-between ${linkStyles} ${theme.colorText}`}
                 >
                   {option.icon}
-                  <span className={"ml-2"}>{option.text}</span>
+                  <span className="ml-2">{option.text}</span>
                 </li>
               ))}
             </motion.ul>
