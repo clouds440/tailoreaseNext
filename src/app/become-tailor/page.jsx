@@ -174,10 +174,10 @@ const BecomeTailor = () => {
       await sendEmailVerification(auth.currentUser);
 
       // 5. Update bId in local storage
-      let userData = JSON.parse(localStorage.getItem("userData")) || {};
+      let UpdatedUserData = JSON.parse(localStorage.getItem("userData")) || {};
       userData.bId = bId;
-      localStorage.setItem("userData", JSON.stringify(userData));
-      sessionStorage.setItem("userData", JSON.stringify(userData));
+      localStorage.setItem("userData", JSON.stringify(UpdatedUserData));
+      sessionStorage.setItem("userData", JSON.stringify(UpdatedUserData));
 
       setShowMessage({
         type: "success",
