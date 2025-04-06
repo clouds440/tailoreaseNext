@@ -300,7 +300,7 @@ const Market = () => {
                 className={`px-3 py-1 text-xs rounded-full ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} flex items-center`}
               >
                 <i className="fas fa-search mr-1"></i>
-                Search: "{searchQuery}"
+                Search: {searchQuery}
               </motion.span>
             )}
             <button
