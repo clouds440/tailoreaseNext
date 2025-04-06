@@ -229,15 +229,6 @@ const Navbar = () => {
                 </li>
                 <li
                   className={linkStyles}
-                  onClick={() => router.push("/try-on")}
-                >
-                  <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
-                  <span className={"hidden md:inline-block md:ml-2"}>
-                    Try On
-                  </span>
-                </li>
-                <li
-                  className={linkStyles}
                   onClick={() => router.push("/market")}
                 >
                   <CartIcon size={"5"} color={`${theme.iconColor}`} />
