@@ -337,7 +337,7 @@ const Market = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setFilters({ ...filters, sortBy: option.name })}
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap flex items-center ${
+              className={`px-2 m-2 py-2 rounded-full text-sm whitespace-nowrap flex items-center ${
                 filters.sortBy === option.name
                   ? `${theme.hoverBg} bg-opacity-50 font-bold`
                   : `${theme.colorBg}`
