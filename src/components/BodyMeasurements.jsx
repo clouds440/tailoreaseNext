@@ -224,7 +224,7 @@ Guidelines:
             btnText={
               savingMeasurements ? (
                 <>
-                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                  <LoadingSpinner size={24} extraClasses={"mr-2"} />
                   Saving...
                 </>
               ) : (
