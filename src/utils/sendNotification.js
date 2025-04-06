@@ -1,0 +1,28 @@
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "./firebaseConfig";
+
+const sendNotification = async (reciever, message, redirect) => {
+  try {
+    // Reference to the user's notifications collection
+    const notificationsRef = collection(
+      db,
+      "notifications",
+      reciever,
+      "userNotifications"
+    );
+
+    // Add a new notification with a unique ID
+    const newNotification = {
+      message,
+      read: false,
+      redirect,
+      createdAt: serverTimestamp(),
+    };
+
+    await addDoc(notificationsRef, newNotification);
+  } catch (error) {
+    console.error("Error adding notification:", error);
+  }
+};
+
+export default sendNotification;

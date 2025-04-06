@@ -218,7 +218,7 @@ const ChatBot = () => {
           >
             {/* ChatBot Header */}
             <div
-              className={`flex items-center justify-between p-4 border-b ${theme.colorBorder}`}
+              className={`flex items-center justify-between p-4 border-b select-none ${theme.colorBorder}`}
             >
               <div className="flex items-center space-x-2">
                 <i className={`fas fa-robot text-4xl ${theme.iconColor}`}></i>

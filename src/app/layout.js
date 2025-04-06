@@ -6,6 +6,7 @@ import PopupMessage from "@/components/PopupMessage";
 import { Roboto } from "next/font/google";
 import ChatBot from "../components/ChatBot";
 import BackgroundDiv from "@/components/BackgroundDiv";
+import NotificationPanel from "@/components/NotificationPanel";
 
 const roboto = Roboto({
   weight: "400",
@@ -41,6 +42,7 @@ export default function RootLayout({ children }) {
               >
                 <PopupMessage />
                 <ChatBot />
+                <NotificationPanel />
                 {children} {/* Renders each page's content */}
               </div>
             </div>

@@ -249,7 +249,7 @@ const Market = () => {
             {/* Filter Button */}
             <div className="relative" ref={dropdownButtonRef}>
               <SimpleButton
-                type={"simple"}
+                type={"default"}
                 btnText={
                   <>
                     <i className="fas fa-filter mr-2"></i>

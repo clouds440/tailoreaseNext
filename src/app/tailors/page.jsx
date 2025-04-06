@@ -208,11 +208,10 @@ const TailorListPage = () => {
                       tailor.businessPictureUrl ||
                       "/images/profile/business/default.png"
                     }
-                    width={0}
-                    height={0}
-                    layout="responsive"
+                    width={800} // set a proper value based on expected image size
+                    height={400}
                     alt={`Image of ${tailor.businessName}`}
-                    className={`w-full object-cover object-top rounded-lg lg:rounded-xl max-h-32`}
+                    className="w-full object-cover object-top rounded-lg lg:rounded-xl max-h-32 h-auto"
                     priority={false}
                     placeholder="blur"
                     blurDataURL="/images/profile/business/default.png"
