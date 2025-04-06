@@ -13,12 +13,11 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import sendNotification from "@/utils/sendNotification";
 import { formatDistanceToNow } from "date-fns";
 import SimpleButton from "./SimpleButton";
 
 const NotificationPanel = () => {
-  const { theme, userData } = useContext(UserContext);
+  const { theme, userData, userLoggedIn } = useContext(UserContext);
   const router = useRouter();
 
   const [notifications, setNotifications] = useState([]);
@@ -169,19 +168,21 @@ const NotificationPanel = () => {
   return (
     <>
       {/* Floating Notification Button */}
-      <div
-        className={`fixed bottom-2 sm:bottom-8 right-16 sm:right-24 w-14 h-14 flex items-center justify-center rounded-full border-2 shadow-lg cursor-pointer hover:scale-105 z-[9999] ${theme.mainTheme}`}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <div className="relative">
-          <i className={`fas fa-bell text-2xl ${theme.iconColor}`}></i>
-          {unreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-              {unreadCount}
-            </span>
-          )}
+      {userLoggedIn && (
+        <div
+          className={`fixed bottom-2 sm:bottom-8 right-16 sm:right-24 w-14 h-14 flex items-center justify-center rounded-full border-2 shadow-lg cursor-pointer hover:scale-105 z-[9999] ${theme.mainTheme}`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className="relative">
+            <i className={`fas fa-bell text-2xl ${theme.iconColor}`}></i>
+            {unreadCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {unreadCount}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Notification Panel */}
       <AnimatePresence>
