@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { db } from "@/utils/firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import TailorAddProductPage from "../add-product/page";
 
 const BusinessDashboard = () => {
   const {
@@ -81,17 +82,14 @@ const BusinessDashboard = () => {
 
   return businessData.status === "active" ? (
     <div
-      className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-screen overflow-hidden select-none justify-center flex ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-full overflow-y-auto select-none justify-center flex ${theme.mainTheme}`}
     >
       {/* Business account is approved and active. Dashboard content displayed here */}
-      <div className="flex flex-col mr-3 text-3xl">
-        {businessData.businessName}:
-      </div>
-      <div className="flex text-3xl">Your business dashboard is not ready</div>
+      <TailorAddProductPage />
     </div>
   ) : (
     <div
-      className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-screen overflow-hidden select-none justify-center flex ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-full overflow-hidden select-none justify-center flex ${theme.mainTheme}`}
     >
       {/* Business account is suspended */}
       <div className="flex flex-col mr-3 text-3xl">

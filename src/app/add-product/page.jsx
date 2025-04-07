@@ -3,9 +3,11 @@ import { useState, useContext } from "react";
 import UserContext from "@/utils/UserContext";
 import { motion } from "framer-motion";
 import SimpleButton from "@/components/SimpleButton";
+import Image from "next/image";
 
-const TailorProductsPage = () => {
-  const { theme } = useContext(UserContext);
+const TailorAddProductPage = () => {
+  const { theme, setShowMessage, setPopUpMessageTrigger } =
+    useContext(UserContext);
   const [productData, setProductData] = useState({
     name: "",
     description: "",
@@ -14,40 +16,97 @@ const TailorProductsPage = () => {
     gender: "",
     images: [],
     measurementsRequired: false,
-    customizationOptions: []
+    customizationOptions: [],
   });
+  const [previewImages, setPreviewImages] = useState([]);
 
-  const categories = ["Shirt", "Pants", "Dress", "Suit", "Jacket", "Skirt", "Other"];
+  const categories = [
+    "Shirt",
+    "Pants",
+    "Dress",
+    "Suit",
+    "Jacket",
+    "Skirt",
+    "Other",
+  ];
   const genderOptions = ["Male", "Female", "Unisex", "Kids"];
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setProductData(prev => ({
+    setProductData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const handleImageUpload = (e) => {
-    // In a real app, you would handle file uploads here
-    const files = Array.from(e.target.files);
-    setProductData(prev => ({
+  function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result); // Base64 string
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file); // Read file as Base64
+    });
+  }
+
+  const handleImageUpload = async (e) => {
+    const { files } = e.target;
+    const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
+
+    const newBase64Images = [];
+    const newPreviewURLs = [];
+
+    for (const file of files) {
+      if (!allowedTypes.includes(file.type)) {
+        setShowMessage({
+          type: "warning",
+          message: "Only JPG, PNG, or SVG images are allowed.",
+        });
+        setPopUpMessageTrigger(true);
+        continue;
+      }
+
+      try {
+        const base64 = await convertToBase64(file);
+        newBase64Images.push({
+          name: file.name,
+          base64,
+        });
+        newPreviewURLs.push(URL.createObjectURL(file));
+      } catch (error) {
+        console.error("Error converting file to Base64:", error);
+        setShowMessage({
+          type: "error",
+          message: `Failed to process ${file.name}.`,
+        });
+        setPopUpMessageTrigger(true);
+      }
+    }
+
+    // Update product data and preview images
+    setProductData((prev) => ({
       ...prev,
-      images: [...prev.images, ...files]
+      images: [...prev.images, ...newBase64Images],
     }));
+
+    setPreviewImages((prev) => [...prev, ...newPreviewURLs]);
   };
 
   const removeImage = (index) => {
-    setProductData(prev => ({
+    setProductData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
+
+    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const addCustomizationOption = () => {
-    setProductData(prev => ({
+    setProductData((prev) => ({
       ...prev,
-      customizationOptions: [...prev.customizationOptions, { name: "", price: "" }]
+      customizationOptions: [
+        ...prev.customizationOptions,
+        { name: "", price: "" },
+      ],
     }));
   };
 
@@ -55,17 +114,19 @@ const TailorProductsPage = () => {
     const { name, value } = e.target;
     const updatedOptions = [...productData.customizationOptions];
     updatedOptions[index][name] = value;
-    
-    setProductData(prev => ({
+
+    setProductData((prev) => ({
       ...prev,
-      customizationOptions: updatedOptions
+      customizationOptions: updatedOptions,
     }));
   };
 
   const removeCustomizationOption = (index) => {
-    setProductData(prev => ({
+    setProductData((prev) => ({
       ...prev,
-      customizationOptions: prev.customizationOptions.filter((_, i) => i !== index)
+      customizationOptions: prev.customizationOptions.filter(
+        (_, i) => i !== index
+      ),
     }));
   };
 
@@ -76,29 +137,30 @@ const TailorProductsPage = () => {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className={`p-6 rounded-xl ${theme.colorBg} bg-opacity-80 shadow-lg`}
-    >
+    <div className={`p-6 w-full rounded-xl h-full shadow-lg`}>
       <div className="flex items-center mb-8">
         <i className={`fas fa-tshirt text-3xl mr-3 ${theme.iconColor}`}></i>
-        <h1 className={`text-2xl font-bold ${theme.colorText}`}>Add New Product</h1>
+        <h1 className={`text-2xl font-bold ${theme.colorText}`}>
+          Add New Product
+        </h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Basic Information */}
           <div className={`p-6 rounded-lg ${theme.colorBg} bg-opacity-50`}>
-            <h2 className={`text-lg font-semibold mb-4 flex items-center ${theme.colorText}`}>
+            <h2
+              className={`text-lg font-semibold mb-4 flex items-center ${theme.colorText}`}
+            >
               <i className="fas fa-info-circle mr-2"></i>
               Basic Information
             </h2>
-            
+
             <div className="space-y-4">
               <div>
-                <label className={`block text-sm font-medium mb-1 ${theme.colorText}`}>
+                <label
+                  className={`block text-sm font-medium mb-1 ${theme.colorText}`}
+                >
                   Product Name *
                 </label>
                 <input
@@ -113,7 +175,9 @@ const TailorProductsPage = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-1 ${theme.colorText}`}>
+                <label
+                  className={`block text-sm font-medium mb-1 ${theme.colorText}`}
+                >
                   Description *
                 </label>
                 <textarea
@@ -129,7 +193,9 @@ const TailorProductsPage = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={`block text-sm font-medium mb-1 ${theme.colorText}`}>
+                  <label
+                    className={`block text-sm font-medium mb-1 ${theme.colorText}`}
+                  >
                     Category *
                   </label>
                   <select
@@ -140,14 +206,18 @@ const TailorProductsPage = () => {
                     className={`w-full p-3 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                   >
                     <option value="">Select Category</option>
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className={`block text-sm font-medium mb-1 ${theme.colorText}`}>
+                  <label
+                    className={`block text-sm font-medium mb-1 ${theme.colorText}`}
+                  >
                     Gender *
                   </label>
                   <select
@@ -158,19 +228,25 @@ const TailorProductsPage = () => {
                     className={`w-full p-3 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                   >
                     <option value="">Select Gender</option>
-                    {genderOptions.map(gender => (
-                      <option key={gender} value={gender}>{gender}</option>
+                    {genderOptions.map((gender) => (
+                      <option key={gender} value={gender}>
+                        {gender}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-1 ${theme.colorText}`}>
+                <label
+                  className={`block text-sm font-medium mb-1 ${theme.colorText}`}
+                >
                   Price (USD) *
                 </label>
                 <div className="relative">
-                  <span className={`absolute left-3 top-3 ${theme.colorText}`}>$</span>
+                  <span className={`absolute left-3 top-3 ${theme.colorText}`}>
+                    $
+                  </span>
                   <input
                     type="number"
                     name="price"
@@ -189,17 +265,27 @@ const TailorProductsPage = () => {
 
           {/* Product Images */}
           <div className={`p-6 rounded-lg ${theme.colorBg} bg-opacity-50`}>
-            <h2 className={`text-lg font-semibold mb-4 flex items-center ${theme.colorText}`}>
+            <h2
+              className={`text-lg font-semibold mb-4 flex items-center ${theme.colorText}`}
+            >
               <i className="fas fa-images mr-2"></i>
               Product Images *
             </h2>
-            
+
             <div className="space-y-4">
-              <div className={`border-2 border-dashed ${theme.colorBorder} rounded-lg p-6 text-center cursor-pointer hover:bg-opacity-30 ${theme.hoverBg} transition-colors`}>
+              <div
+                className={`border-2 border-dashed ${theme.colorBorder} rounded-lg p-6 text-center cursor-pointer hover:bg-opacity-30 ${theme.hoverBg} transition-colors`}
+              >
                 <label className="cursor-pointer">
-                  <i className={`fas fa-cloud-upload-alt text-3xl mb-2 ${theme.iconColor}`}></i>
-                  <p className={`text-sm ${theme.colorText}`}>Click to upload or drag and drop</p>
-                  <p className={`text-xs ${theme.colorText} opacity-70`}>PNG, JPG (max. 5MB each)</p>
+                  <i
+                    className={`fas fa-cloud-upload-alt text-3xl mb-2 ${theme.iconColor}`}
+                  ></i>
+                  <p className={`text-sm ${theme.colorText}`}>
+                    Click to upload or drag and drop
+                  </p>
+                  <p className={`text-xs ${theme.colorText} opacity-70`}>
+                    PNG, JPG (max. 5MB each)
+                  </p>
                   <input
                     type="file"
                     multiple
@@ -215,10 +301,14 @@ const TailorProductsPage = () => {
                   {productData.images.map((image, index) => (
                     <div key={index} className="relative group">
                       <div className="aspect-square bg-gray-200 rounded-md overflow-hidden">
-                        {/* In a real app, you'd display the actual image */}
-                        <div className="w-full h-full flex items-center justify-center">
-                          <i className="fas fa-image text-gray-400 text-xl"></i>
-                        </div>
+                        <Image
+                          src={previewImages[index]}
+                          alt={image.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                          priority={index < 5}
+                        />
                       </div>
                       <button
                         type="button"
@@ -235,9 +325,13 @@ const TailorProductsPage = () => {
           </div>
 
           {/* Customization Options */}
-          <div className={`p-6 rounded-lg ${theme.colorBg} bg-opacity-50 md:col-span-2`}>
+          <div
+            className={`p-6 rounded-lg ${theme.colorBg} bg-opacity-50 md:col-span-2`}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h2 className={`text-lg font-semibold flex items-center ${theme.colorText}`}>
+              <h2
+                className={`text-lg font-semibold flex items-center ${theme.colorText}`}
+              >
                 <i className="fas fa-sliders-h mr-2"></i>
                 Customization Options
               </h2>
@@ -260,15 +354,23 @@ const TailorProductsPage = () => {
                   onChange={handleInputChange}
                   className={`mr-2 rounded ${theme.colorBorder} focus:ring-blue-500`}
                 />
-                <label htmlFor="measurementsRequired" className={`text-sm ${theme.colorText}`}>
+                <label
+                  htmlFor="measurementsRequired"
+                  className={`text-sm ${theme.colorText}`}
+                >
                   This product requires customer measurements
                 </label>
               </div>
 
               {productData.customizationOptions.map((option, index) => (
-                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div
+                  key={index}
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+                >
                   <div>
-                    <label className={`block text-sm font-medium mb-1 ${theme.colorText}`}>
+                    <label
+                      className={`block text-sm font-medium mb-1 ${theme.colorText}`}
+                    >
                       Option Name
                     </label>
                     <input
@@ -281,11 +383,17 @@ const TailorProductsPage = () => {
                     />
                   </div>
                   <div>
-                    <label className={`block text-sm font-medium mb-1 ${theme.colorText}`}>
+                    <label
+                      className={`block text-sm font-medium mb-1 ${theme.colorText}`}
+                    >
                       Additional Price
                     </label>
                     <div className="relative">
-                      <span className={`absolute left-2 top-2 ${theme.colorText}`}>$</span>
+                      <span
+                        className={`absolute left-2 top-2 ${theme.colorText}`}
+                      >
+                        $
+                      </span>
                       <input
                         type="number"
                         name="price"
@@ -298,20 +406,21 @@ const TailorProductsPage = () => {
                       />
                     </div>
                   </div>
-                  <button
-                    type="button"
+                  <SimpleButton
+                    type="default"
                     onClick={() => removeCustomizationOption(index)}
-                    className={`p-2 rounded-lg ${theme.colorBg} hover:bg-opacity-70 transition-colors`}
-                  >
-                    <i className={`fas fa-trash ${theme.colorText}`}></i>
-                  </button>
+                    btnText={
+                      <i className={`fas fa-trash ${theme.iconColor}`}></i>
+                    }
+                    extraclasses={"py-[14px]"}
+                  />
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="mt-8 flex justify-end">
+        <div className="mt-6 pb-6 flex justify-center">
           <SimpleButton
             type="primary"
             btnText={
@@ -324,8 +433,8 @@ const TailorProductsPage = () => {
           />
         </div>
       </form>
-    </motion.div>
+    </div>
   );
 };
 
-export default TailorProductsPage;
+export default TailorAddProductPage;

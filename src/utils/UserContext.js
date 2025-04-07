@@ -21,7 +21,7 @@ export const UserProvider = ({ children }) => {
     midnightWhisper: {
       themeName: "midnightWhisper",
       mainTheme: "midnight-whisper",
-      bgImage: "url(/background_images/backgroundDefaultBlue.jpg)",
+      bgImage: "url(/background_images/background-23.jpg)",
       colorText: "text-gray-100",
       colorBorder: "border-gray-100",
       iconColor: "text-blue-500",

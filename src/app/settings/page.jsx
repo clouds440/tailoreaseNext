@@ -238,7 +238,7 @@ function AccountSettings() {
 
   return (
     <div
-      className={`max-w-[99.5%] mx-auto my-4 md:my-1 w-auto h-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto h-full overflow-y-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
     >
       <h2
         className={`flex text-2xl font-bold mb-6 pt-6 border-b ${theme.colorBorder}`}

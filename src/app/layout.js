@@ -38,7 +38,7 @@ export default function RootLayout({ children }) {
 
               {/* Main content with scrollable overflow */}
               <div
-                className={`overflow-y-auto flex-1 mt-[85px] md:mt-0 px-[1px]`}
+                className={`overflow-hidden flex-1 mt-[85px] md:mt-0 px-[1px]`}
               >
                 <PopupMessage />
                 <ChatBot />

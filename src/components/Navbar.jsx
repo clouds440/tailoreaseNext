@@ -2,7 +2,7 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Logo from "./Logo";
 import SimpleButton from "./SimpleButton";
-import { auth, db } from "@/utils/firebaseConfig";
+import { auth } from "@/utils/firebaseConfig";
 import { signOut } from "firebase/auth";
 import UserContext from "@/utils/UserContext";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,6 @@ import {
   UserIcon,
 } from "../../public/icons/svgIcons";
 import { motion, AnimatePresence } from "framer-motion";
-import { collection, query, where, getDocs } from "firebase/firestore";
 
 const Navbar = () => {
   const {
@@ -37,49 +36,9 @@ const Navbar = () => {
   const [userFullName, setUserFullName] = useState(userData.fullName);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [hasBusinessAccount, setHasBusinessAccount] = useState(null);
-  const [isBusinessDashboard, setIsBusinessDashboard] = useState(false);
+
   const dropdownRef = useRef(null);
   const router = useRouter();
-
-  useEffect(() => {
-    const checkBusinessAccount = async () => {
-      if (!userLoggedIn || !userData?.uid) {
-        setHasBusinessAccount(null);
-        return;
-      }
-
-      try {
-        const userQuery = query(
-          collection(db, "tailors"),
-          where("ownerId", "==", userData.uid)
-        );
-        const querySnapshot = await getDocs(userQuery);
-
-        if (!querySnapshot.empty) {
-          const tailorDoc = querySnapshot.docs[0];
-          const { approved } = tailorDoc.data();
-          setHasBusinessAccount({
-            approved: approved || false,
-            exists: true,
-          });
-        } else {
-          setHasBusinessAccount({
-            approved: false,
-            exists: false,
-          });
-        }
-      } catch (error) {
-        console.error("Error checking business account:", error);
-        setHasBusinessAccount({
-          approved: false,
-          exists: false,
-        });
-      }
-    };
-
-    checkBusinessAccount();
-  }, [userData, userLoggedIn]);
 
   const handleLogout = async () => {
     try {
@@ -124,16 +83,6 @@ const Navbar = () => {
     setUserFullName(userData.fullName);
   }, [userData]);
 
-  const toggleDashboard = () => {
-    const newState = !isBusinessDashboard;
-    setIsBusinessDashboard(newState);
-    if (newState) {
-      router.push("/tailor-products");
-    } else {
-      router.push("/");
-    }
-  };
-
   const themeOptions = [
     {
       value: "systemDefault",
@@ -163,7 +112,7 @@ const Navbar = () => {
   };
 
   const handleSaveTheme = () => {
-    localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName));
+    localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName)); // Assume theme is available
     setShowMessage({
       type: "success",
       message: "Theme applied!",
@@ -219,14 +168,19 @@ const Navbar = () => {
   const [windowHeight, setWindowHeight] = useState(undefined);
 
   useEffect(() => {
+    // Only execute on the client side
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       setWindowHeight(window.innerHeight);
     };
 
+    // Initial window size on mount
     handleResize();
+
+    // Add event listener to handle window resizing
     window.addEventListener("resize", handleResize);
 
+    // Cleanup event listener on unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -251,22 +205,6 @@ const Navbar = () => {
               {userLoggedIn ? (
                 <div className="py-1 mt-3 text-center mx-3 sm:mx-5 md:mx-0 select-none">
                   <span>{userFullName}</span>
-                  {hasBusinessAccount?.exists && hasBusinessAccount?.approved && (
-                    <div className="flex items-center justify-center mt-4">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
-                          checked={isBusinessDashboard}
-                          onChange={toggleDashboard}
-                        />
-                        <div className={`w-11 h-6 ${theme.colorBg} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}></div>
-                        <span className="ml-2 text-xs">
-                          {isBusinessDashboard ? "Tailor" : "User"}
-                        </span>
-                      </label>
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
@@ -286,83 +224,49 @@ const Navbar = () => {
               }`}
             >
               <ul className="md:space-y-2 justify-evenly select-none w-full md:inline grid grid-flow-col">
-                {!isBusinessDashboard ? (
-                  <>
-                    <li onClick={() => router.push("/")} className={linkStyles}>
-                      <HomeIcon size={"5"} color={`${theme.iconColor}`} />
-                      <span className={"hidden md:inline-block md:ml-2"}>Home</span>
-                    </li>
-                    <li
-                      className={linkStyles}
-                      onClick={() => router.push("/market")}
-                    >
-                      <CartIcon size={"5"} color={`${theme.iconColor}`} />
-                      <span className={"hidden md:inline-block md:ml-2"}>
-                        Market
-                      </span>
-                    </li>
-                    <li
-                      className={linkStyles}
-                      onClick={() => router.push("/tailors")}
-                    >
-                      <TailorIcon size={"5"} color={`${theme.iconColor}`} />
-                      <span className={"hidden md:inline-block md:ml-2"}>
-                        Tailors
-                      </span>
-                    </li>
-                    {userLoggedIn && (
-                      <li
-                        onClick={() => router.push("/business-dashboard")}
-                        className={`${linkStyles}`}
-                      >
-                        <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
-                        <span className={"hidden md:inline-block md:ml-2"}>
-                          Business
-                        </span>
-                      </li>
-                    )}
-                    <li
-                      onClick={() => router.push("/contact-us")}
-                      className={`${linkStyles}`}
-                    >
-                      <ContactIcon size={"5"} color={`${theme.iconColor}`} />
-                      <span className={"hidden md:inline-block md:ml-2"}>
-                        Contact
-                      </span>
-                    </li>
-                  </>
-                ) : (
-                  <>
-                    <li
-                      onClick={() => router.push("/tailor-products")}
-                      className={linkStyles}
-                    >
-                      <CartIcon size={"5"} color={`${theme.iconColor}`} />
-                      <span className={"hidden md:inline-block md:ml-2"}>
-                        Products
-                      </span>
-                    </li>
-                    <li
-                      onClick={() => router.push("/tailor-orders")}
-                      className={linkStyles}
-                    >
-                      <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
-                      <span className={"hidden md:inline-block md:ml-2"}>
-                        Orders
-                      </span>
-                    </li>
-                    <li
-                      onClick={() => router.push("/tailor-insights")}
-                      className={linkStyles}
-                    >
-                      <InfoIcon size={"5"} color={`${theme.iconColor}`} />
-                      <span className={"hidden md:inline-block md:ml-2"}>
-                        Insights
-                      </span>
-                    </li>
-                  </>
+                <li onClick={() => router.push("/")} className={linkStyles}>
+                  <HomeIcon size={"5"} color={`${theme.iconColor}`} />
+                  <span className={"hidden md:inline-block md:ml-2"}>Home</span>
+                </li>
+                <li
+                  className={linkStyles}
+                  onClick={() => router.push("/market")}
+                >
+                  <CartIcon size={"5"} color={`${theme.iconColor}`} />
+                  <span className={"hidden md:inline-block md:ml-2"}>
+                    Market
+                  </span>
+                </li>
+                <li
+                  className={linkStyles}
+                  onClick={() => router.push("/tailors")}
+                >
+                  <TailorIcon size={"5"} color={`${theme.iconColor}`} />
+                  <span className={"hidden md:inline-block md:ml-2"}>
+                    Tailors
+                  </span>
+                </li>
+                {userLoggedIn && (
+                  <li
+                    onClick={() => router.push("/business-dashboard")}
+                    className={`${linkStyles}`}
+                  >
+                    <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
+                    <span className={"hidden md:inline-block md:ml-2"}>
+                      Business
+                    </span>
+                  </li>
                 )}
-                {!userLoggedIn && !isBusinessDashboard && (
+                <li
+                  onClick={() => router.push("/contact-us")}
+                  className={`${linkStyles}`}
+                >
+                  <ContactIcon size={"5"} color={`${theme.iconColor}`} />
+                  <span className={"hidden md:inline-block md:ml-2"}>
+                    Contact
+                  </span>
+                </li>
+                {!userLoggedIn && (
                   <li
                     onClick={() => router.push("/about-us")}
                     className={`${linkStyles}`}
