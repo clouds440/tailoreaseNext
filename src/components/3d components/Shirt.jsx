@@ -38,6 +38,7 @@ const Shirt = ({ morphValues, morphTargets, texture, color }) => {
             color: color ? new THREE.Color(color) : child.material.color, // Apply color only if selected
             metalness: 0.1,
             roughness: 0.6,
+            side: THREE.DoubleSide,
           });
           child.material.needsUpdate = true;
         }

@@ -237,199 +237,204 @@ function AccountSettings() {
   }, [userLoggedIn, router]);
 
   return (
-    <div
-      className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto h-full overflow-y-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
-    >
-      <h2
-        className={`flex text-2xl font-bold mb-6 pt-6 border-b ${theme.colorBorder}`}
-      >
-        Account Settings
-        <SettingsIcon
-          color={`${theme.iconColor}`}
-          extraClasses={"ml-3 rtl:mr-3 mt-1"}
-        />
-      </h2>
-      {/* Parent Settings div */}
+    <div className="h-full overflow-y-auto">
       <div
-        className={`lg:flex lg:space-x-5 xl:space-x-14 pb-6 border-b ${theme.colorBorder}`}
+        className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
       >
-        {/* Personal Info Section */}
-        <div className="space-y-4 w-full lg:w-1/2">
-          <h2 className="flex text-xl font-semibold  mb-6">
-            Personal Information
-            <UserIcon color={`${theme.iconColor}`} extraClasses={"ml-3 mt-1"} />
-          </h2>
-          <div
-            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
-          >
-            <span>Full Name</span>
-            <span
-              className={`flex  cursor-pointer ${theme.hoverText}`}
-              onClick={() => handleFieldClick("fullName")}
-            >
-              {userData.fullName}
-              <EditIcon
+        <h2
+          className={`flex text-2xl font-bold mb-6 pt-6 border-b ${theme.colorBorder}`}
+        >
+          Account Settings
+          <SettingsIcon
+            color={`${theme.iconColor}`}
+            extraClasses={"ml-3 rtl:mr-3 mt-1"}
+          />
+        </h2>
+        {/* Parent Settings div */}
+        <div
+          className={`lg:flex lg:space-x-5 xl:space-x-14 pb-6 border-b ${theme.colorBorder}`}
+        >
+          {/* Personal Info Section */}
+          <div className="space-y-4 w-full lg:w-1/2">
+            <h2 className="flex text-xl font-semibold  mb-6">
+              Personal Information
+              <UserIcon
                 color={`${theme.iconColor}`}
                 extraClasses={"ml-3 mt-1"}
               />
-            </span>
-          </div>
-          <div
-            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
-          >
-            <span>Email</span>
-            <span
-              className={`flex  cursor-pointer ${theme.hoverText}`}
-              onClick={() => {
-                setShowDialog(true);
-                setDialogBoxInfo({
-                  title: "Information!",
-                  message: "Email address cannot be changed!",
-                  type: "info",
-                });
-              }}
+            </h2>
+            <div
+              className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
             >
-              {userData.email}
-            </span>
-          </div>
-          <div
-            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
-          >
-            <span>Phone Number</span>
-            <span
-              className={`flex  cursor-pointer ${theme.hoverText}`}
-              onClick={() => handleFieldClick("phone")}
+              <span>Full Name</span>
+              <span
+                className={`flex  cursor-pointer ${theme.hoverText}`}
+                onClick={() => handleFieldClick("fullName")}
+              >
+                {userData.fullName}
+                <EditIcon
+                  color={`${theme.iconColor}`}
+                  extraClasses={"ml-3 mt-1"}
+                />
+              </span>
+            </div>
+            <div
+              className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
             >
-              {userData.phone !== "" ? (
-                userData.phone
-              ) : (
-                <span
-                  className={`italic ${theme.colorText} ${theme.hoverText}`}
-                >
-                  <sub>click to add phone number</sub>
-                </span>
-              )}
-              <EditIcon
-                color={`${theme.iconColor}`}
-                extraClasses={"ml-3 mt-1"}
-              />
-            </span>
-          </div>
-          <div
-            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
-          >
-            <span>Password</span>
-            <span
-              className={`flex cursor-pointer ${theme.hoverText}`}
-              onClick={() => handleFieldClick("password")}
-            >
-              ●●●●●●●●
-              <EditIcon
-                color={`${theme.iconColor}`}
-                extraClasses={"ml-3 mt-1"}
-              />
-            </span>
-          </div>
-        </div>
-        {/* divider line */}
-        <div className={`w-0 border-r ${theme.colorBorder}`}></div>{" "}
-        {/* Preferrences section */}
-        <div className="space-y-4 w-full lg:w-1/2 mt-8 lg:mt-0">
-          <h2 className={`flex text-xl font-semibold  mb-6`}>
-            Preferrences
-            <AdjustmentsIcon
-              color={`${theme.iconColor}`}
-              extraClasses={"ml-3 mt-1"}
-            />
-          </h2>
-          <div
-            className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
-          >
-            <label htmlFor="select-options">Theme</label>
-            <Optionselector
-              options={themeOptions}
-              value={theme.themeName}
-              onChange={handleThemeChange}
-              theme={theme}
-              classes={"w-40"}
-            />
-          </div>
-          <div className="flex">
-            <div className="flex items-center mx-auto justify-center mt-8 sm:space-x-3 space-x-1">
-              <SimpleButton
+              <span>Email</span>
+              <span
+                className={`flex  cursor-pointer ${theme.hoverText}`}
                 onClick={() => {
                   setShowDialog(true);
                   setDialogBoxInfo({
-                    title: "Warning!",
-                    message: "Are you sure you want to discard all changes?",
-                    type: "warning",
-                    buttons: [
-                      {
-                        label: "Yes, Discard",
-                        onClick: handleDiscardChanges,
-                        type: "danger",
-                      },
-                    ],
+                    title: "Information!",
+                    message: "Email address cannot be changed!",
+                    type: "info",
                   });
                 }}
-                btnText={"Discard"}
-                type={"danger"}
-                extraclasses={"w-auto"}
+              >
+                {userData.email}
+              </span>
+            </div>
+            <div
+              className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+            >
+              <span>Phone Number</span>
+              <span
+                className={`flex  cursor-pointer ${theme.hoverText}`}
+                onClick={() => handleFieldClick("phone")}
+              >
+                {userData.phone !== "" ? (
+                  userData.phone
+                ) : (
+                  <span
+                    className={`italic ${theme.colorText} ${theme.hoverText}`}
+                  >
+                    <sub>click to add phone number</sub>
+                  </span>
+                )}
+                <EditIcon
+                  color={`${theme.iconColor}`}
+                  extraClasses={"ml-3 mt-1"}
+                />
+              </span>
+            </div>
+            <div
+              className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+            >
+              <span>Password</span>
+              <span
+                className={`flex cursor-pointer ${theme.hoverText}`}
+                onClick={() => handleFieldClick("password")}
+              >
+                ●●●●●●●●
+                <EditIcon
+                  color={`${theme.iconColor}`}
+                  extraClasses={"ml-3 mt-1"}
+                />
+              </span>
+            </div>
+          </div>
+          {/* divider line */}
+          <div className={`w-0 border-r ${theme.colorBorder}`}></div>{" "}
+          {/* Preferrences section */}
+          <div className="space-y-4 w-full lg:w-1/2 mt-8 lg:mt-0">
+            <h2 className={`flex text-xl font-semibold  mb-6`}>
+              Preferrences
+              <AdjustmentsIcon
+                color={`${theme.iconColor}`}
+                extraClasses={"ml-3 mt-1"}
               />
-              <SimpleButton
-                onClick={handleSavePreferences}
-                btnText={
-                  isLoading ? (
-                    <LoadingSpinner size={24} extraClasses={"mx-[38px]"} />
-                  ) : (
-                    "Save Prefererences"
-                  )
-                }
-                type={"primary"}
-                extraclasses={"w-auto px-6"}
-                disabled={isLoading}
+            </h2>
+            <div
+              className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+            >
+              <label htmlFor="select-options">Theme</label>
+              <Optionselector
+                options={themeOptions}
+                value={theme.themeName}
+                onChange={handleThemeChange}
+                theme={theme}
+                classes={"w-40"}
               />
+            </div>
+            <div className="flex">
+              <div className="flex items-center mx-auto justify-center mt-8 sm:space-x-3 space-x-1">
+                <SimpleButton
+                  onClick={() => {
+                    setShowDialog(true);
+                    setDialogBoxInfo({
+                      title: "Warning!",
+                      message: "Are you sure you want to discard all changes?",
+                      type: "warning",
+                      buttons: [
+                        {
+                          label: "Yes, Discard",
+                          onClick: handleDiscardChanges,
+                          type: "danger",
+                        },
+                      ],
+                    });
+                  }}
+                  btnText={"Discard"}
+                  type={"danger"}
+                  extraclasses={"w-auto"}
+                />
+                <SimpleButton
+                  onClick={handleSavePreferences}
+                  btnText={
+                    isLoading ? (
+                      <LoadingSpinner size={24} extraClasses={"mx-[38px]"} />
+                    ) : (
+                      "Save Prefererences"
+                    )
+                  }
+                  type={"primary"}
+                  extraclasses={"w-auto px-6"}
+                  disabled={isLoading}
+                />
+              </div>
             </div>
           </div>
         </div>
+
+        {/*Body measurements component*/}
+        <BodyMeasurements
+          measurements={measurements}
+          setMeasurements={setMeasurements}
+          uid={userData.uid}
+        />
+
+        {modalInfo.isOpen && (
+          <EditFieldModal
+            modalInfo={modalInfo}
+            setModalInfo={setModalInfo}
+            field={modalInfo.field}
+            value={modalInfo.value}
+            onSave={handleFieldSave}
+            isLoading={isLoading}
+          />
+        )}
+
+        {isPasswordModalOpen && (
+          <ChangePasswordModal
+            setIsPasswordModalOpen={setIsPasswordModalOpen}
+            onSave={hadleChangePassword}
+            isLoading={isLoading}
+            isPasswordModalOpen={isPasswordModalOpen}
+          />
+        )}
+        {showDialog && (
+          <DialogBox
+            title={DialogBoxInfo.title}
+            body={DialogBoxInfo.message}
+            type={DialogBoxInfo.type}
+            showDialog={showDialog}
+            setShowDialog={setShowDialog}
+            buttons={DialogBoxInfo.buttons}
+          />
+        )}
       </div>
-
-      {/*Body measurements component*/}
-      <BodyMeasurements
-        measurements={measurements}
-        setMeasurements={setMeasurements}
-        uid={userData.uid}
-      />
-
-      {modalInfo.isOpen && (
-        <EditFieldModal
-          modalInfo={modalInfo}
-          setModalInfo={setModalInfo}
-          field={modalInfo.field}
-          value={modalInfo.value}
-          onSave={handleFieldSave}
-          isLoading={isLoading}
-        />
-      )}
-
-      {isPasswordModalOpen && (
-        <ChangePasswordModal
-          setIsPasswordModalOpen={setIsPasswordModalOpen}
-          onSave={hadleChangePassword}
-          isLoading={isLoading}
-          isPasswordModalOpen={isPasswordModalOpen}
-        />
-      )}
-      {showDialog && (
-        <DialogBox
-          title={DialogBoxInfo.title}
-          body={DialogBoxInfo.message}
-          type={DialogBoxInfo.type}
-          showDialog={showDialog}
-          setShowDialog={setShowDialog}
-          buttons={DialogBoxInfo.buttons}
-        />
-      )}
     </div>
   );
 }

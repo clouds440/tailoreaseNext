@@ -5,13 +5,12 @@ import UserContext from "@/utils/UserContext";
 import Logo from "@/components/Logo";
 import SimpleButton from "@/components/SimpleButton";
 import Link from "next/link";
-import RotatingJacket from "@/components/RotatingJacket";
 
 export default function Home() {
   const { theme, inputStyles, placeHolderStyles } = useContext(UserContext);
 
   return (
-    <>
+    <div className="h-full overflow-y-auto">
       <div
         className={`max-w-[99.5%] mx-auto p-6 mt-3 md:mt-1 mb-1 rounded-lg flex flex-col items-center overflow-hidden select-none ${theme.mainTheme}`}
       >
@@ -41,7 +40,6 @@ export default function Home() {
 
           {/* Right Section */}
           <div className="relative" data-aos="fade-left">
-            <RotatingJacket />
             <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 rounded-2xl text-[#00000030] text-[22rem] font-extrabold -z-10">
               TE
             </p>
@@ -192,6 +190,6 @@ export default function Home() {
           © 2024 TailorEase. All Rights Reserved.
         </div>
       </div>
-    </>
+    </div>
   );
 }

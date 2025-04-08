@@ -81,11 +81,13 @@ const BusinessDashboard = () => {
   }
 
   return businessData.status === "active" ? (
-    <div
-      className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-full overflow-y-auto select-none justify-center flex ${theme.mainTheme}`}
-    >
-      {/* Business account is approved and active. Dashboard content displayed here */}
-      <TailorAddProductPage />
+    <div className="h-full overflow-y-auto">
+      <div
+        className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-fit min-h-full select-none justify-center flex ${theme.mainTheme}`}
+      >
+        {/* Business account is approved and active. Dashboard content displayed here */}
+        <TailorAddProductPage />
+      </div>
     </div>
   ) : (
     <div

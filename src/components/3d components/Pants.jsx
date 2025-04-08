@@ -36,8 +36,9 @@ const Pants = ({ morphValues, morphTargets, texture, color }) => {
           child.material = new THREE.MeshStandardMaterial({
             map: loadedTexture || child.material.map, // Use the default texture if no new one is provided
             color: color ? new THREE.Color(color) : child.material.color, // Apply color only if selected
-            metalness: 0.1,
+            metalness: 0.2,
             roughness: 0.6,
+            side: THREE.DoubleSide,
           });
           child.material.needsUpdate = true;
         }

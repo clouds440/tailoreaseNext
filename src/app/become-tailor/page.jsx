@@ -34,7 +34,6 @@ const BecomeTailor = () => {
   const [formData, setFormData] = useState({});
   const [disableResendButton, setDisableResendButton] = useState(false);
   const router = useRouter();
-  const [isBusinessDashboard, setIsBusinessDashboard] = useState(false);
 
   const [hasBusinessAccount, setHasBusinessAccount] = useState(null);
 
@@ -90,16 +89,6 @@ const BecomeTailor = () => {
 
     checkBusinessAccount();
   }, [userData, userLoggedIn, router]);
-
-  const toggleDashboard = () => {
-    const newState = !isBusinessDashboard;
-    setIsBusinessDashboard(newState);
-    if (newState) {
-      router.push("/tailor-products");
-    } else {
-      router.push("/");
-    }
-  };
 
   const stepNames = ["Business Info", "Additional Info", "Submitting"];
 
@@ -296,49 +285,7 @@ const BecomeTailor = () => {
         </div>
       </div>
     ) : (
-      <div
-        className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg flex flex-col justify-center items-center h-full ${theme.mainTheme}`}
-      >
-        <div
-          className={`flex p-5 rounded-lg flex-col items-center text-center ${theme.colorBg}`}
-        >
-          <span className="text-2xl">You already have a verified business account!</span>
-          <span className="my-5">
-            You can switch between your user and tailor dashboards using the toggle below.
-          </span>
-          
-          <div className="flex items-center justify-center mb-5">
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={isBusinessDashboard}
-                onChange={toggleDashboard}
-              />
-              <div className={`w-11 h-6 ${theme.colorBg} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}></div>
-              <span className="ml-3 text-sm font-medium">
-                {isBusinessDashboard ? "Tailor Dashboard" : "User Dashboard"}
-              </span>
-            </label>
-          </div>
-
-          <div className="flex space-x-3">
-            <Link href={"/"}>
-              <SimpleButton
-                btnText={"Go Home"}
-                type={"primary"}
-                extraclasses={"py-2 px-5 text-xl"}
-              />
-            </Link>
-            <SimpleButton
-              btnText={"Go to Business Dashboard"}
-              type={"primary"}
-              extraclasses={"py-2 px-5 text-xl"}
-              onClick={() => router.push("/business-dashboard")}
-            />
-          </div>
-        </div>
-      </div>
+      router.push(`/business-dashboard`)
     )
   ) : (
     <div className="h-full relative overflow-y-auto overflow-x-hidden">

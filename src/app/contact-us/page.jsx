@@ -74,7 +74,7 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="max-w-[99.5%] mx-auto my-4 md:my-1 h-screen flex-grow rounded-lg">
+    <div className="max-w-[99.5%] mx-auto my-4 md:my-1 h-full overflow-y-auto flex-grow rounded-lg">
       <div className="flex flex-col h-full rounded-xl md:flex-row">
         {/* Left Section */}
         <div

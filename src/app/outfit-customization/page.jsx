@@ -91,7 +91,7 @@ const OutfitCustomization = () => {
 
   return (
     <div
-      className={`max-w-[99.5%] mx-auto flex flex-col md:flex-row items-center p-6 my-4 md:my-1 rounded-lg h-screen overflow-hidden select-none justify-center ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto flex flex-col md:flex-row items-center p-6 my-4 md:my-1 rounded-lg h-full overflow-y-auto select-none justify-center ${theme.mainTheme}`}
     >
       {/* Customization panel (Left Side) */}
       <Resizable
@@ -105,15 +105,15 @@ const OutfitCustomization = () => {
         minHeight={isMobile ? "30vh" : "full"}
         maxHeight={isMobile ? "30vh" : "full"}
         enable={!isMobile && { right: true }}
-        onResizeStop={(e, direction, ref, d) => {
+        onResizeStop={(d) => {
           if (isMobile) {
             setHeight(`${parseFloat(height) + d.height}px`);
           } else {
             setWidth(width + d.width);
           }
         }}
-        className={`p-4 rounded-lg overflow-y-auto overflow-x-hidden ${
-          isMobile ? "mb-1" : "broder-r border-double h-[100%]"
+        className={`p-6 rounded-lg overflow-y-auto overflow-x-hidden ${
+          isMobile ? "mb-1" : "h-full"
         } ${theme.mainTheme}`}
       >
         {/* Morph sliders for each outfit */}

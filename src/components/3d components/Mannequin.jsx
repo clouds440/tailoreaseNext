@@ -44,6 +44,7 @@ const Mannequin = ({ colorValue }) => {
             color: getSkinTone(colorValue), // Use mapped skin tone
             metalness: 0.05,
             roughness: 0.7,
+            side: THREE.DoubleSide,
           });
         }
       });

@@ -167,134 +167,135 @@ const TailorListPage = () => {
   };
 
   return (
-    <div
-      className={`max-w-[99.5%] mx-auto my-4 md:my-1 overflow-hidden select-none`}
-    >
-      <div className={`p-4 ${theme.mainTheme} rounded-lg`}>
-        <h2 className={`text-2xl font-bold mb-6 ${theme.colorText}`}>
-          All Registered Tailors
-        </h2>
-        <div className={`w-full flex justify-between items-center relative`}>
-          <div className="relative" ref={dropdownButtonRef}>
-            <SimpleButton
-              type={"simple"}
-              btnText={`Sort by: ${filters.sortBy}`}
-              extraclasses={`px-4 py-2 border font-semibold ${theme.colorBorder}`}
-              onClick={toggleDropdown}
-            />
+    <div className="h-full overflow-y-auto">
+      <div className={`max-w-[99.5%] mx-auto my-4 md:my-1 select-none`}>
+        <div className={`p-4 ${theme.mainTheme} rounded-lg`}>
+          <h2 className={`text-2xl font-bold mb-6 ${theme.colorText}`}>
+            All Registered Tailors
+          </h2>
+          <div className={`w-full flex justify-between items-center relative`}>
+            <div className="relative" ref={dropdownButtonRef}>
+              <SimpleButton
+                type={"simple"}
+                btnText={`Sort by: ${filters.sortBy}`}
+                extraclasses={`px-4 py-2 border font-semibold ${theme.colorBorder}`}
+                onClick={toggleDropdown}
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div
-        className={`${theme.mainTheme} w-full rounded-xl overflow-hidden flex flex-wrap justify-evenly items-center h-screen p-8 mt-1 mb-3 md:mb-1 mx-auto`}
-      >
-        {loading ? (
-          <div className="flex justify-center items-center h-screen">
-            <ClipLoader color="#ffffff" size={60} />
-          </div>
-        ) : (
-          <>
-            {tailorList.length <= 0 ? (
-              <span className="bold text-3xl">No tailors to show</span>
-            ) : (
-              tailorList.map((tailor, index) => (
-                <div
-                  key={index}
-                  className={`cursor-pointer overflow-hidden my-4 w-[15rem] max-w-full h-[16rem] rounded-2xl border transition-all duration-300 transform hover:scale-[1.01] ${theme.hoverShadow} ${theme.colorBorder}`}
-                  onClick={() => handleTailorClick(tailor)}
-                >
-                  <Image
-                    src={
-                      tailor.businessPictureUrl ||
-                      "/images/profile/business/default.png"
-                    }
-                    width={800} // set a proper value based on expected image size
-                    height={400}
-                    alt={`Image of ${tailor.businessName}`}
-                    className="w-full object-cover object-top rounded-lg lg:rounded-xl max-h-32 h-auto"
-                    priority={false}
-                    placeholder="blur"
-                    blurDataURL="/images/profile/business/default.png"
-                  />
-                  <h3
-                    className={`text-lg px-2 pt-2 font-bold ${theme.colorText}`}
-                  >
-                    {tailor.businessName}
-                  </h3>
-                  <span className="text-sm block -mb-2 ml-2 text-gray-100">
-                    {tailor.openTime} - {tailor.closeTime}
-                  </span>
-                  <span className="text-yellow-500 text-sm ml-2">
-                    {"★".repeat(Math.floor(tailor.normalizedRating))}
-                    {"☆".repeat(5 - Math.floor(tailor.normalizedRating))}
-                  </span>
-                  <h4 className="text-sm text-center ml-2 text-gray-300">
-                    Ranked {index + 1} by TailorEase with these selected checks
-                  </h4>
-                </div>
-              ))
-            )}
-          </>
-        )}
-      </div>
-
-      {popupVisible && (
-        <QuickView
-          theme={theme}
-          tailor={selectedTailor}
-          setPopupVisible={setPopupVisible}
-          popupVisible={popupVisible}
-        />
-      )}
-      <AnimatePresence>
-        {dropdownOpen && (
-          <motion.div
-            ref={dropdownRef}
-            className={`absolute mt-1 p-4 w-auto ${theme.mainTheme} text-${theme.colorText} rounded-md shadow-lg border ${theme.colorBorder}`}
-            style={{
-              top: dropdownPosition.top,
-              left: dropdownPosition.left,
-              zIndex: 1000,
-              width: "fit-content",
-            }}
-            initial="hidden"
-            animate={dropdownOpen ? "visible" : "hidden"}
-            exit="exit"
-            variants={dropdownVariants}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-          >
-            <div className="relative min-w-[18rem] mb-4">
-              <h3 className="font-bold text-lg mb-2">Select Filters</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {specialities.map((speciality) => (
-                  <div
-                    key={speciality}
-                    onClick={() => handleChange(speciality)}
-                    className={`p-2 border rounded-lg cursor-pointer ${
-                      specialityFilter.includes(speciality)
-                        ? "bg-blue-500"
-                        : `bg-gray-600 ${theme.hoverBg}`
-                    }`}
-                  >
-                    {specialityFilter.includes(speciality) && (
-                      <span className="text-green-500 absolute -translate-y-4 -translate-x-3">
-                        ✔
-                      </span>
-                    )}
-                    {speciality}
-                  </div>
-                ))}
-              </div>
+        <div
+          className={`${theme.mainTheme} w-full rounded-xl h-full flex flex-wrap justify-evenly items-center p-8 mt-1 mb-3 md:mb-1 mx-auto`}
+        >
+          {loading ? (
+            <div className="flex justify-center items-center h-screen">
+              <ClipLoader color="#ffffff" size={60} />
             </div>
-            <SimpleButton
-              type={"simple"}
-              btnText={"Apply Filters"}
-              extraclasses={`px-4 py-2 rounded-lg`}
-              onClick={applyFilters}
-            />
-          </motion.div>
+          ) : (
+            <>
+              {tailorList.length <= 0 ? (
+                <span className="bold text-3xl">No tailors to show</span>
+              ) : (
+                tailorList.map((tailor, index) => (
+                  <div
+                    key={index}
+                    className={`cursor-pointer overflow-hidden my-4 w-[15rem] max-w-full h-[16rem] rounded-2xl border transition-all duration-300 transform hover:scale-[1.01] ${theme.hoverShadow} ${theme.colorBorder}`}
+                    onClick={() => handleTailorClick(tailor)}
+                  >
+                    <Image
+                      src={
+                        tailor.businessPictureUrl ||
+                        "/images/profile/business/default.png"
+                      }
+                      width={800} // set a proper value based on expected image size
+                      height={400}
+                      alt={`Image of ${tailor.businessName}`}
+                      className="w-full object-cover object-top rounded-lg lg:rounded-xl max-h-32 h-auto"
+                      priority={false}
+                      placeholder="blur"
+                      blurDataURL="/images/profile/business/default.png"
+                    />
+                    <h3
+                      className={`text-lg px-2 pt-2 font-bold ${theme.colorText}`}
+                    >
+                      {tailor.businessName}
+                    </h3>
+                    <span className="text-sm block -mb-2 ml-2 text-gray-100">
+                      {tailor.openTime} - {tailor.closeTime}
+                    </span>
+                    <span className="text-yellow-500 text-sm ml-2">
+                      {"★".repeat(Math.floor(tailor.normalizedRating))}
+                      {"☆".repeat(5 - Math.floor(tailor.normalizedRating))}
+                    </span>
+                    <h4 className="text-sm text-center ml-2 text-gray-300">
+                      Ranked {index + 1} by TailorEase with these selected
+                      checks
+                    </h4>
+                  </div>
+                ))
+              )}
+            </>
+          )}
+        </div>
+
+        {popupVisible && (
+          <QuickView
+            theme={theme}
+            tailor={selectedTailor}
+            setPopupVisible={setPopupVisible}
+            popupVisible={popupVisible}
+          />
         )}
-      </AnimatePresence>
+        <AnimatePresence>
+          {dropdownOpen && (
+            <motion.div
+              ref={dropdownRef}
+              className={`absolute mt-1 p-4 w-auto ${theme.mainTheme} text-${theme.colorText} rounded-md shadow-lg border ${theme.colorBorder}`}
+              style={{
+                top: dropdownPosition.top,
+                left: dropdownPosition.left,
+                zIndex: 1000,
+                width: "fit-content",
+              }}
+              initial="hidden"
+              animate={dropdownOpen ? "visible" : "hidden"}
+              exit="exit"
+              variants={dropdownVariants}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+            >
+              <div className="relative min-w-[18rem] mb-4">
+                <h3 className="font-bold text-lg mb-2">Select Filters</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {specialities.map((speciality) => (
+                    <div
+                      key={speciality}
+                      onClick={() => handleChange(speciality)}
+                      className={`p-2 border rounded-lg cursor-pointer ${
+                        specialityFilter.includes(speciality)
+                          ? "bg-blue-500"
+                          : `bg-gray-600 ${theme.hoverBg}`
+                      }`}
+                    >
+                      {specialityFilter.includes(speciality) && (
+                        <span className="text-green-500 absolute -translate-y-4 -translate-x-3">
+                          ✔
+                        </span>
+                      )}
+                      {speciality}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <SimpleButton
+                type={"simple"}
+                btnText={"Apply Filters"}
+                extraclasses={`px-4 py-2 rounded-lg`}
+                onClick={applyFilters}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
