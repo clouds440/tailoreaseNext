@@ -9,6 +9,7 @@ import { auth, db } from "@/utils/firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import Image from "next/image";
+import OptionSelector from "@/components/OptionSelector";
 
 const SignUpForm = () => {
   const {
@@ -25,8 +26,17 @@ const SignUpForm = () => {
     fullName: "",
     email: "",
     password: "",
+    gender: "",
+    age: "",
     phone: "",
   });
+
+  const genders = [
+    { value: "", label: "Gender" },
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+    { value: "other", label: "Other" },
+  ];
 
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -49,6 +59,7 @@ const SignUpForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate Name
     if (!formData.fullName.trim()) {
       setShowMessage({
         type: "info",
@@ -65,6 +76,7 @@ const SignUpForm = () => {
       return;
     }
 
+    // Validate Email
     if (!formData.email || !/^\S+@\S+\.\S+$/.test(formData.email)) {
       setShowMessage({
         type: "warning",
@@ -74,6 +86,28 @@ const SignUpForm = () => {
       return;
     }
 
+    // Validate Age
+    const ageValue = formData.age.trim();
+    if (!ageValue || isNaN(ageValue) || +ageValue < 7 || +ageValue > 100) {
+      setShowMessage({
+        type: "info",
+        message: "Enter a valid age between 7 and 100 with no spaces",
+      });
+      setPopUpMessageTrigger("true");
+      return;
+    }
+
+    // Validate Gender
+    if (!formData.gender || formData.gender === "") {
+      setShowMessage({
+        type: "info",
+        message: "Please select a gender",
+      });
+      setPopUpMessageTrigger("true");
+      return;
+    }
+
+    // Validate Phone
     if (!/^\d*$/.test(formData.phone)) {
       setShowMessage({
         type: "warning",
@@ -104,6 +138,8 @@ const SignUpForm = () => {
         uid: user.uid,
         fullName: formData.fullName,
         email: formData.email,
+        age: formData.age,
+        gender: formData.gender,
         phone: formData.phone,
       });
       setShowMessage({
@@ -215,6 +251,29 @@ const SignUpForm = () => {
                 />
                 <label className={`${placeHolderStyles}`} htmlFor="password">
                   Password
+                </label>
+              </div>
+              <div className="relative mb-4">
+                <OptionSelector
+                  options={genders}
+                  value={formData.gender}
+                  onChange={handleChange}
+                  name="gender"
+                  classes="w-full"
+                />
+              </div>
+              <div className="relative mb-4">
+                <input
+                  type="tel"
+                  id="age"
+                  name="age"
+                  value={formData.age}
+                  onChange={handleChange}
+                  className={`${inputStyles}`}
+                  placeholder=" "
+                />
+                <label className={`${placeHolderStyles}`} htmlFor="age">
+                  Age <span className="text-xs"></span>
                 </label>
               </div>
               <div className="relative mb-4">

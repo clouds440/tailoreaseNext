@@ -82,14 +82,14 @@ const DialogBox = ({
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="fixed top-[50%] inset-0 flex items-center justify-center"
+          className="fixed inset-0 flex h-screen items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
           <div className="bg-black bg-opacity-50 fixed inset-0"></div>
-          <div className="w-auto max-w-[75%] md:max-w-[60%] fixed lex items-center justify-center md:translate-x-24 -translate-y-20 md:-translate-y-48">
+          <div className="w-auto max-w-[75%] md:max-w-[60%] fixed lex items-center justify-center md:translate-x-24">
             <motion.div
               className={`rounded-xl shadow-lg w-auto z-50 ${theme.mainTheme}`}
               initial={{ scale: 0.7 }}

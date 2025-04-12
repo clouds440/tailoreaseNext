@@ -100,7 +100,7 @@ function ChangePasswordModal({
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className={`fixed top-[50%] inset-0 flex items-center justify-center md:translate-x-24 md:-translate-y-48`}
+          className={`fixed inset-0 flex h-screen items-center justify-center md:translate-x-24`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

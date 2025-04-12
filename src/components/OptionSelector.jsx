@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import UserContext from "@/utils/UserContext";
 
-const OptionSelector = ({ options, value, onChange, theme, classes }) => {
+const OptionSelector = ({ options, value, onChange, name, classes }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { theme } = useContext(UserContext);
 
   const dropdownVariants = {
     hidden: { scaleY: 0, transformOrigin: "top" },
@@ -13,7 +15,7 @@ const OptionSelector = ({ options, value, onChange, theme, classes }) => {
   };
 
   const handleSelect = (optionValue) => {
-    onChange({ target: { value: optionValue } });
+    onChange({ target: { name, value: optionValue } });
     setIsOpen(false);
   };
 

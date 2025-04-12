@@ -17,7 +17,7 @@ import {
 import React, { useContext, useState, useEffect } from "react";
 import EditFieldModal from "@/components/EditFieldModal";
 import ChangePasswordModal from "@/components/ChangePasswordModal";
-import Optionselector from "@/components/OptionSelector";
+import OptionSelector from "@/components/OptionSelector";
 import UserContext from "@/utils/UserContext";
 import { useRouter } from "next/navigation";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -62,6 +62,7 @@ function AccountSettings() {
   const fieldLabels = {
     fullName: "Full Name",
     phone: "Phone Number",
+    age: "Age",
   };
 
   const handleFieldClick = (field) => {
@@ -82,7 +83,8 @@ function AccountSettings() {
       // Check if the new value is different
       if (
         (field === "fullName" && newValue === userData.fullName) ||
-        (field === "phone" && newValue === userData.phone)
+        (field === "phone" && newValue === userData.phone) ||
+        (field === "age" && newValue === userData.age)
       ) {
         setModalInfo({ isOpen: false, field: "", value: "" });
         return;
@@ -299,6 +301,39 @@ function AccountSettings() {
             <div
               className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
             >
+              <span>Gender</span>
+              <span
+                className={`flex  cursor-pointer ${theme.hoverText}`}
+                onClick={() => {
+                  setShowDialog(true);
+                  setDialogBoxInfo({
+                    title: "Information!",
+                    message: "Gender cannot be changed!",
+                    type: "info",
+                  });
+                }}
+              >
+                {userData.gender}
+              </span>
+            </div>
+            <div
+              className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+            >
+              <span>Age</span>
+              <span
+                className={`flex  cursor-pointer ${theme.hoverText}`}
+                onClick={() => handleFieldClick("age")}
+              >
+                {userData.age}
+                <EditIcon
+                  color={`${theme.iconColor}`}
+                  extraClasses={"ml-3 mt-1"}
+                />
+              </span>
+            </div>
+            <div
+              className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
+            >
               <span>Phone Number</span>
               <span
                 className={`flex  cursor-pointer ${theme.hoverText}`}
@@ -350,7 +385,7 @@ function AccountSettings() {
               className={`flex justify-between items-center p-3 rounded-md ${theme.colorBg}`}
             >
               <label htmlFor="select-options">Theme</label>
-              <Optionselector
+              <OptionSelector
                 options={themeOptions}
                 value={theme.themeName}
                 onChange={handleThemeChange}
