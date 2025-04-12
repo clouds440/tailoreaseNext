@@ -17,7 +17,7 @@ const outfitCategories = {
 };
 
 const OutfitCustomization = () => {
-  const { theme } = useContext(UserContext);
+  const { theme, userData } = useContext(UserContext);
   const searchParams = useSearchParams();
 
   // Get outfit(s) from URL and convert them into an array
@@ -188,8 +188,9 @@ const OutfitCustomization = () => {
         ))}
 
         {/* Skin Tone slider */}
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Skin Tone</h3>
+        <div className={`border-t ${theme.borderColor}`}>
+          <h3 className="text-lg font-semibold my-3">Model</h3>
+          <h3 className="text-sm font-medium">Skin Tone</h3>
           <input
             type="range"
             min="0"
@@ -221,7 +222,7 @@ const OutfitCustomization = () => {
           colorValue={colorValue}
           texture={texture}
           color={color}
-          gender={"female"}
+          gender={userData.gender.toLowerCase() || "male"}
         />
       </div>
     </div>

@@ -88,7 +88,7 @@ const CustomizationScene = ({
         gender={gender}
         useSkirtAsDefaultLegs={
           !outfitTypes.some((type) =>
-            ["pants", "shorts", "skirt"].includes(type)
+            ["pants", "shorts", "skirt", "jeans"].includes(type)
           )
         }
       />

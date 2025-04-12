@@ -45,7 +45,6 @@ const NotificationPanel = () => {
           });
           setNotifications(notifications);
         } else {
-          console.log("No notifications found.");
         }
       } catch (error) {
         console.error("Error fetching notifications:", error);
