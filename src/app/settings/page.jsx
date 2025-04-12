@@ -108,6 +108,18 @@ function AccountSettings() {
         }
       }
 
+      if (field === "age") {
+        const ageValue = newValue;
+        if (!ageValue || isNaN(ageValue) || +ageValue < 7 || +ageValue > 100) {
+          setShowMessage({
+            type: "info",
+            message: "Enter a valid age between 7 and 100 with no spaces",
+          });
+          setPopUpMessageTrigger("true");
+          return;
+        }
+      }
+
       // Query Firestore to find the document with the matching UID
       const userQuery = query(
         collection(db, "users"),
