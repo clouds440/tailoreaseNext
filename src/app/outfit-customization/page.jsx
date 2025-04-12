@@ -221,6 +221,7 @@ const OutfitCustomization = () => {
           colorValue={colorValue}
           texture={texture}
           color={color}
+          gender={"female"}
         />
       </div>
     </div>

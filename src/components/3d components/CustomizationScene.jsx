@@ -21,6 +21,7 @@ const CustomizationScene = ({
   colorValue,
   texture,
   color,
+  gender,
 }) => {
   const [selectedOutfits, setSelectedOutfits] = useState([]);
   const [morphTargets, localSetMorphTargets] = useState({});
@@ -82,7 +83,15 @@ const CustomizationScene = ({
       <ambientLight intensity={0.8} />
       <directionalLight position={[10, 10, 5]} />
 
-      <Mannequin colorValue={colorValue} />
+      <Mannequin
+        colorValue={colorValue}
+        gender={gender}
+        useSkirtAsDefaultLegs={
+          !outfitTypes.some((type) =>
+            ["pants", "shorts", "skirt"].includes(type)
+          )
+        }
+      />
 
       {selectedOutfits.map((Outfit, index) => (
         <Outfit
