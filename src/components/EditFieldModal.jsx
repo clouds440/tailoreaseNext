@@ -30,6 +30,8 @@ function EditFieldModal({
   const fieldLabels = {
     fullName: "Full Name",
     phone: "Phone Number",
+    age: "Age",
+    gender: "Gender",
   };
 
   const handleChange = (e) => {
@@ -126,14 +128,33 @@ function EditFieldModal({
               </h2>
               <form onSubmit={handleSubmit}>
                 <div className="relative mb-4">
-                  <input
-                    type="text"
-                    name={field}
-                    value={inputValue}
-                    onChange={handleChange}
-                    className={`${inputStyles}`}
-                    placeholder=" "
-                  />
+                  {field === "gender" ? (
+                    <select
+                      name="gender"
+                      value={inputValue}
+                      onChange={handleChange}
+                      className={`${inputStyles}`}
+                    >
+                      <option value="" className={`${theme.colorBg}`}>
+                        Select Gender
+                      </option>
+                      <option value="Male" className={`${theme.colorBg}`}>
+                        Male
+                      </option>
+                      <option value="Female" className={`${theme.colorBg}`}>
+                        Female
+                      </option>
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      name={field}
+                      value={inputValue}
+                      onChange={handleChange}
+                      className={`${inputStyles}`}
+                      placeholder=" "
+                    />
+                  )}
                   <label className={`${placeHolderStyles}`}>
                     {fieldLabels[field]}
                   </label>

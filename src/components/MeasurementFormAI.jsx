@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import UserContext from "@/utils/UserContext";
 
 const MeasurementFormAI = ({ userInfo, setUserInfo }) => {
-  const { inputStyles, theme, userData } = useContext(UserContext);
+  const { inputStyles, theme } = useContext(UserContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,14 +16,13 @@ const MeasurementFormAI = ({ userInfo, setUserInfo }) => {
         type="number"
         name="age"
         placeholder="Age"
-        value={userInfo.age || userData.age || ""}
+        value={userInfo.age}
         onChange={handleChange}
         className={`${inputStyles}`}
-        onFocus={(e) => e.target.select()}
       />
       <select
         name="gender"
-        value={(userInfo.gender || userData.gender || "").toLowerCase().trim()}
+        value={userInfo.gender}
         onChange={handleChange}
         className={`${inputStyles}`}
       >

@@ -63,6 +63,7 @@ function AccountSettings() {
     fullName: "Full Name",
     phone: "Phone Number",
     age: "Age",
+    gender: "Gender",
   };
 
   const handleFieldClick = (field) => {
@@ -316,16 +317,21 @@ function AccountSettings() {
               <span>Gender</span>
               <span
                 className={`flex  cursor-pointer ${theme.hoverText}`}
-                onClick={() => {
-                  setShowDialog(true);
-                  setDialogBoxInfo({
-                    title: "Information!",
-                    message: "Gender cannot be changed!",
-                    type: "info",
-                  });
-                }}
+                onClick={() => handleFieldClick("gender")}
               >
-                {userData.gender}
+                {userData.gender ? (
+                  userData.gender
+                ) : (
+                  <span
+                    className={`italic ${theme.colorText} ${theme.hoverText}`}
+                  >
+                    <sub>click to select your gender</sub>
+                  </span>
+                )}
+                <EditIcon
+                  color={`${theme.iconColor}`}
+                  extraClasses={"ml-3 mt-1"}
+                />
               </span>
             </div>
             <div
@@ -336,7 +342,15 @@ function AccountSettings() {
                 className={`flex  cursor-pointer ${theme.hoverText}`}
                 onClick={() => handleFieldClick("age")}
               >
-                {userData.age}
+                {userData.age ? (
+                  userData.age
+                ) : (
+                  <span
+                    className={`italic ${theme.colorText} ${theme.hoverText}`}
+                  >
+                    <sub>click to enter your age</sub>
+                  </span>
+                )}
                 <EditIcon
                   color={`${theme.iconColor}`}
                   extraClasses={"ml-3 mt-1"}

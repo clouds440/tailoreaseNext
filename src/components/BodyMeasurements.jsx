@@ -27,15 +27,15 @@ const measurementFields = [
 ];
 
 const BodyMeasurements = ({ measurements, setMeasurements, uid }) => {
-  const { theme, setShowMessage, setPopUpMessageTrigger } =
+  const { theme, setShowMessage, setPopUpMessageTrigger, userData } =
     useContext(UserContext);
   const [editingField, setEditingField] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [savingMeasurements, setSavingMeasurements] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [userInfo, setUserInfo] = useState({
-    age: "",
-    gender: "",
+    age: userData.age || "",
+    gender: userData.gender && userData.gender.toLowerCase(),
     height: "",
     weight: "",
   });
