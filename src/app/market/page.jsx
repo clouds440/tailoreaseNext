@@ -377,7 +377,7 @@ const Market = () => {
                     initial="hidden"
                     animate="visible"
                     transition={{ duration: 0.3, delay: index * 0.05 }}
-                    className={`${theme.mainTheme} cursor-pointer overflow-hidden rounded-xl border transition-all duration-300 ${theme.colorBorder} ${theme.hoverShadow} flex flex-col`}
+                    className={`cursor-pointer overflow-hidden rounded-xl border transition-all duration-300 ${theme.colorBorder} ${theme.hoverShadow} flex flex-col`}
                   >
                     <div className="relative overflow-hidden aspect-square w-full">
                       <Image
@@ -390,7 +390,7 @@ const Market = () => {
                       />
                     </div>
                     <div
-                      className={`p-3 ${theme.colorBg} overflow-hidden flex-grow`}
+                      className={`p-3 rounded-b-xl ${theme.colorBg} overflow-hidden flex-grow`}
                     >
                       <h3
                         className={`font-semibold line-clamp-2 ${theme.colorText}`}
