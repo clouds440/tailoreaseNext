@@ -56,7 +56,7 @@ const AboutUs = () => {
 
   return (
     <div
-      className={`${theme.mainTheme} max-w-[99.5%] mx-auto my-3 md:my-1 min-h-screen py-8 px-4 md:px-16 rounded-lg`}
+      className={`${theme.mainTheme} max-w-[99.5%] mx-auto my-3 md:my-1 h-full overflow-y-auto py-8 px-4 md:px-16 rounded-lg`}
     >
       <header className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4">About Us</h1>

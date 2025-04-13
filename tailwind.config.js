@@ -40,7 +40,7 @@ module.exports = {
           backgroundColor: "rgba(53, 71, 181, 0.75)", // sky background
           backdropFilter: "blur(30px)", // backdrop-blur-xl
           boxShadow: "0 1px 6px 2px #8b5cf6", // violet-500
-          color: "#bae6fd", // Set all text to sky-200
+          color: "#FACC15", // Set all text to sky-200
           borderColor: "#1e88e5", // Bluish border color
         },
       };
