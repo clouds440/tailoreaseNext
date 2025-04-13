@@ -7,21 +7,9 @@ import { signOut } from "firebase/auth";
 import UserContext from "@/utils/UserContext";
 import { useRouter } from "next/navigation";
 import DialogBox from "./DialogBox";
-import {
-  SettingsIcon,
-  LogoutIcon,
-  MenuIcon,
-  HomeIcon,
-  CartIcon,
-  ServicesIcon,
-  ContactIcon,
-  LoginIcon,
-  InfoIcon,
-  TailorIcon,
-  ThemeIcon,
-  UserIcon,
-} from "../../public/icons/svgIcons";
 import { motion, AnimatePresence } from "framer-motion";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/utils/firebaseConfig";
 
 const Navbar = () => {
   const {
@@ -36,9 +24,47 @@ const Navbar = () => {
   const [userFullName, setUserFullName] = useState(userData.fullName);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+  const [isVerifiedTailor, setIsVerifiedTailor] = useState(false);
+  const [activeDashboard, setActiveDashboard] = useState('user');
+  const [windowWidth, setWindowWidth] = useState(undefined);
+  const [windowHeight, setWindowHeight] = useState(undefined);
 
   const dropdownRef = useRef(null);
   const router = useRouter();
+
+  // Check if user is a verified tailor and set initial dashboard
+  useEffect(() => {
+    const checkTailorStatus = async () => {
+      if (!userLoggedIn || !userData.uid) {
+        setIsVerifiedTailor(false);
+        setActiveDashboard('user');
+        return;
+      }
+
+      try {
+        const tailorsRef = collection(db, "tailors");
+        const q = query(tailorsRef, where("ownerId", "==", userData.uid));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const tailorData = querySnapshot.docs[0].data();
+          const isTailor = tailorData.approved === true;
+          setIsVerifiedTailor(isTailor);
+          // Start with user dashboard by default
+          setActiveDashboard('user');
+        } else {
+          setIsVerifiedTailor(false);
+          setActiveDashboard('user');
+        }
+      } catch (error) {
+        console.error("Error checking tailor status:", error);
+        setIsVerifiedTailor(false);
+        setActiveDashboard('user');
+      }
+    };
+
+    checkTailorStatus();
+  }, [userLoggedIn, userData]);
 
   const handleLogout = async () => {
     try {
@@ -47,6 +73,8 @@ const Navbar = () => {
       sessionStorage.removeItem("userData");
       setUserLoggedIn(false);
       setDropdownOpen(false);
+      setIsVerifiedTailor(false);
+      setActiveDashboard('user');
       setShowMessage({
         type: "success",
         message: "Logged out!",
@@ -83,6 +111,34 @@ const Navbar = () => {
     setUserFullName(userData.fullName);
   }, [userData]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const switchToTailorDashboard = () => {
+    if (isVerifiedTailor) {
+      setActiveDashboard('tailor');
+      router.push('/business-dashboard');
+      setDropdownOpen(false);
+    }
+  };
+
+  const switchToUserDashboard = () => {
+    setActiveDashboard('user');
+    router.push('/');
+    setDropdownOpen(false);
+  };
+
   const themeOptions = [
     {
       value: "systemDefault",
@@ -112,7 +168,7 @@ const Navbar = () => {
   };
 
   const handleSaveTheme = () => {
-    localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName)); // Assume theme is available
+    localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName));
     setShowMessage({
       type: "success",
       message: "Theme applied!",
@@ -129,63 +185,180 @@ const Navbar = () => {
     },
   ];
 
-  const dropdownOptions = [
-    ...(userLoggedIn
-      ? [
-          {
-            text: "Logout",
-            icon: <LogoutIcon size={"5"} color={`text-red-700`} />,
-            onClick: handleLogout,
-          },
-          {
-            text: "Settings",
-            icon: <SettingsIcon size={"5"} color={`${theme.iconColor}`} />,
-            onClick: () => {
-              router.push("/settings");
-              setDropdownOpen(false);
-            },
-          },
-          {
-            text: "Profile",
-            icon: <UserIcon size={"5"} color={`${theme.iconColor}`} />,
-            onClick: () => {
-              router.push("/profile");
-              setDropdownOpen(false);
-            },
-          },
-        ]
-      : []),
+  // Common dropdown options
+  const commonDropdownOptions = [
     {
       text: "Theme",
-      icon: <ThemeIcon size={"5"} color={`${theme.iconColor}`} />,
+      icon: <i className="fas fa-palette fa-fw" />,
       onClick: () => {
         setShowDialog(true);
       },
     },
   ];
 
-  const [windowWidth, setWindowWidth] = useState(undefined);
-  const [windowHeight, setWindowHeight] = useState(undefined);
+  // Visitor dropdown options
+  const visitorDropdownOptions = [
+    ...commonDropdownOptions,
+    {
+      text: "Login",
+      icon: <i className="fas fa-sign-in-alt fa-fw" />,
+      onClick: () => {
+        router.push("/login");
+        setDropdownOpen(false);
+      },
+    },
+  ];
 
-  useEffect(() => {
-    // Only execute on the client side
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-      setWindowHeight(window.innerHeight);
-    };
+  // User dropdown options (shown when in user dashboard)
+  const userDropdownOptions = [
+    ...commonDropdownOptions,
+    {
+      text: "Logout",
+      icon: <i className="fas fa-sign-out-alt fa-fw text-red-700" />,
+      onClick: handleLogout,
+    },
+    {
+      text: "Settings",
+      icon: <i className="fas fa-cog fa-fw" />,
+      onClick: () => {
+        router.push("/settings");
+        setDropdownOpen(false);
+      },
+    },
+    isVerifiedTailor && {
+      text: "Tailor",
+      icon: <i className="fas fa-scissors fa-fw" />,
+      onClick: switchToTailorDashboard,
+    },
+  ].filter(Boolean);
 
-    // Initial window size on mount
-    handleResize();
+  // Tailor dropdown options (shown when in tailor dashboard)
+  const tailorDropdownOptions = [
+    ...commonDropdownOptions,
+    {
+      text: "Logout",
+      icon: <i className="fas fa-sign-out-alt fa-fw text-red-700" />,
+      onClick: handleLogout,
+    },
+    {
+      text: "Settings",
+      icon: <i className="fas fa-cog fa-fw" />,
+      onClick: () => {
+        router.push("/settings");
+        setDropdownOpen(false);
+      },
+    },
+    {
+      text: "User",
+      icon: <i className="fas fa-user fa-fw" />,
+      onClick: switchToUserDashboard,
+    },
+  ];
 
-    // Add event listener to handle window resizing
-    window.addEventListener("resize", handleResize);
+  // Visitor navigation items
+  const visitorNavItems = [
+    {
+      path: "/",
+      icon: <i className="fas fa-home" />,
+      label: "Home",
+    },
+    {
+      path: "/market",
+      icon: <i className="fas fa-shopping-cart" />,
+      label: "Market",
+    },
+    {
+      path: "/tailors",
+      icon: <i className="fas fa-scissors" />,
+      label: "Tailors",
+    },
+    {
+      path: "/contact-us",
+      icon: <i className="fas fa-envelope" />,
+      label: "Contact",
+    },
+    {
+      path: "/about-us",
+      icon: <i className="fas fa-info-circle" />,
+      label: "About",
+    },
+  ];
 
-    // Cleanup event listener on unmount
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  // User dashboard navigation items
+  const userDashboardNavItems = [
+    {
+      path: "/",
+      icon: <i className="fas fa-user" />,
+      label: "Profile",
+    },
+    {
+      path: "/market",
+      icon: <i className="fas fa-shopping-cart" />,
+      label: "Market",
+    },
+    {
+      path: "/tailors",
+      icon: <i className="fas fa-scissors" />,
+      label: "Tailors",
+    },
+    {
+      path: "/contact-us",
+      icon: <i className="fas fa-envelope" />,
+      label: "Contact",
+    },
+    // Add Become Tailor button conditionally
+    !isVerifiedTailor && {
+      path: "/become-tailor",
+      icon: <i className="fas fa-scissors" />,
+      label: "Become Tailor",
+    },
+  ].filter(Boolean); 
 
+  // Tailor dashboard navigation items
+  const tailorDashboardNavItems = [
+    {
+      path: "/business-dashboard",
+      icon: <i className="fas fa-user" />,
+      label: "Profile",
+    },
+    {
+      path: "/products",
+      icon: <i className="fas fa-box-open" />,
+      label: "Products",
+    },
+    {
+      path: "/orders",
+      icon: <i className="fas fa-clipboard-list" />,
+      label: "Orders",
+    },
+    {
+      path: "/analytics",
+      icon: <i className="fas fa-chart-line" />,
+      label: "Analytics",
+    },
+    {
+      path: "/payouts",
+      icon: <i className="fas fa-money-bill-wave" />,
+      label: "Payouts",
+    },
+  ];
+
+  // Determine which navigation items to use based on user status and active dashboard
+  const getNavItems = () => {
+    if (!userLoggedIn) return visitorNavItems;
+    if (activeDashboard === 'tailor') return tailorDashboardNavItems;
+    return userDashboardNavItems;
+  };
+
+  // Determine which dropdown options to use based on user status and active dashboard
+  const getDropdownOptions = () => {
+    if (!userLoggedIn) return visitorDropdownOptions;
+    if (activeDashboard === 'tailor') return tailorDropdownOptions;
+    return userDropdownOptions;
+  };
+
+  const navItems = getNavItems();
+  const dropdownOptions = getDropdownOptions();
   const animate = windowWidth >= 768 ? 10 : -10;
   const linkStyles = `flex items-center justify-center md:justify-start cursor-pointer px-4 py-2 rounded-xl w-auto md:w-full duration-500 ${theme.hoverBg}`;
 
@@ -196,9 +369,7 @@ const Navbar = () => {
       >
         <div className="justify-between h-full">
           <div>
-            <div
-              className={`flex md:block h-12 md:h-auto justify-between mt-1`}
-            >
+            <div className={`flex md:block h-12 md:h-auto justify-between mt-1`}>
               <Logo
                 classes={`md:my-5 my-1 max-w-16 md:max-w-full items-center justify-center`}
               />
@@ -213,7 +384,7 @@ const Navbar = () => {
                     btnText={"Log In"}
                     type={"simple"}
                     extraclasses="w-full mx-2"
-                    icon={<LoginIcon size={"5"} />}
+                    icon={<i className="fas fa-sign-in-alt" />}
                   />
                 </div>
               )}
@@ -224,59 +395,18 @@ const Navbar = () => {
               }`}
             >
               <ul className="md:space-y-2 justify-evenly select-none w-full md:inline grid grid-flow-col">
-                <li onClick={() => router.push("/")} className={linkStyles}>
-                  <HomeIcon size={"5"} color={`${theme.iconColor}`} />
-                  <span className={"hidden md:inline-block md:ml-2"}>Home</span>
-                </li>
-                <li
-                  className={linkStyles}
-                  onClick={() => router.push("/market")}
-                >
-                  <CartIcon size={"5"} color={`${theme.iconColor}`} />
-                  <span className={"hidden md:inline-block md:ml-2"}>
-                    Market
-                  </span>
-                </li>
-                <li
-                  className={linkStyles}
-                  onClick={() => router.push("/tailors")}
-                >
-                  <TailorIcon size={"5"} color={`${theme.iconColor}`} />
-                  <span className={"hidden md:inline-block md:ml-2"}>
-                    Tailors
-                  </span>
-                </li>
-                {userLoggedIn && (
+                {navItems.map((item, index) => (
                   <li
-                    onClick={() => router.push("/business-dashboard")}
-                    className={`${linkStyles}`}
+                    key={index}
+                    onClick={() => router.push(item.path)}
+                    className={linkStyles}
                   >
-                    <ServicesIcon size={"5"} color={`${theme.iconColor}`} />
-                    <span className={"hidden md:inline-block md:ml-2"}>
-                      Business
+                    <span className="text-lg mr-2">{item.icon}</span>
+                    <span className={"hidden md:inline-block"}>
+                      {item.label}
                     </span>
                   </li>
-                )}
-                <li
-                  onClick={() => router.push("/contact-us")}
-                  className={`${linkStyles}`}
-                >
-                  <ContactIcon size={"5"} color={`${theme.iconColor}`} />
-                  <span className={"hidden md:inline-block md:ml-2"}>
-                    Contact
-                  </span>
-                </li>
-                {!userLoggedIn && (
-                  <li
-                    onClick={() => router.push("/about-us")}
-                    className={`${linkStyles}`}
-                  >
-                    <InfoIcon size={"5"} color={`${theme.iconColor}`} />
-                    <span className={"hidden md:inline-block md:ml-2"}>
-                      About
-                    </span>
-                  </li>
-                )}
+                ))}
                 <div>
                   <div
                     className={`relative md:absolute md:bottom-1 w-full rounded-xl ${
@@ -290,7 +420,7 @@ const Navbar = () => {
                     >
                       <div className="flex">
                         <span className="flex items-center select-none">
-                          <MenuIcon size={"5"} color={"text-yellow-600"} />
+                          <i className="fas fa-bars text-yellow-600" />
                           <span className={"hidden md:inline-block ml-2"}>
                             Menu
                           </span>
@@ -330,8 +460,8 @@ const Navbar = () => {
                   onClick={option.onClick}
                   className={`justify-between ${linkStyles} ${theme.colorText}`}
                 >
-                  {option.icon}
-                  <span className="ml-2">{option.text}</span>
+                  <span className="text-lg mr-2">{option.icon}</span>
+                  <span>{option.text}</span>
                 </li>
               ))}
             </motion.ul>
