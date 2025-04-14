@@ -1,6 +1,5 @@
 "use client";
 import React, { useContext, useState, useEffect, useRef } from "react";
-
 import Logo from "./Logo";
 import SimpleButton from "./SimpleButton";
 import { auth } from "@/utils/firebaseConfig";
@@ -22,25 +21,25 @@ const Navbar = () => {
     setShowMessage,
     setPopUpMessageTrigger,
     handleSetTheme,
+    activeDashboard,
+    updateActiveDashboard,
   } = useContext(UserContext);
 
-  const [userFullName, setUserFullName] = useState(userData.fullName);
+  const [userFullName, setUserFullName] = useState(userData?.fullName || "");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [isVerifiedTailor, setIsVerifiedTailor] = useState(false);
-  const [activeDashboard, setActiveDashboard] = useState("user");
   const [windowWidth, setWindowWidth] = useState(undefined);
   const [windowHeight, setWindowHeight] = useState(undefined);
 
   const dropdownRef = useRef(null);
   const router = useRouter();
 
-  // Check if user is a verified tailor and set initial dashboard
+  // Check if user is a verified tailor
   useEffect(() => {
     const checkTailorStatus = async () => {
-      if (!userLoggedIn || !userData.uid) {
+      if (!userLoggedIn || !userData?.uid) {
         setIsVerifiedTailor(false);
-        setActiveDashboard("user");
         return;
       }
 
@@ -53,16 +52,12 @@ const Navbar = () => {
           const tailorData = querySnapshot.docs[0].data();
           const isTailor = tailorData.approved === true;
           setIsVerifiedTailor(isTailor);
-          // Start with user dashboard by default
-          setActiveDashboard("user");
         } else {
           setIsVerifiedTailor(false);
-          setActiveDashboard("user");
         }
       } catch (error) {
         console.error("Error checking tailor status:", error);
         setIsVerifiedTailor(false);
-        setActiveDashboard("user");
       }
     };
 
@@ -77,12 +72,13 @@ const Navbar = () => {
       setUserLoggedIn(false);
       setDropdownOpen(false);
       setIsVerifiedTailor(false);
-      setActiveDashboard("user");
+      updateActiveDashboard("user");
       setShowMessage({
         type: "success",
         message: "Logged out!",
       });
       setPopUpMessageTrigger("true");
+      router.replace("/login");
     } catch (error) {
       setShowMessage({
         type: "danger",
@@ -111,7 +107,9 @@ const Navbar = () => {
   }, [dropdownOpen]);
 
   useEffect(() => {
-    setUserFullName(userData.fullName);
+    if (userData?.fullName) {
+      setUserFullName(userData.fullName);
+    }
   }, [userData]);
 
   useEffect(() => {
@@ -130,15 +128,15 @@ const Navbar = () => {
 
   const switchToTailorDashboard = () => {
     if (isVerifiedTailor) {
-      setActiveDashboard("tailor");
-      router.push("/business-dashboard");
+      updateActiveDashboard("tailor");
+      router.replace("/business-dashboard");
       setDropdownOpen(false);
     }
   };
 
   const switchToUserDashboard = () => {
-    setActiveDashboard("user");
-    router.push("/");
+    updateActiveDashboard("user");
+    router.replace("/");
     setDropdownOpen(false);
   };
 
@@ -206,7 +204,7 @@ const Navbar = () => {
       text: "Login",
       icon: <i className="fas fa-sign-in-alt fa-fw" />,
       onClick: () => {
-        router.push("/login");
+        router.replace("/login");
         setDropdownOpen(false);
       },
     },
@@ -224,7 +222,7 @@ const Navbar = () => {
       text: "Settings",
       icon: <i className="fas fa-cog fa-fw" />,
       onClick: () => {
-        router.push("/settings");
+        router.replace("/settings");
         setDropdownOpen(false);
       },
     },
@@ -247,7 +245,7 @@ const Navbar = () => {
       text: "Settings",
       icon: <i className="fas fa-cog fa-fw" />,
       onClick: () => {
-        router.push("/settings");
+        router.replace("/settings");
         setDropdownOpen(false);
       },
     },
@@ -309,7 +307,6 @@ const Navbar = () => {
       icon: <i className="fas fa-envelope" />,
       label: "Contact",
     },
-    // Add Become Tailor button conditionally
     !isVerifiedTailor && {
       path: "/become-tailor",
       icon: <i className="fas fa-scissors" />,
@@ -346,14 +343,14 @@ const Navbar = () => {
     },
   ];
 
-  // Determine which navigation items to use based on user status and active dashboard
+  // Determine which navigation items to use
   const getNavItems = () => {
     if (!userLoggedIn) return visitorNavItems;
     if (activeDashboard === "tailor") return tailorDashboardNavItems;
     return userDashboardNavItems;
   };
 
-  // Determine which dropdown options to use based on user status and active dashboard
+  // Determine which dropdown options to use
   const getDropdownOptions = () => {
     if (!userLoggedIn) return visitorDropdownOptions;
     if (activeDashboard === "tailor") return tailorDropdownOptions;
@@ -363,18 +360,16 @@ const Navbar = () => {
   const navItems = getNavItems();
   const dropdownOptions = getDropdownOptions();
   const animate = windowWidth >= 768 ? 10 : -10;
-  const linkStyles = `flex items-center justify-center md:justify-start cursor-pointer px-4 py-2 rounded-xl w-auto md:w-full duration-500 ${theme.hoverBg}`;
+  const linkStyles = `flex items-center justify-center md:justify-start cursor-pointer px-4 py-2 rounded-xl w-auto md:w-full duration-500 ${theme?.hoverBg || ""}`;
 
   return (
     <div className="flex">
       <nav
-        className={`flex-shrink-0 fixed top-0 md:left-0 h-24 md:h-screen w-screen md:w-40 rounded-md ${theme.mainTheme}`}
+        className={`flex-shrink-0 fixed top-0 md:left-0 h-24 md:h-screen w-screen md:w-40 rounded-md ${theme?.mainTheme || ""}`}
       >
         <div className="justify-between h-full">
           <div>
-            <div
-              className={`flex md:block h-12 md:h-auto justify-between mt-1`}
-            >
+            <div className={`flex md:block h-12 md:h-auto justify-between mt-1`}>
               <Logo
                 classes={`md:my-5 my-1 max-w-16 md:max-w-full items-center justify-center`}
               />
@@ -385,7 +380,7 @@ const Navbar = () => {
               ) : (
                 <div className="flex items-center justify-center">
                   <SimpleButton
-                    onClick={() => router.push("/login")}
+                    onClick={() => router.replace("/login")}
                     btnText={"Log In"}
                     type={"simple"}
                     extraclasses="w-full mx-2"
@@ -403,7 +398,7 @@ const Navbar = () => {
                 {navItems.map((item, index) => (
                   <li
                     key={index}
-                    onClick={() => router.push(item.path)}
+                    onClick={() => router.replace(item.path)}
                     className={linkStyles}
                   >
                     <span className="text-lg mr-2">{item.icon}</span>
@@ -415,7 +410,7 @@ const Navbar = () => {
                 <div>
                   <div
                     className={`relative md:absolute md:bottom-1 w-full rounded-xl ${
-                      windowWidth >= 768 && windowHeight <= 400 && theme.colorBg
+                      windowWidth >= 768 && windowHeight <= 400 && theme?.colorBg
                     }`}
                   >
                     <div
@@ -426,7 +421,7 @@ const Navbar = () => {
                       <div className="flex">
                         <span className="flex items-center select-none">
                           <MenuIcon
-                            color={`${theme.iconColor}`}
+                            color={`${theme?.iconColor || ""}`}
                             extraClasses={"mt-1"}
                           />
                           <span className={"hidden md:inline-block ml-2"}>
@@ -448,8 +443,8 @@ const Navbar = () => {
             className={`absolute w-auto md:w-40 z-50 py-2 rounded-md ${
               windowWidth >= 768
                 ? "md:bottom-[45px]"
-                : "right-1 top-[100px] px-2 py-2 " + theme.colorBg
-            } ${windowHeight <= 650 && theme.colorBg}`}
+                : "right-1 top-[100px] px-2 py-2 " + theme?.colorBg
+            } ${windowHeight <= 650 && theme?.colorBg}`}
             initial={{ opacity: 0, y: animate }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: animate }}
@@ -466,7 +461,7 @@ const Navbar = () => {
                 <li
                   key={index}
                   onClick={option.onClick}
-                  className={`justify-between ${linkStyles} ${theme.colorText}`}
+                  className={`justify-between ${linkStyles} ${theme?.colorText || ""}`}
                 >
                   <span className="text-lg mr-2">{option.icon}</span>
                   <span>{option.text}</span>

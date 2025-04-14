@@ -16,6 +16,7 @@ export const UserProvider = ({ children }) => {
     type: "",
     message: "",
   });
+  const [activeDashboard, setActiveDashboard] = useState("user");
 
   const themes = {
     midnightWhisper: {
@@ -67,6 +68,23 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  // Function to update active dashboard and persist it
+  const updateActiveDashboard = (dashboardType) => {
+    setActiveDashboard(dashboardType);
+    // Update in storage if user is logged in
+    if (userLoggedIn && userData) {
+      const updatedUserData = { ...userData, activeDashboard: dashboardType };
+      setUserData(updatedUserData);
+      // Update in both storage locations if they exist
+      if (localStorage.getItem("userData")) {
+        localStorage.setItem("userData", JSON.stringify(updatedUserData));
+      }
+      if (sessionStorage.getItem("userData")) {
+        sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
+      }
+    }
+  };
+
   useEffect(() => {
     // Ensure this runs only on the client
     if (typeof window !== "undefined") {
@@ -80,25 +98,29 @@ export const UserProvider = ({ children }) => {
       const parsedUser = savedUser
         ? JSON.parse(savedUser)
         : { uid: "", fullName: "", email: "", password: "" };
+      
+      // Set active dashboard from storage if available
+      if (parsedUser.activeDashboard) {
+        setActiveDashboard(parsedUser.activeDashboard);
+      }
+      
       setUserData(parsedUser);
-
-      // Determine if the user is logged in
       setUserLoggedIn(!!parsedUser.uid);
-
-      // Mark app as ready
       setIsReady(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Runs only once after the initial render
+  }, []);
 
   // Show a loader until the app is ready
   if (!isReady) {
-    return; // Replace with your app's loading indicator
+    return <div className="flex items-center justify-center h-screen w-full">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
   }
 
-  const inputStyles = `w-full p-1 mt-4 peer ${theme.colorText} border-b-2 z-10 ${theme.colorBorder} outline-none focus:border-blue-500 transition-all duration-300 bg-transparent`;
+  const inputStyles = `w-full p-1 mt-4 peer ${theme?.colorText || "text-gray-800"} border-b-2 z-10 ${theme?.colorBorder || "border-gray-800"} outline-none focus:border-blue-500 transition-all duration-300 bg-transparent`;
 
-  const placeHolderStyles = `absolute top-5 pointer-events-none left-1 ${theme.colorText} duration-300 transform -translate-y-7 scale-75 origin-left peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:${theme.colorText} peer-focus:-translate-y-7 peer-focus:scale-80 peer-focus:text-blue-800`;
+  const placeHolderStyles = `absolute top-5 pointer-events-none left-1 ${theme?.colorText || "text-gray-800"} duration-300 transform -translate-y-7 scale-75 origin-left peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:${theme?.colorText || "text-gray-800"} peer-focus:-translate-y-7 peer-focus:scale-80 peer-focus:text-blue-800`;
 
   return (
     <UserContext.Provider
@@ -109,6 +131,8 @@ export const UserProvider = ({ children }) => {
         setPopUpMessageTrigger,
         setUserLoggedIn,
         setTheme,
+        updateActiveDashboard,
+        activeDashboard,
         theme,
         userData,
         userLoggedIn,
