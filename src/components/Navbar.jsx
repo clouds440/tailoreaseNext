@@ -1,18 +1,17 @@
 "use client";
 import React, { useContext, useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
-import { auth } from "@/utils/firebaseConfig";
+
 import Logo from "./Logo";
 import SimpleButton from "./SimpleButton";
+import { auth } from "@/utils/firebaseConfig";
+import { signOut } from "firebase/auth";
+import UserContext from "@/utils/UserContext";
+import { useRouter } from "next/navigation";
 import DialogBox from "./DialogBox";
 import { motion, AnimatePresence } from "framer-motion";
-import UserContext from "@/utils/UserContext";
-
-// Custom hooks
-import useOutsideClick from "@/app/hooks/useOutsideClick";
-import useWindowDimensions from "@/app/hooks/useWindowDimensions";
-import useTailorStatus from "@/app/hooks/useTailorStatus";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/utils/firebaseConfig";
+import { MenuIcon } from "../../public/icons/svgIcons";
 
 const Navbar = () => {
   const {
@@ -25,23 +24,50 @@ const Navbar = () => {
     handleSetTheme,
   } = useContext(UserContext);
 
-  const router = useRouter();
   const [userFullName, setUserFullName] = useState(userData.fullName);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+  const [isVerifiedTailor, setIsVerifiedTailor] = useState(false);
+  const [activeDashboard, setActiveDashboard] = useState("user");
+  const [windowWidth, setWindowWidth] = useState(undefined);
+  const [windowHeight, setWindowHeight] = useState(undefined);
+
   const dropdownRef = useRef(null);
+  const router = useRouter();
 
-  // Custom hooks usage
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  const { isVerifiedTailor, activeDashboard, setActiveDashboard } =
-    useTailorStatus(userLoggedIn, userData);
-
+  // Check if user is a verified tailor and set initial dashboard
   useEffect(() => {
-    setUserFullName(userData.fullName);
-  }, [userData]);
+    const checkTailorStatus = async () => {
+      if (!userLoggedIn || !userData.uid) {
+        setIsVerifiedTailor(false);
+        setActiveDashboard("user");
+        return;
+      }
 
-  // Close dropdown when clicking outside
-  useOutsideClick(dropdownRef, () => setDropdownOpen(false), dropdownOpen);
+      try {
+        const tailorsRef = collection(db, "tailors");
+        const q = query(tailorsRef, where("ownerId", "==", userData.uid));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const tailorData = querySnapshot.docs[0].data();
+          const isTailor = tailorData.approved === true;
+          setIsVerifiedTailor(isTailor);
+          // Start with user dashboard by default
+          setActiveDashboard("user");
+        } else {
+          setIsVerifiedTailor(false);
+          setActiveDashboard("user");
+        }
+      } catch (error) {
+        console.error("Error checking tailor status:", error);
+        setIsVerifiedTailor(false);
+        setActiveDashboard("user");
+      }
+    };
+
+    checkTailorStatus();
+  }, [userLoggedIn, userData]);
 
   const handleLogout = async () => {
     try {
@@ -50,7 +76,12 @@ const Navbar = () => {
       sessionStorage.removeItem("userData");
       setUserLoggedIn(false);
       setDropdownOpen(false);
-      setShowMessage({ type: "success", message: "Logged out!" });
+      setIsVerifiedTailor(false);
+      setActiveDashboard("user");
+      setShowMessage({
+        type: "success",
+        message: "Logged out!",
+      });
       setPopUpMessageTrigger("true");
     } catch (error) {
       setShowMessage({
@@ -60,6 +91,42 @@ const Navbar = () => {
       setPopUpMessageTrigger("true");
     }
   };
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (dropdownOpen) {
+      document.addEventListener("click", handleClickOutside);
+    } else {
+      document.removeEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
+  useEffect(() => {
+    setUserFullName(userData.fullName);
+  }, [userData]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const switchToTailorDashboard = () => {
     if (isVerifiedTailor) {
@@ -105,24 +172,34 @@ const Navbar = () => {
 
   const handleSaveTheme = () => {
     localStorage.setItem("TailorEaseTheme", JSON.stringify(theme.themeName));
-    setShowMessage({ type: "success", message: "Theme applied!" });
+    setShowMessage({
+      type: "success",
+      message: "Theme applied!",
+    });
     setPopUpMessageTrigger(true);
     setShowDialog(false);
   };
 
   const dialogButtons = [
-    { label: "Save Theme", onClick: handleSaveTheme, type: "primary" },
+    {
+      label: "Save Theme",
+      onClick: handleSaveTheme,
+      type: "primary",
+    },
   ];
 
-  // Dropdown options
+  // Common dropdown options
   const commonDropdownOptions = [
     {
       text: "Theme",
       icon: <i className="fas fa-palette fa-fw" />,
-      onClick: () => setShowDialog(true),
+      onClick: () => {
+        setShowDialog(true);
+      },
     },
   ];
 
+  // Visitor dropdown options
   const visitorDropdownOptions = [
     ...commonDropdownOptions,
     {
@@ -135,6 +212,7 @@ const Navbar = () => {
     },
   ];
 
+  // User dropdown options (shown when in user dashboard)
   const userDropdownOptions = [
     ...commonDropdownOptions,
     {
@@ -157,6 +235,7 @@ const Navbar = () => {
     },
   ].filter(Boolean);
 
+  // Tailor dropdown options (shown when in tailor dashboard)
   const tailorDropdownOptions = [
     ...commonDropdownOptions,
     {
@@ -179,9 +258,13 @@ const Navbar = () => {
     },
   ];
 
-  // Navigation Items
+  // Visitor navigation items
   const visitorNavItems = [
-    { path: "/", icon: <i className="fas fa-home" />, label: "Home" },
+    {
+      path: "/",
+      icon: <i className="fas fa-home" />,
+      label: "Home",
+    },
     {
       path: "/market",
       icon: <i className="fas fa-shopping-cart" />,
@@ -204,8 +287,13 @@ const Navbar = () => {
     },
   ];
 
+  // User dashboard navigation items
   const userDashboardNavItems = [
-    { path: "/", icon: <i className="fas fa-user" />, label: "Profile" },
+    {
+      path: "/",
+      icon: <i className="fas fa-user" />,
+      label: "Profile",
+    },
     {
       path: "/market",
       icon: <i className="fas fa-shopping-cart" />,
@@ -221,6 +309,7 @@ const Navbar = () => {
       icon: <i className="fas fa-envelope" />,
       label: "Contact",
     },
+    // Add Become Tailor button conditionally
     !isVerifiedTailor && {
       path: "/become-tailor",
       icon: <i className="fas fa-scissors" />,
@@ -228,6 +317,7 @@ const Navbar = () => {
     },
   ].filter(Boolean);
 
+  // Tailor dashboard navigation items
   const tailorDashboardNavItems = [
     {
       path: "/business-dashboard",
@@ -256,12 +346,14 @@ const Navbar = () => {
     },
   ];
 
+  // Determine which navigation items to use based on user status and active dashboard
   const getNavItems = () => {
     if (!userLoggedIn) return visitorNavItems;
     if (activeDashboard === "tailor") return tailorDashboardNavItems;
     return userDashboardNavItems;
   };
 
+  // Determine which dropdown options to use based on user status and active dashboard
   const getDropdownOptions = () => {
     if (!userLoggedIn) return visitorDropdownOptions;
     if (activeDashboard === "tailor") return tailorDropdownOptions;
@@ -280,8 +372,12 @@ const Navbar = () => {
       >
         <div className="justify-between h-full">
           <div>
-            <div className="flex md:block h-12 md:h-auto justify-between mt-1">
-              <Logo classes="md:my-5 my-1 max-w-16 md:max-w-full items-center justify-center" />
+            <div
+              className={`flex md:block h-12 md:h-auto justify-between mt-1`}
+            >
+              <Logo
+                classes={`md:my-5 my-1 max-w-16 md:max-w-full items-center justify-center`}
+              />
               {userLoggedIn ? (
                 <div className="py-1 mt-3 text-center mx-3 sm:mx-5 md:mx-0 select-none">
                   <span>{userFullName}</span>
@@ -290,8 +386,8 @@ const Navbar = () => {
                 <div className="flex items-center justify-center">
                   <SimpleButton
                     onClick={() => router.push("/login")}
-                    btnText="Log In"
-                    type="simple"
+                    btnText={"Log In"}
+                    type={"simple"}
                     extraclasses="w-full mx-2"
                     icon={<i className="fas fa-sign-in-alt" />}
                   />
@@ -311,7 +407,9 @@ const Navbar = () => {
                     className={linkStyles}
                   >
                     <span className="text-lg mr-2">{item.icon}</span>
-                    <span className="hidden md:inline-block">{item.label}</span>
+                    <span className={"hidden md:inline-block"}>
+                      {item.label}
+                    </span>
                   </li>
                 ))}
                 <div>
@@ -327,8 +425,11 @@ const Navbar = () => {
                     >
                       <div className="flex">
                         <span className="flex items-center select-none">
-                          <i className="fas fa-bars text-yellow-600" />
-                          <span className="hidden md:inline-block ml-2">
+                          <MenuIcon
+                            color={`${theme.iconColor}`}
+                            extraClasses={"mt-1"}
+                          />
+                          <span className={"hidden md:inline-block ml-2"}>
                             Menu
                           </span>
                         </span>
@@ -355,7 +456,7 @@ const Navbar = () => {
             transition={{ duration: 0.3 }}
           >
             <motion.ul
-              className="md:space-y-2 justify-center select-none w-full"
+              className={`md:space-y-2 justify-center select-none w-full`}
               initial={{ opacity: 0, y: animate }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: animate }}
