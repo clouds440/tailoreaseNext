@@ -6,11 +6,13 @@ import Mannequin from "./Mannequin";
 import Jacket from "./Jacket";
 import Shirt from "./Shirt";
 import Pants from "./Pants";
+import FemaleDress from "./FemaleDress";
 
 const outfitComponents = {
   jacket: Jacket,
   shirt: Shirt,
   pants: Pants,
+  femaleDress: FemaleDress,
 };
 
 const CustomizationScene = ({
@@ -88,7 +90,7 @@ const CustomizationScene = ({
         gender={gender}
         useSkirtAsDefaultLegs={
           !outfitTypes.some((type) =>
-            ["pants", "shorts", "skirt", "jeans"].includes(type)
+            ["pants", "shorts", "skirt", "jeans", "femaleDress"].includes(type)
           )
         }
       />

@@ -8,12 +8,12 @@ import ColorPicker from "@/components/ColorPicker";
 import SimpleButton from "@/components/SimpleButton";
 
 const outfitCategories = {
-  jacket: "torso",
-  pants: "legs",
-  shirt: "torso",
-  jeans: "legs",
-
-  // Add more outfits and their categories here
+  jacket: { category: "torso", gender: "Male" },
+  pants: { category: "legs", gender: "Male" },
+  shirt: { category: "torso", gender: "Male" },
+  jeans: { category: "legs", gender: "unisex" },
+  femaleDress: { category: "full", gender: "Female" },
+  // Add more here...
 };
 
 const OutfitCustomization = () => {
@@ -27,8 +27,24 @@ const OutfitCustomization = () => {
   const usedCategories = new Set();
 
   outfitTypes.forEach((outfit) => {
-    const category = outfitCategories[outfit];
-    if (category && !usedCategories.has(category)) {
+    const outfitInfo = outfitCategories[outfit];
+    if (!outfitInfo) return;
+
+    const { category, gender } = outfitInfo;
+
+    // Skip if gender doesn't match (unless unisex)
+    if (gender !== "unisex" && gender !== userData.gender) return;
+
+    if (category === "full") {
+      uniqueOutfits.length = 0;
+      usedCategories.clear();
+      uniqueOutfits.push(outfit);
+      usedCategories.add("full");
+    } else if (
+      !usedCategories.has("full") &&
+      category &&
+      !usedCategories.has(category)
+    ) {
       uniqueOutfits.push(outfit);
       usedCategories.add(category);
     }
@@ -215,7 +231,7 @@ const OutfitCustomization = () => {
         }%] h-[80%] md:h-[100%] flex justify-center items-center`}
       >
         <CustomizationScene
-          outfitTypes={outfitTypes}
+          outfitTypes={uniqueOutfits}
           morphValues={morphValues}
           setMorphValues={handleSetMorphValues}
           setMorphTargets={handleSetMorphTargets}
