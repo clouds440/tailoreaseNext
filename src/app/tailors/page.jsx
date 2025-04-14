@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import QuickView from "@/components/QuickView";
 import Image from "next/image";
 
-const tailors = () => {
+const Tailors = () => {
   const { theme } = useContext(UserContext);
 
   const specialities = [
@@ -566,4 +566,4 @@ const tailors = () => {
   );
 };
 
-export default tailors;
+export default Tailors;
