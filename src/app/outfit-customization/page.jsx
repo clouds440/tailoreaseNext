@@ -17,7 +17,7 @@ const outfitCategories = {
 };
 
 const OutfitCustomization = () => {
-  const { theme, userData } = useContext(UserContext);
+  const { theme, userData, userLoggedIn } = useContext(UserContext);
   const searchParams = useSearchParams();
 
   // Get outfit(s) from URL and convert them into an array
@@ -33,7 +33,11 @@ const OutfitCustomization = () => {
     const { category, gender } = outfitInfo;
 
     // Skip if gender doesn't match (unless unisex)
-    if (gender !== "unisex" && gender !== userData.gender) return;
+    if (
+      gender !== "unisex" &&
+      (userLoggedIn ? gender !== userData?.gender : gender !== "Male")
+    )
+      return;
 
     if (category === "full") {
       uniqueOutfits.length = 0;
@@ -238,7 +242,7 @@ const OutfitCustomization = () => {
           colorValue={colorValue}
           texture={texture}
           color={color}
-          gender={userData.gender.toLowerCase() || "male"}
+          gender={userData?.gender?.toLowerCase() || "male"}
         />
       </div>
     </div>
