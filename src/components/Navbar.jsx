@@ -129,7 +129,7 @@ const Navbar = () => {
   const switchToTailorDashboard = () => {
     if (isVerifiedTailor) {
       updateActiveDashboard("tailor");
-      router.replace("/business-dashboard");
+      router.replace("/business-dashboard/profile");
       setDropdownOpen(false);
     }
   };
@@ -317,7 +317,7 @@ const Navbar = () => {
   // Tailor dashboard navigation items
   const tailorDashboardNavItems = [
     {
-      path: "/business-dashboard",
+      path: "/business-dashboard/profile",
       icon: <i className="fas fa-user" />,
       label: "Profile",
     },
