@@ -26,16 +26,17 @@ const measurementFields = [
   { key: "legOpening", label: "Leg Opening", icon: "circle-notch" },
 ];
 
-const BodyMeasurements = ({ measurements, setMeasurements, uid }) => {
-  const { theme, setShowMessage, setPopUpMessageTrigger, userData } =
+const BodyMeasurements = ({ uid, authorization }) => {
+  const { theme, setShowMessage, setPopUpMessageTrigger } =
     useContext(UserContext);
   const [editingField, setEditingField] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [measurements, setMeasurements] = useState({});
   const [savingMeasurements, setSavingMeasurements] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [userInfo, setUserInfo] = useState({
-    age: userData.age || "",
-    gender: userData.gender && userData.gender.toLowerCase(),
+    age: "",
+    gender: "",
     height: "",
     weight: "",
   });
@@ -68,6 +69,14 @@ const BodyMeasurements = ({ measurements, setMeasurements, uid }) => {
   }, [setMeasurements, uid]);
 
   const handleSaveMeasurements = async () => {
+    if (!authorization) {
+      setShowMessage({
+        type: "danger",
+        message: "You're not authorized to make changes to these measurements",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
     try {
       setSavingMeasurements(true);
       const docRef = doc(db, "settings", uid, "user_settings", "measurements");

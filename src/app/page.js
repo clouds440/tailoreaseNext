@@ -15,53 +15,59 @@ export default function Home() {
         className={`max-w-[99.5%] mx-auto p-6 mt-3 md:mt-1 mb-1 rounded-lg flex flex-col items-center overflow-hidden select-none ${theme.mainTheme}`}
       >
         {/* Top Section */}
-        <div
-          className={`w-full flex flex-wrap-reverse justify-evenly items-center`}
-        >
+        <div className="w-full flex flex-wrap-reverse justify-evenly items-center gap-6">
           {/* Left Section */}
-          <div data-aos="fade-right" className="max-w-lg mt-4">
-            <h3 className={`text-7xl font-extrabold ${theme.colorText}`}>
+          <div data-aos="fade-right" className="max-w-xl mt-4 space-y-5">
+            <h3
+              className={`text-6xl md:text-7xl font-extrabold leading-tight ${theme.colorText}`}
+            >
               TailorEase
             </h3>
-            <p className={`text-lg ${theme.subTextColor}`}>
+            <p className={`text-xl ${theme.subTextColor}`}>
               AI Enhanced Fitting Experience
             </p>
-            <p className={`text-lg mt-8 ${theme.subTextColor}`}>
+            <p className={`text-md md:text-lg mt-6 ${theme.subTextColor}`}>
               Revolutionize the way you shop and connect with tailors. Virtual
               shops, try-ons, and custom orders – all in one platform.
             </p>
-            <Link href={"/market"}>
+            <Link href="/market">
               <SimpleButton
                 btnText="Get Started Now"
-                extraclasses="mt-4 py-3"
+                extraclasses="mt-6 py-3"
               />
             </Link>
           </div>
 
           {/* Right Section */}
-          <div className="relative" data-aos="fade-left">
-            <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4 rounded-2xl text-[#00000030] text-[22rem] font-extrabold -z-10">
+          <div
+            className="relative flex justify-center items-center"
+            data-aos="fade-left"
+          >
+            <p className="absolute text-[22rem] font-extrabold -z-10 text-[#00000030]">
               TE
             </p>
+            {/* You can add an illustration/model here later */}
           </div>
         </div>
 
-        {/* "Why Choose Us" Section */}
+        {/* Why Choose Us */}
         <div
-          className={`mt-16 w-full py-12 px-6 rounded-3xl relative flex flex-col items-center`}
+          className="mt-20 w-full py-12 px-6 rounded-3xl relative flex flex-col items-center"
           data-aos="fade-up"
         >
-          <h2 className={`text-4xl font-bold ${theme.colorText}`}>
+          <h2
+            className={`text-4xl md:text-5xl font-bold text-center ${theme.colorText}`}
+          >
             Why Choose TailorEase
           </h2>
           <p
-            className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-[10rem] font-extrabold -z-10 ${theme.colorText} opacity-[2%]`}
+            className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] text-[10rem] font-extrabold -z-10 ${theme.colorText} opacity-[2%]`}
           >
             Benefits
           </p>
 
           {/* Features */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 w-full max-w-4xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-12 w-full max-w-5xl">
             {[
               {
                 title: "Tailor/Customer Focus",
@@ -84,9 +90,12 @@ export default function Home() {
                   "Experience a realistic virtual try-on experience for your convenience.",
               },
             ].map(({ title, description }, index) => (
-              <div className="flex items-start space-x-4" key={index}>
+              <div
+                key={index}
+                className="flex items-start gap-4 p-4 rounded-2xl border border-white/10 hover:shadow-md transition-all duration-300"
+              >
                 <div
-                  className={`flex items-center justify-center w-14 h-12 rounded-3xl ${theme.colorText} border-2 border-current`}
+                  className={`w-14 h-12 flex items-center justify-center rounded-3xl border-2 ${theme.colorText}`}
                 >
                   <i className="fas fa-check"></i>
                 </div>
@@ -94,7 +103,7 @@ export default function Home() {
                   <h3 className={`text-2xl font-semibold ${theme.colorText}`}>
                     {title}
                   </h3>
-                  <p className={`text-sm ${theme.subTextColor}`}>
+                  <p className={`text-sm mt-1 ${theme.subTextColor}`}>
                     {description}
                   </p>
                 </div>
@@ -104,30 +113,29 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Footer */}
       <div
         className={`max-w-[99.5%] mx-auto mb-3 md:mb-1 py-12 px-6 rounded-lg overflow-x-hidden ${theme.mainTheme} ${theme.colorBorder}`}
       >
         <p
-          className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-[10rem] font-extrabold -z-10 ${theme.colorText} opacity-[2%]`}
+          className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] text-[10rem] font-extrabold -z-10 ${theme.colorText} opacity-[2%]`}
         >
           Footer
         </p>
 
-        {/* Footer Box Wrapper */}
-        <div
-          className={`w-full flex flex-wrap justify-between space-y-8 md:space-y-0 p-6 rounded-3xl`}
-        >
-          <div className="flex flex-col space-y-6 w-full lg:w-1/3">
+        <div className="w-full flex flex-wrap justify-between gap-y-10 md:gap-y-0 p-6 rounded-3xl">
+          {/* Logo + Socials */}
+          <div className="flex flex-col gap-6 w-full lg:w-1/3">
             <Logo />
             <h3 className={`text-2xl font-bold ${theme.colorText}`}>
               Follow Us
             </h3>
-            <div className="flex space-x-4">
+            <div className="flex gap-4">
               {["facebook", "twitter", "linkedin", "instagram", "youtube"].map(
                 (platform) => (
                   <div
                     key={platform}
-                    className={`w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-800 transition duration-300`}
+                    className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-800 transition duration-300"
                   >
                     <i className={`fab fa-${platform} text-xl`}></i>
                   </div>
@@ -136,8 +144,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Center - Quick Links */}
-          <div className="flex flex-col space-y-4 w-full lg:w-1/3">
+          {/* Quick Links */}
+          <div className="flex flex-col gap-4 w-full lg:w-1/3">
             <h3 className={`text-2xl font-bold ${theme.colorText}`}>
               Quick Links
             </h3>
@@ -159,12 +167,12 @@ export default function Home() {
             </ul>
           </div>
 
-          {/* Right - Newsletter Subscription */}
-          <div className="flex flex-col space-y-6 w-full lg:w-1/3">
+          {/* Newsletter */}
+          <div className="flex flex-col gap-6 w-full lg:w-1/3">
             <h3 className={`text-3xl font-bold ${theme.colorText}`}>
               Stay Updated
             </h3>
-            <form className="flex items-center space-x-4">
+            <form className="flex items-center gap-4">
               <div className="relative">
                 <input
                   type="email"
@@ -172,12 +180,12 @@ export default function Home() {
                   className={`${inputStyles}`}
                   placeholder=" "
                 />
-                <label className={`${placeHolderStyles}`} htmlFor="email">
+                <label htmlFor="email" className={`${placeHolderStyles}`}>
                   Enter Email
                 </label>
               </div>
               <SimpleButton
-                btnText={"Subscribe"}
+                btnText="Subscribe"
                 extraclasses="py-2"
                 type="primary"
               />
@@ -185,8 +193,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Secondary Footer */}
-        <div className={`w-full text-center text-lg`}>
+        <div
+          className={`w-full text-center text-lg mt-10 ${theme.subTextColor}`}
+        >
           © 2024 TailorEase. All Rights Reserved.
         </div>
       </div>

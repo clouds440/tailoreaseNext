@@ -27,8 +27,8 @@ export const UserProvider = ({ children }) => {
       colorBorder: "border-gray-100",
       iconColor: "text-blue-500",
       hoverText: "hover:text-blue-400",
-      colorBg: "bg-slate-800 backdrop-blur-xl bg-opacity-90",
-      hoverBg: "hover:bg-indigo-400 hover:bg-opacity-30",
+      colorBg: "bg-slate-700 backdrop-blur-xl bg-opacity-90",
+      hoverBg: "hover:bg-indigo-400 hover:bg-opacity-50",
       hoverShadow: "hover:shadow-md hover:shadow-amber-300",
     },
     lunarGlow: {
@@ -98,12 +98,12 @@ export const UserProvider = ({ children }) => {
       const parsedUser = savedUser
         ? JSON.parse(savedUser)
         : { uid: "", fullName: "", email: "", password: "" };
-      
+
       // Set active dashboard from storage if available
       if (parsedUser.activeDashboard) {
         setActiveDashboard(parsedUser.activeDashboard);
       }
-      
+
       setUserData(parsedUser);
       setUserLoggedIn(!!parsedUser.uid);
       setIsReady(true);
@@ -113,14 +113,24 @@ export const UserProvider = ({ children }) => {
 
   // Show a loader until the app is ready
   if (!isReady) {
-    return <div className="flex items-center justify-center h-screen w-full">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
+    return (
+      <div className="flex items-center justify-center h-screen w-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
-  const inputStyles = `w-full p-1 mt-4 peer ${theme?.colorText || "text-gray-800"} border-b-2 z-10 ${theme?.colorBorder || "border-gray-800"} outline-none focus:border-blue-500 transition-all duration-300 bg-transparent`;
+  const inputStyles = `w-full p-1 mt-4 peer ${
+    theme?.colorText || "text-gray-800"
+  } border-b-2 z-10 ${
+    theme?.colorBorder || "border-gray-800"
+  } outline-none focus:border-blue-500 transition-all duration-300 bg-transparent`;
 
-  const placeHolderStyles = `absolute top-5 pointer-events-none left-1 ${theme?.colorText || "text-gray-800"} duration-300 transform -translate-y-7 scale-75 origin-left peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:${theme?.colorText || "text-gray-800"} peer-focus:-translate-y-7 peer-focus:scale-80 peer-focus:text-blue-800`;
+  const placeHolderStyles = `absolute top-5 pointer-events-none left-1 ${
+    theme?.colorText || "text-gray-800"
+  } duration-300 transform -translate-y-7 scale-75 origin-left peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:${
+    theme?.colorText || "text-gray-800"
+  } peer-focus:-translate-y-7 peer-focus:scale-80 peer-focus:text-blue-800`;
 
   return (
     <UserContext.Provider

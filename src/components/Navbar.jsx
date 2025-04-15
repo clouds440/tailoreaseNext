@@ -288,9 +288,9 @@ const Navbar = () => {
   // User dashboard navigation items
   const userDashboardNavItems = [
     {
-      path: "/",
+      path: "/user",
       icon: <i className="fas fa-user" />,
-      label: "Profile",
+      label: "Dashboard",
     },
     {
       path: "/market",
@@ -360,16 +360,22 @@ const Navbar = () => {
   const navItems = getNavItems();
   const dropdownOptions = getDropdownOptions();
   const animate = windowWidth >= 768 ? 10 : -10;
-  const linkStyles = `flex items-center justify-center md:justify-start cursor-pointer px-4 py-2 rounded-xl w-auto md:w-full duration-500 ${theme?.hoverBg || ""}`;
+  const linkStyles = `flex items-center justify-center md:justify-start cursor-pointer px-4 py-2 rounded-xl w-auto md:w-full duration-500 ${
+    theme?.hoverBg || ""
+  }`;
 
   return (
     <div className="flex">
       <nav
-        className={`flex-shrink-0 fixed top-0 md:left-0 h-24 md:h-screen w-screen md:w-40 rounded-md ${theme?.mainTheme || ""}`}
+        className={`flex-shrink-0 fixed top-0 md:left-0 h-24 md:h-screen w-screen md:w-40 rounded-md ${
+          theme?.mainTheme || ""
+        }`}
       >
         <div className="justify-between h-full">
           <div>
-            <div className={`flex md:block h-12 md:h-auto justify-between mt-1`}>
+            <div
+              className={`flex md:block h-12 md:h-auto justify-between mt-1`}
+            >
               <Logo
                 classes={`md:my-5 my-1 max-w-16 md:max-w-full items-center justify-center`}
               />
@@ -410,7 +416,9 @@ const Navbar = () => {
                 <div>
                   <div
                     className={`relative md:absolute md:bottom-1 w-full rounded-xl ${
-                      windowWidth >= 768 && windowHeight <= 400 && theme?.colorBg
+                      windowWidth >= 768 &&
+                      windowHeight <= 400 &&
+                      theme?.colorBg
                     }`}
                   >
                     <div
@@ -461,7 +469,9 @@ const Navbar = () => {
                 <li
                   key={index}
                   onClick={option.onClick}
-                  className={`justify-between ${linkStyles} ${theme?.colorText || ""}`}
+                  className={`justify-between ${linkStyles} ${
+                    theme?.colorText || ""
+                  }`}
                 >
                   <span className="text-lg mr-2">{option.icon}</span>
                   <span>{option.text}</span>

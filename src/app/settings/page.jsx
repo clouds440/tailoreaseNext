@@ -29,7 +29,6 @@ import {
 } from "../../../public/icons/svgIcons";
 import SimpleButton from "@/components/SimpleButton";
 import DialogBox from "@/components/DialogBox";
-import BodyMeasurements from "@/components/BodyMeasurements";
 
 function AccountSettings() {
   const {
@@ -54,7 +53,6 @@ function AccountSettings() {
     type: "",
     buttons: [],
   });
-  const [measurements, setMeasurements] = useState({});
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
@@ -458,14 +456,6 @@ function AccountSettings() {
             </div>
           </div>
         </div>
-
-        {/*Body measurements component*/}
-        <BodyMeasurements
-          measurements={measurements}
-          setMeasurements={setMeasurements}
-          uid={userData.uid}
-        />
-
         {modalInfo.isOpen && (
           <EditFieldModal
             modalInfo={modalInfo}
