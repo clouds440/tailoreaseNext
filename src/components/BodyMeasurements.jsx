@@ -221,41 +221,44 @@ Guidelines:
           </h2>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <SimpleButton
-            btnText="Generate with AI"
-            type="accent"
-            icon={<AiIcon />}
-            onClick={() => setShowDialog(true)}
-            extraclasses="w-full sm:w-auto"
-          />
-          <SimpleButton
-            btnText={
-              savingMeasurements ? (
-                <>
-                  <LoadingSpinner size={24} extraClasses={"mr-2"} />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <i className="fas fa-save mr-2"></i>
-                  Save
-                </>
-              )
-            }
-            type="primary"
-            extraclasses="w-full sm:w-auto px-5"
-            disabled={isLoading || savingMeasurements}
-            onClick={handleSaveMeasurements}
-          />
-        </div>
+        {/* BUTTONS — Only show if authorized */}
+        {authorization && (
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <SimpleButton
+              btnText="Generate with AI"
+              type="accent"
+              icon={<AiIcon />}
+              onClick={() => setShowDialog(true)}
+              extraclasses="w-full sm:w-auto"
+            />
+            <SimpleButton
+              btnText={
+                savingMeasurements ? (
+                  <>
+                    <LoadingSpinner size={24} extraClasses={"mr-2"} />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-save mr-2"></i>
+                    Save
+                  </>
+                )
+              }
+              type="primary"
+              extraclasses="w-full sm:w-auto px-5"
+              disabled={isLoading || savingMeasurements}
+              onClick={handleSaveMeasurements}
+            />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {measurementFields.map(({ key, label, icon }) => (
           <motion.div
             key={key}
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.04 }}
             className={`p-4 ${theme.colorBg} rounded-lg border ${theme.colorBorder} ${theme.hoverBg} transition-all duration-200`}
           >
             <div className="flex items-center justify-between mb-2">
@@ -268,7 +271,7 @@ Guidelines:
               )}
             </div>
 
-            {editingField === key ? (
+            {authorization && editingField === key ? (
               <input
                 type="number"
                 value={measurements[key] || ""}
@@ -284,15 +287,23 @@ Guidelines:
               </div>
             ) : (
               <div
-                className={`cursor-pointer p-2 rounded-md hover:bg-opacity-30 ${theme.hoverBg} transition-colors duration-200 flex justify-between items-center`}
-                onClick={() => handleEdit(key)}
+                className={`p-2 rounded-md ${
+                  authorization
+                    ? "cursor-pointer hover:bg-opacity-30 " + theme.hoverBg
+                    : ""
+                } transition-colors duration-200 flex justify-between items-center`}
+                onClick={() => authorization && handleEdit(key)}
               >
                 <span className={measurements[key] ? "" : "opacity-70"}>
                   {measurements[key] || "Click to edit"}
                 </span>
-                <i
-                  className={`fas fa-pencil-alt text-xs ${theme.iconColor}`}
-                ></i>
+
+                {/* Only show edit icon if authorized */}
+                {authorization && (
+                  <i
+                    className={`fas fa-pencil-alt text-xs ${theme.iconColor}`}
+                  ></i>
+                )}
               </div>
             )}
           </motion.div>

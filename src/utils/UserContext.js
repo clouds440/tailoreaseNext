@@ -28,7 +28,7 @@ export const UserProvider = ({ children }) => {
       iconColor: "text-blue-500",
       hoverText: "hover:text-blue-400",
       colorBg: "bg-slate-700 backdrop-blur-xl bg-opacity-90",
-      hoverBg: "hover:bg-indigo-400 hover:bg-opacity-50",
+      hoverBg: "hover:bg-indigo-400 hover:bg-opacity-40",
       hoverShadow: "hover:shadow-md hover:shadow-amber-300",
     },
     lunarGlow: {
