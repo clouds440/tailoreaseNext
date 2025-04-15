@@ -209,7 +209,7 @@ const ChatBot = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className={`fixed bottom-[6rem] right-2 sm:right-8 max-w-full w-[280px] h-[450px] sm:w-[340px] sm:h-[510px] bg-white rounded-lg shadow-lg flex flex-col z-[99999] ${theme.mainTheme} ${theme.colorBorder}`}
+            className={`fixed bottom-[6rem] right-2 sm:right-8 max-w-full w-[280px] h-[450px] sm:w-[400px] sm:h-[75%] bg-white rounded-lg shadow-lg flex flex-col z-[99999] ${theme.mainTheme} ${theme.colorBorder}`}
             ref={chatBoxRef}
             variants={chatBoxVariants}
             initial="hidden"

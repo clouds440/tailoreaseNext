@@ -288,7 +288,7 @@ const Navbar = () => {
   // User dashboard navigation items
   const userDashboardNavItems = [
     {
-      path: "/user",
+      path: "/user?tab=profile",
       icon: <i className="fas fa-user" />,
       label: "Dashboard",
     },

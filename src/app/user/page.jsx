@@ -58,7 +58,7 @@ const UserDashboard = () => {
     if (isLoading) {
       return (
         <div className="flex justify-center items-center h-screen">
-          <ClipLoader />
+          <ClipLoader color="white" />
         </div>
       );
     }
@@ -147,8 +147,10 @@ const UserDashboard = () => {
                   <button
                     key={tab.key}
                     onClick={() => {
-                      setIsLoading(true);
-                      setActiveTab(tab.key);
+                      if (activeTab !== tab.key) {
+                        setIsLoading(true);
+                        setActiveTab(tab.key);
+                      }
                     }}
                     className={`rounded-2xl py-3 px-6 text-sm font-medium flex items-center gap-2 transition-colors duration-300 ${
                       activeTab === tab.key ? theme.colorBg : "bg-transparent"
@@ -168,7 +170,7 @@ const UserDashboard = () => {
           <Suspense
             fallback={
               <div className="flex justify-center items-center py-20">
-                <ClipLoader color={theme.iconColor} />
+                <ClipLoader color="white" />
               </div>
             }
           >
