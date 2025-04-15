@@ -58,7 +58,7 @@ const UserDashboard = () => {
     if (isLoading) {
       return (
         <div className="flex justify-center items-center h-screen">
-          <ClipLoader color={theme.iconColor} />
+          <ClipLoader />
         </div>
       );
     }
@@ -99,7 +99,7 @@ const UserDashboard = () => {
   return (
     <div className="h-full overflow-y-auto">
       <div
-        className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto min-h-screen p-6 rounded-lg select-none ${theme.mainTheme}`}
       >
         {/* Top Navbar */}
         <div
@@ -131,10 +131,18 @@ const UserDashboard = () => {
             >
               <div className="flex flex-col md:flex-row gap-2 p-2 md:p-3">
                 {[
-                  { key: "profile", label: "Profile" },
-                  { key: "orders", label: "My Orders" },
-                  { key: "tailors", label: "My Tailors" },
-                  { key: "outfits", label: "My Outfits" },
+                  { key: "profile", label: "Profile", icon: "fas fa-user" },
+                  { key: "orders", label: "My Orders", icon: "fas fa-box" },
+                  {
+                    key: "tailors",
+                    label: "My Tailors",
+                    icon: "fas fa-scissors",
+                  },
+                  {
+                    key: "outfits",
+                    label: "My Outfits",
+                    icon: "fas fa-tshirt",
+                  },
                 ].map((tab) => (
                   <button
                     key={tab.key}
@@ -142,10 +150,11 @@ const UserDashboard = () => {
                       setIsLoading(true);
                       setActiveTab(tab.key);
                     }}
-                    className={`rounded-2xl py-3 px-6 text-sm font-medium transition-colors duration-300 ${
+                    className={`rounded-2xl py-3 px-6 text-sm font-medium flex items-center gap-2 transition-colors duration-300 ${
                       activeTab === tab.key ? theme.colorBg : "bg-transparent"
                     } hover:${theme.hoverBg} ${theme.hoverText}`}
                   >
+                    <i className={tab.icon}></i>
                     {tab.label}
                   </button>
                 ))}
