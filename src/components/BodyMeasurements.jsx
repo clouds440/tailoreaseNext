@@ -313,12 +313,7 @@ Guidelines:
       <AnimatePresence>
         {showDialog && (
           <DialogBox
-            title={
-              <div className="flex items-center">
-                <i className="fas fa-robot mr-2 text-blue-500"></i>
-                AI Measurement Generator
-              </div>
-            }
+            title={"AI Measurement Generator"}
             type="info"
             showDialog={showDialog}
             setShowDialog={setShowDialog}

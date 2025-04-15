@@ -21,7 +21,7 @@ const sendNotification = async (reciever, message, redirect) => {
 
     await addDoc(notificationsRef, newNotification);
   } catch (error) {
-    console.error("Error adding notification:", error);
+    console.error("Error sending notification:", error);
   }
 };
 

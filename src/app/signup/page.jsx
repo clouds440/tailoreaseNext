@@ -184,7 +184,7 @@ const SignUpForm = () => {
 
   useEffect(() => {
     if (userLoggedIn) {
-      router.push("/");
+      router.push("/user");
     }
   }, [userLoggedIn, router]);
 

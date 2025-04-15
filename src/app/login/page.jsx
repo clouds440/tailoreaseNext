@@ -107,7 +107,7 @@ const LoginForm = () => {
       if (redirectUrl) {
         router.push(redirectUrl);
       } else {
-        router.push("/");
+        router.push("/user");
       }
     }
   }, [userLoggedIn, router, searchParams]);

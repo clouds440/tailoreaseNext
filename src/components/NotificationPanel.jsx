@@ -21,6 +21,7 @@ const NotificationPanel = () => {
   const router = useRouter();
 
   const [notifications, setNotifications] = useState([]);
+  const [activeTab, setActiveTab] = useState("user");
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef();
 
@@ -207,6 +208,20 @@ const NotificationPanel = () => {
                 className="fas fa-times cursor-pointer text-xl"
                 onClick={() => setIsOpen(false)}
               ></i>
+            </div>
+            <div className="w-full grid grid-cols-2">
+              <SimpleButton
+                btnText="User"
+                type={activeTab === "user" ? "default" : "primary"}
+                onClick={() => setActiveTab("user")}
+                extraclasses="w-full rounded-none"
+              />
+              <SimpleButton
+                btnText="Business"
+                type={activeTab === "business" ? "default" : "primary"}
+                onClick={() => setActiveTab("business")}
+                extraclasses="w-full rounded-none"
+              />
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 space-y-2">

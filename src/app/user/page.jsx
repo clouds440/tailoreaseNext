@@ -19,7 +19,7 @@ const UserDashboard = () => {
 
   // Get sharedId from the URL for shareable profiles. If it exists, we're in shared mode.
   const sharedId = searchParams.get("share");
-  const isSharedMode = Boolean(sharedId);
+  const isSharedMode = sharedId && sharedId !== userData?.uid;
 
   // For logged in mode, we use the "tab" search parameter; default to "profile"
   const initialTab = searchParams.get("tab") || "profile";
@@ -39,7 +39,7 @@ const UserDashboard = () => {
   // Update loading state on tab change (only for dashboard mode)
   useEffect(() => {
     if (!isSharedMode) {
-      const delay = setTimeout(() => setIsLoading(false), 400);
+      const delay = setTimeout(() => setIsLoading(false), 300);
       return () => clearTimeout(delay);
     } else {
       setIsLoading(false);
@@ -73,7 +73,7 @@ const UserDashboard = () => {
       default:
         return (
           <>
-            <UserProfile />
+            <UserProfile userData={userData} />
             <BodyMeasurements uid={userData.uid} authorization={userLoggedIn} />
           </>
         );
