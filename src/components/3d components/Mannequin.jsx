@@ -9,9 +9,9 @@ const Mannequin = ({ colorValue, gender, useSkirtAsDefaultLegs = true }) => {
   const mannequinRef = useRef();
   const mannequin = useLoader(
     OBJLoader,
-    gender === "male"
-      ? "/models/mannequin/mannequin-male.obj"
-      : "/models/mannequin/mannequin-female.obj"
+    gender === "female"
+      ? "/models/mannequin/mannequin-female.obj"
+      : "/models/mannequin/mannequin-male.obj"
   );
 
   const [femaleParts, setFemaleParts] = useState(null);

@@ -8,21 +8,23 @@ import ColorPicker from "@/components/ColorPicker";
 import SimpleButton from "@/components/SimpleButton";
 
 const outfitCategories = {
-  jacket: { category: "torso", gender: "Male" },
-  pants: { category: "legs", gender: "Male" },
-  shirt: { category: "torso", gender: "Male" },
+  jacket: { category: "torso", gender: "male" },
+  pants: { category: "legs", gender: "male" },
+  shirt: { category: "torso", gender: "male" },
   jeans: { category: "legs", gender: "unisex" },
-  femaleDress: { category: "full", gender: "Female" },
+  femaleDress: { category: "full", gender: "female" },
   // Add more here...
 };
 
 const OutfitCustomization = () => {
-  const { theme, userData, userLoggedIn } = useContext(UserContext);
+  const { theme } = useContext(UserContext);
+  const [selectedGender, setSelectedGender] = useState(null);
   const searchParams = useSearchParams();
 
   // Get outfit(s) from URL and convert them into an array
   const outfitTypes = searchParams.get("outfit")?.split(",") || [];
 
+  let selectedGenderLocal = null;
   const uniqueOutfits = [];
   const usedCategories = new Set();
 
@@ -32,12 +34,13 @@ const OutfitCustomization = () => {
 
     const { category, gender } = outfitInfo;
 
-    // Skip if gender doesn't match (unless unisex)
-    if (
-      gender !== "unisex" &&
-      (userLoggedIn ? gender !== userData?.gender : gender !== "Male")
-    )
-      return;
+    // If outfit is non-unisex and we haven't set a selected gender yet, set it.
+    if (gender !== "unisex" && !selectedGenderLocal) {
+      selectedGenderLocal = gender;
+    }
+
+    // Filter: only accept outfits that are either unisex or match the selected gender.
+    if (gender !== "unisex" && gender !== selectedGenderLocal) return;
 
     if (category === "full") {
       uniqueOutfits.length = 0;
@@ -53,6 +56,11 @@ const OutfitCustomization = () => {
       usedCategories.add(category);
     }
   });
+
+  // Now update your state once:
+  if (!selectedGender) {
+    setSelectedGender(selectedGenderLocal);
+  }
 
   const [morphTargets, setMorphTargets] = useState({});
   const [morphValues, setMorphValues] = useState({});
@@ -242,7 +250,7 @@ const OutfitCustomization = () => {
           colorValue={colorValue}
           texture={texture}
           color={color}
-          gender={userData?.gender?.toLowerCase() || "male"}
+          gender={selectedGender}
         />
       </div>
     </div>
