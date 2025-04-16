@@ -2,15 +2,15 @@
 import { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import { db } from "@/utils/firebaseConfig";
-import { 
-  collection, 
-  getDocs, 
-  query, 
-  where, 
-  addDoc, 
-  deleteDoc, 
-  doc, 
-  updateDoc 
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  addDoc,
+  deleteDoc,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClipLoader } from "react-spinners";
@@ -70,7 +70,7 @@ const TailorProductDashboard = () => {
           where("isActive", "==", true)
         );
         const predefinedSnapshot = await getDocs(predefinedQuery);
-        
+
         if (predefinedSnapshot.empty) {
           setPredefinedProducts([]);
         } else {
@@ -87,13 +87,12 @@ const TailorProductDashboard = () => {
           where("tailorId", "==", userData.bId)
         );
         const tailorSnapshot = await getDocs(tailorQuery);
-        
+
         const tailorProductsData = tailorSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setTailorProducts(tailorProductsData);
-
       } catch (error) {
         console.error("Error fetching products:", error);
         setError(`Failed to load products: ${error.message}`);
@@ -126,7 +125,7 @@ const TailorProductDashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!selectedProduct) {
       showDialogMessage(
         "No Product Selected",
@@ -149,7 +148,8 @@ const TailorProductDashboard = () => {
         productId: selectedProduct.id,
         price: parseFloat(formData.price),
         deliveryTime: `${formData.deliveryTime} days`,
-        description: formData.description || `${selectedProduct.name} stitching service`,
+        description:
+          formData.description || `${selectedProduct.name} stitching service`,
         isActive: formData.isActive,
         has3DTryOn: formData.has3DTryOn,
         createdAt: new Date().toISOString(),
@@ -179,7 +179,7 @@ const TailorProductDashboard = () => {
 
       // Show success message
       showSuccessMessage("Product added successfully!");
-      
+
       // Reset form
       setSelectedProduct(null);
       setFormData({
@@ -201,10 +201,12 @@ const TailorProductDashboard = () => {
     try {
       setIsDeleting(true);
       await deleteDoc(doc(db, "tailorProducts", productId));
-      
+
       // Update local state
-      setTailorProducts(tailorProducts.filter(product => product.id !== productId));
-      
+      setTailorProducts(
+        tailorProducts.filter((product) => product.id !== productId)
+      );
+
       showSuccessMessage("Product deleted successfully!");
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -221,13 +223,19 @@ const TailorProductDashboard = () => {
         isActive: !product.isActive,
         updatedAt: new Date().toISOString(),
       });
-      
+
       // Update local state
-      setTailorProducts(tailorProducts.map(p => 
-        p.id === product.id ? { ...p, isActive: !p.isActive } : p
-      ));
-      
-      showSuccessMessage(`Product ${!product.isActive ? 'activated' : 'deactivated'} successfully!`);
+      setTailorProducts(
+        tailorProducts.map((p) =>
+          p.id === product.id ? { ...p, isActive: !p.isActive } : p
+        )
+      );
+
+      showSuccessMessage(
+        `Product ${
+          !product.isActive ? "activated" : "deactivated"
+        } successfully!`
+      );
     } catch (error) {
       console.error("Error updating product status:", error);
       showErrorMessage(`Failed to update product status: ${error.message}`);
@@ -284,7 +292,7 @@ const TailorProductDashboard = () => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <span>{options.find(opt => opt.value === value)?.label}</span>
+          <span>{options.find((opt) => opt.value === value)?.label}</span>
           <motion.span
             animate={{ rotate: isOpen ? 180 : 0 }}
             transition={{ duration: 0.2 }}
@@ -305,10 +313,17 @@ const TailorProductDashboard = () => {
               {options.map((option) => (
                 <motion.div
                   key={option.value}
-                  whileHover={{ scale: 1.02, backgroundColor: theme.colorBgHover }}
-                  className={`px-4 py-2 cursor-pointer ${theme.colorText} ${value === option.value ? theme.colorPrimaryBg : ''}`}
+                  whileHover={{
+                    scale: 1.02,
+                    backgroundColor: theme.colorBgHover,
+                  }}
+                  className={`px-4 py-2 cursor-pointer ${theme.colorText} ${
+                    value === option.value ? theme.colorPrimaryBg : ""
+                  }`}
                   onClick={() => {
-                    onChange({ target: { name: "deliveryTime", value: option.value } });
+                    onChange({
+                      target: { name: "deliveryTime", value: option.value },
+                    });
                     setIsOpen(false);
                   }}
                 >
@@ -324,7 +339,9 @@ const TailorProductDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center h-full ${theme.mainTheme}`}>
+      <div
+        className={`flex items-center justify-center h-full ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -336,7 +353,7 @@ const TailorProductDashboard = () => {
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-16 h-16 border-4 border-t-transparent border-blue-500 rounded-full"
           />
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -351,13 +368,15 @@ const TailorProductDashboard = () => {
 
   if (error) {
     return (
-      <div className={`flex items-center justify-center h-full ${theme.mainTheme}`}>
+      <div
+        className={`flex items-center justify-center h-full ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="text-center p-6 max-w-md"
         >
-          <motion.div 
+          <motion.div
             animate={{ y: [-5, 5, -5] }}
             transition={{ duration: 2, repeat: Infinity }}
             className={`text-5xl mb-4 ${theme.iconColor}`}
@@ -377,7 +396,9 @@ const TailorProductDashboard = () => {
   }
 
   return (
-    <div className={`h-full overflow-y-auto ${theme.mainTheme} ${theme.colorText} py-8 px-4 sm:px-6 lg:px-8`}>
+    <div
+      className={`h-full overflow-y-auto ${theme.mainTheme} ${theme.colorText} py-8 px-4 sm:px-6 lg:px-8`}
+    >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -395,29 +416,38 @@ const TailorProductDashboard = () => {
             Product Dashboard
           </motion.h1>
 
-          <motion.div 
+          <motion.div
             className="flex rounded-lg p-1 bg-gray-200 dark:bg-gray-700"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
             <button
-              className={`px-4 py-2 rounded-md transition-all ${selectedTab === 'add' ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}` : `${theme.colorText} opacity-80 hover:opacity-100`}`}
-              onClick={() => setSelectedTab('add')}
+              className={`px-4 py-2 rounded-md transition-all ${
+                selectedTab === "add"
+                  ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}`
+                  : `${theme.colorText} opacity-80 hover:opacity-100`
+              }`}
+              onClick={() => setSelectedTab("add")}
             >
               <i className="fas fa-plus mr-2"></i> Add Product
             </button>
             <button
-              className={`px-4 py-2 rounded-md transition-all ${selectedTab === 'manage' ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}` : `${theme.colorText} opacity-80 hover:opacity-100`}`}
-              onClick={() => setSelectedTab('manage')}
+              className={`px-4 py-2 rounded-md transition-all ${
+                selectedTab === "manage"
+                  ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}`
+                  : `${theme.colorText} opacity-80 hover:opacity-100`
+              }`}
+              onClick={() => setSelectedTab("manage")}
             >
-              <i className="fas fa-list mr-2"></i> My Products ({tailorProducts.length})
+              <i className="fas fa-list mr-2"></i> My Products (
+              {tailorProducts.length})
             </button>
           </motion.div>
         </div>
 
         {/* Main Content */}
-        {selectedTab === 'add' ? (
+        {selectedTab === "add" ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Predefined Products List */}
             <motion.div
@@ -431,9 +461,9 @@ const TailorProductDashboard = () => {
                   <i className={`fas fa-boxes mr-2 ${theme.iconColor}`}></i>
                   Base Products
                 </h2>
-                
+
                 {predefinedProducts.length > 0 ? (
-                  <motion.div 
+                  <motion.div
                     className="space-y-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -453,22 +483,27 @@ const TailorProductDashboard = () => {
                         layout
                       >
                         <div className="flex items-center space-x-4">
-                          <motion.div 
+                          <motion.div
                             className="relative w-16 h-16 rounded-md overflow-hidden"
                             whileHover={{ scale: 1.05 }}
                           >
                             <Image
                               src={product.imageUrl}
                               alt={product.name}
-                              layout="fill"
-                              objectFit="cover"
+                              width={300} // adjust as needed
+                              height={300} // adjust as needed
+                              style={{ objectFit: "cover" }}
                               className="transition-transform duration-300 hover:scale-105"
                             />
                           </motion.div>
                           <div>
                             <h3 className="font-medium">{product.name}</h3>
-                            <p className="text-sm opacity-80">{product.category}</p>
-                            <p className="text-xs opacity-60">{product.material}</p>
+                            <p className="text-sm opacity-80">
+                              {product.category}
+                            </p>
+                            <p className="text-xs opacity-60">
+                              {product.material}
+                            </p>
                           </div>
                         </div>
                       </motion.div>
@@ -484,8 +519,12 @@ const TailorProductDashboard = () => {
                     <div className={`text-5xl mb-4 ${theme.iconColor}`}>
                       <i className="fas fa-box-open"></i>
                     </div>
-                    <h3 className="text-lg font-medium mb-2">No Base Products Available</h3>
-                    <p className="opacity-80">There are currently no predefined products in the system.</p>
+                    <h3 className="text-lg font-medium mb-2">
+                      No Base Products Available
+                    </h3>
+                    <p className="opacity-80">
+                      There are currently no predefined products in the system.
+                    </p>
                   </motion.div>
                 )}
               </div>
@@ -505,10 +544,10 @@ const TailorProductDashboard = () => {
                       <i className={`fas fa-cog mr-2 ${theme.iconColor}`}></i>
                       Customize Product
                     </h2>
-                    
+
                     <div className="flex flex-col md:flex-row gap-6 mb-8">
                       {/* Product Image */}
-                      <motion.div 
+                      <motion.div
                         className="relative w-full md:w-1/3 h-48 rounded-lg overflow-hidden"
                         initial={{ scale: 0.9 }}
                         animate={{ scale: 1 }}
@@ -517,20 +556,23 @@ const TailorProductDashboard = () => {
                         <Image
                           src={selectedProduct.imageUrl}
                           alt={selectedProduct.name}
-                          layout="fill"
-                          objectFit="cover"
+                          width={300} // adjust as needed
+                          height={300} // adjust as needed
+                          style={{ objectFit: "cover" }}
                           className="transition-transform duration-300 hover:scale-105"
                         />
                       </motion.div>
-                      
+
                       {/* Product Info */}
-                      <motion.div 
+                      <motion.div
                         className="flex-1"
                         initial={{ x: 20 }}
                         animate={{ x: 0 }}
                         transition={{ delay: 0.2 }}
                       >
-                        <h3 className="text-2xl font-bold mb-2">{selectedProduct.name}</h3>
+                        <h3 className="text-2xl font-bold mb-2">
+                          {selectedProduct.name}
+                        </h3>
                         <div className="flex flex-wrap gap-2 mb-4">
                           <motion.span
                             className={`px-3 py-1 rounded-full text-sm ${theme.colorBgSecondary}`}
@@ -546,11 +588,12 @@ const TailorProductDashboard = () => {
                           </motion.span>
                         </div>
                         <p className={`${theme.colorText} opacity-80`}>
-                          {selectedProduct.description || "No description available"}
+                          {selectedProduct.description ||
+                            "No description available"}
                         </p>
                       </motion.div>
                     </div>
-                    
+
                     {/* Customization Form */}
                     <form onSubmit={handleSubmit}>
                       <div className="space-y-6">
@@ -576,7 +619,7 @@ const TailorProductDashboard = () => {
                             Price (in your currency)
                           </label>
                         </motion.div>
-                        
+
                         {/* Delivery Time */}
                         <motion.div
                           className="relative"
@@ -587,12 +630,12 @@ const TailorProductDashboard = () => {
                           <label className={`block mb-2 ${theme.colorText}`}>
                             Delivery Time
                           </label>
-                          <DeliveryTimeDropdown 
+                          <DeliveryTimeDropdown
                             value={formData.deliveryTime}
                             onChange={handleInputChange}
                           />
                         </motion.div>
-                        
+
                         {/* Description */}
                         <motion.div
                           className="relative"
@@ -612,7 +655,7 @@ const TailorProductDashboard = () => {
                             Custom Description (optional)
                           </label>
                         </motion.div>
-                        
+
                         {/* 3D Try On */}
                         <motion.div
                           className="flex items-center"
@@ -628,11 +671,14 @@ const TailorProductDashboard = () => {
                             onChange={handleInputChange}
                             className="w-4 h-4 rounded mr-3"
                           />
-                          <label htmlFor="has3DTryOn" className={`${theme.colorText}`}>
+                          <label
+                            htmlFor="has3DTryOn"
+                            className={`${theme.colorText}`}
+                          >
                             Enable 3D Try-On for this product
                           </label>
                         </motion.div>
-                        
+
                         {/* Status */}
                         <motion.div
                           className="flex items-center"
@@ -648,11 +694,14 @@ const TailorProductDashboard = () => {
                             onChange={handleInputChange}
                             className="w-4 h-4 rounded mr-3"
                           />
-                          <label htmlFor="isActive" className={`${theme.colorText}`}>
+                          <label
+                            htmlFor="isActive"
+                            className={`${theme.colorText}`}
+                          >
                             Active (visible to customers)
                           </label>
                         </motion.div>
-                        
+
                         {/* Submit Button */}
                         <motion.div
                           className="pt-4"
@@ -664,12 +713,17 @@ const TailorProductDashboard = () => {
                             btnText={
                               isSubmitting ? (
                                 <>
-                                  <ClipLoader size={18} color="#ffffff" className="mr-2" />
+                                  <ClipLoader
+                                    size={18}
+                                    color="#ffffff"
+                                    className="mr-2"
+                                  />
                                   Adding...
                                 </>
                               ) : (
                                 <>
-                                  <i className="fas fa-plus mr-2"></i> Add to My Products
+                                  <i className="fas fa-plus mr-2"></i> Add to My
+                                  Products
                                 </>
                               )
                             }
@@ -695,9 +749,12 @@ const TailorProductDashboard = () => {
                     >
                       <i className="fas fa-box-open"></i>
                     </motion.div>
-                    <h3 className="text-xl font-semibold mb-2">No Product Selected</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                      No Product Selected
+                    </h3>
                     <p className={`${theme.colorText} opacity-80 max-w-md`}>
-                      Please select a product from the list to customize and add to your profile.
+                      Please select a product from the list to customize and add
+                      to your profile.
                     </p>
                   </motion.div>
                 )}
@@ -716,7 +773,7 @@ const TailorProductDashboard = () => {
                 <i className={`fas fa-list mr-2 ${theme.iconColor}`}></i>
                 My Products ({tailorProducts.length})
               </h2>
-              
+
               {tailorProducts.length > 0 ? (
                 <div className="space-y-4 h-screen overflow-y-auto">
                   {tailorProducts.map((product) => (
@@ -725,50 +782,70 @@ const TailorProductDashboard = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
-                      className={`p-4 rounded-lg ${theme.colorBgSecondary} border ${theme.colorBorder} ${!product.isActive ? 'opacity-70' : ''}`}
+                      className={`p-4 rounded-lg ${
+                        theme.colorBgSecondary
+                      } border ${theme.colorBorder} ${
+                        !product.isActive ? "opacity-70" : ""
+                      }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-start space-x-4 flex-1">
-                          <motion.div 
+                          <motion.div
                             className="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0"
                             whileHover={{ scale: 1.05 }}
                           >
                             <Image
-                              src={product.baseProductData?.imageUrl || "/images/default-product.png"}
+                              src={
+                                product.baseProductData?.imageUrl ||
+                                "/images/default-product.png"
+                              }
                               alt={product.baseProductData?.name || "Product"}
-                              layout="fill"
-                              objectFit="cover"
+                              width={300} // adjust as needed
+                              height={300} // adjust as needed
+                              style={{ objectFit: "cover" }}
                             />
                           </motion.div>
-                          
+
                           <div className="flex-1">
                             <div className="flex items-center">
-                              <h3 className="font-medium mr-2">{product.baseProductData?.name}</h3>
-                              <span className={`text-xs px-2 py-1 rounded-full ${
-                                product.isActive 
-                                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                  : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                              }`}>
-                                {product.isActive ? 'Active' : 'Inactive'}
+                              <h3 className="font-medium mr-2">
+                                {product.baseProductData?.name}
+                              </h3>
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                  product.isActive
+                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                    : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                                }`}
+                              >
+                                {product.isActive ? "Active" : "Inactive"}
                               </span>
                             </div>
-                            <p className="text-sm opacity-80 mb-1">{product.description}</p>
+                            <p className="text-sm opacity-80 mb-1">
+                              {product.description}
+                            </p>
                             <div className="flex flex-wrap gap-2 text-sm">
-                              <span className={`px-2 py-1 rounded-full ${theme.colorBgTertiary}`}>
+                              <span
+                                className={`px-2 py-1 rounded-full ${theme.colorBgTertiary}`}
+                              >
                                 ₹{product.price}
                               </span>
-                              <span className={`px-2 py-1 rounded-full ${theme.colorBgTertiary}`}>
+                              <span
+                                className={`px-2 py-1 rounded-full ${theme.colorBgTertiary}`}
+                              >
                                 {product.deliveryTime}
                               </span>
                               {product.has3DTryOn && (
-                                <span className={`px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`}>
+                                <span
+                                  className={`px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`}
+                                >
                                   3D Try-On
                                 </span>
                               )}
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="relative">
                           <motion.button
                             className={`p-2 rounded-full ${theme.colorText} hover:${theme.colorBgHover}`}
@@ -778,7 +855,7 @@ const TailorProductDashboard = () => {
                           >
                             <i className="fas fa-ellipsis-v"></i>
                           </motion.button>
-                          
+
                           <AnimatePresence>
                             {activeDropdown === product.id && (
                               <motion.div
@@ -794,18 +871,30 @@ const TailorProductDashboard = () => {
                                     onClick={() => handleToggleStatus(product)}
                                     whileHover={{ x: 5 }}
                                   >
-                                    <i className={`fas fa-toggle-${product.isActive ? 'on' : 'off'} mr-2`}></i>
-                                    {product.isActive ? 'Deactivate' : 'Activate'}
+                                    <i
+                                      className={`fas fa-toggle-${
+                                        product.isActive ? "on" : "off"
+                                      } mr-2`}
+                                    ></i>
+                                    {product.isActive
+                                      ? "Deactivate"
+                                      : "Activate"}
                                   </motion.button>
                                   <motion.button
                                     className={`w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30`}
-                                    onClick={() => handleDeleteProduct(product.id)}
+                                    onClick={() =>
+                                      handleDeleteProduct(product.id)
+                                    }
                                     whileHover={{ x: 5 }}
                                     disabled={isDeleting}
                                   >
                                     {isDeleting ? (
                                       <>
-                                        <ClipLoader size={14} color="#ef4444" className="mr-2" />
+                                        <ClipLoader
+                                          size={14}
+                                          color="#ef4444"
+                                          className="mr-2"
+                                        />
                                         Deleting...
                                       </>
                                     ) : (
@@ -838,9 +927,12 @@ const TailorProductDashboard = () => {
                   >
                     <i className="fas fa-box-open"></i>
                   </motion.div>
-                  <h3 className="text-xl font-semibold mb-2">No Products Added Yet</h3>
+                  <h3 className="text-xl font-semibold mb-2">
+                    No Products Added Yet
+                  </h3>
                   <p className={`${theme.colorText} opacity-80 max-w-md`}>
-                    You haven't added any products yet. Go to the "Add Product" tab to get started.
+                    You haven&apos;t added any products yet. Go to the
+                    &lsquo;Add Product&lsquo; tab to get started.
                   </p>
                 </motion.div>
               )}
