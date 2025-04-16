@@ -2,7 +2,7 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { db, auth, storage } from "@/utils/firebaseConfig";
+import { db, auth } from "@/utils/firebaseConfig";
 import {
   doc,
   getDoc,
@@ -12,7 +12,6 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClipLoader } from "react-spinners";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -26,7 +25,7 @@ const FIXED_SPECIALTIES = [
   "Kids Specialist",
   "Alterations",
   "Custom Tailoring",
-  "Other"
+  "Other",
 ];
 
 const TailorBusinessProfile = () => {
@@ -35,6 +34,7 @@ const TailorBusinessProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
   const router = useRouter();
@@ -98,7 +98,7 @@ const TailorBusinessProfile = () => {
         const bid = userDataFromDB.bId;
 
         if (!bid) {
-          setError("Business ID (bid) not found in user document");
+          setError("Business ID not found in user document");
           return;
         }
 
@@ -146,6 +146,7 @@ const TailorBusinessProfile = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result);
@@ -154,18 +155,70 @@ const TailorBusinessProfile = () => {
     }
   };
 
+  // Helper function to convert a file to a Base64 string
+  function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result); // Base64 string
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file); // Read file as Base64
+    });
+  }
+
   const uploadImage = async (file) => {
     if (!file) return null;
 
     try {
       setIsUploading(true);
-      const storageRef = ref(
-        storage,
-        `business_images/${userData.uid}/${file.name}`
-      );
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      return downloadURL;
+
+      const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
+      if (!allowedTypes.includes(file.type)) {
+        setShowMessage({
+          type: "warning",
+          message: "Please upload a JPG or PNG image file.",
+        });
+        setPopUpMessageTrigger(true);
+        return;
+      }
+
+      // Convert file to Base64
+      let base64;
+      try {
+        base64 = await convertToBase64(file);
+        setPreviewImage(URL.createObjectURL(file));
+      } catch (error) {
+        console.error("Error converting file to Base64:", error);
+        setShowMessage({
+          type: "error",
+          message: "Failed to process the image. Please try again.",
+        });
+        setPopUpMessageTrigger(true);
+        return; // Stop further execution
+      }
+
+      // Upload the image to server
+      const fileName = `business-${Date.now()}.jpg`;
+      const targetPath = "images/profile/business";
+
+      const response = await fetch("/api/imageUpload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageData: base64, // Use the base64 string we just got
+          fileName,
+          targetPath,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Image upload failed: ${errorText}`);
+      }
+
+      const { url } = await response.json();
+      return "/" + url;
     } catch (error) {
       console.error("Error uploading image:", error);
       throw error;
@@ -175,13 +228,13 @@ const TailorBusinessProfile = () => {
   };
 
   const toggleSpeciality = (speciality) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const isSelected = prev.specialities.includes(speciality);
       return {
         ...prev,
         specialities: isSelected
-          ? prev.specialities.filter(item => item !== speciality)
-          : [...prev.specialities, speciality]
+          ? prev.specialities.filter((item) => item !== speciality)
+          : [...prev.specialities, speciality],
       };
     });
   };
@@ -212,8 +265,8 @@ const TailorBusinessProfile = () => {
 
       // Upload new image if changed
       let imageUrl = formData.businessPictureUrl;
-      if (fileInputRef.current?.files[0]) {
-        imageUrl = await uploadImage(fileInputRef.current.files[0]);
+      if (selectedFile) {
+        imageUrl = await uploadImage(selectedFile);
       }
 
       const updatedData = {
@@ -267,7 +320,9 @@ const TailorBusinessProfile = () => {
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center h-screen ${theme.mainTheme}`}>
+      <div
+        className={`flex items-center justify-center h-screen ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -279,7 +334,7 @@ const TailorBusinessProfile = () => {
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-16 h-16 border-4 border-t-transparent border-blue-500 rounded-full"
           />
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -294,13 +349,15 @@ const TailorBusinessProfile = () => {
 
   if (error) {
     return (
-      <div className={`flex items-center justify-center h-screen ${theme.mainTheme}`}>
+      <div
+        className={`flex items-center justify-center h-screen ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="text-center p-6 max-w-md"
         >
-          <motion.div 
+          <motion.div
             animate={{ y: [-5, 5, -5] }}
             transition={{ duration: 2, repeat: Infinity }}
             className={`text-5xl mb-4 ${theme.iconColor}`}
@@ -321,7 +378,9 @@ const TailorBusinessProfile = () => {
 
   if (!tailorData) {
     return (
-      <div className={`flex items-center justify-center h-screen ${theme.mainTheme}`}>
+      <div
+        className={`flex items-center justify-center h-screen ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -341,7 +400,9 @@ const TailorBusinessProfile = () => {
   }
 
   return (
-    <div className={`h-full overflow-y-auto ${theme.mainTheme} ${theme.colorText} py-8 px-4 sm:px-6 lg:px-8`}>
+    <div
+      className={`h-full overflow-y-auto ${theme.mainTheme} ${theme.colorText} py-8 px-4 sm:px-6 lg:px-8`}
+    >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -360,8 +421,8 @@ const TailorBusinessProfile = () => {
           </motion.h1>
 
           {!isEditing && (
-            <motion.div 
-              whileHover={{ scale: 1.05 }} 
+            <motion.div
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -398,10 +459,14 @@ const TailorBusinessProfile = () => {
                   transition={{ delay: 0.3 }}
                 >
                   <div className="relative group">
-                    <motion.div 
+                    <motion.div
                       className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white shadow-lg relative"
                       whileHover={{ scale: 1.03 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 10,
+                      }}
                     >
                       {previewImage ? (
                         <Image
@@ -434,7 +499,7 @@ const TailorBusinessProfile = () => {
                       />
                     </motion.label>
                     {isUploading && (
-                      <motion.div 
+                      <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full"
@@ -573,13 +638,16 @@ const TailorBusinessProfile = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1.0 }}
                 >
-                  <label className={`block mb-4 ${theme.colorText} text-lg font-medium`}>
+                  <label
+                    className={`block mb-4 ${theme.colorText} text-lg font-medium`}
+                  >
                     Specialities
                   </label>
-                  
+
                   <div className="flex flex-wrap gap-3">
                     {FIXED_SPECIALTIES.map((speciality) => {
-                      const isSelected = formData.specialities.includes(speciality);
+                      const isSelected =
+                        formData.specialities.includes(speciality);
                       return (
                         <motion.button
                           key={speciality}
@@ -615,15 +683,17 @@ const TailorBusinessProfile = () => {
                       );
                     })}
                   </div>
-                  
+
                   {/* Selected Specialities */}
                   {formData.specialities.length > 0 && (
-                    <motion.div 
+                    <motion.div
                       className="mt-6"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                     >
-                      <h4 className="text-md font-medium mb-2">Your Selected Specialities:</h4>
+                      <h4 className="text-md font-medium mb-2">
+                        Your Selected Specialities:
+                      </h4>
                       <div className="flex flex-wrap gap-2">
                         {formData.specialities.map((speciality, index) => (
                           <motion.div
