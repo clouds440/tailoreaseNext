@@ -8,15 +8,19 @@ import UserContext from "@/utils/UserContext";
 import { collection, getDocs, setDoc, doc } from "firebase/firestore";
 import { db } from "@/utils/firebaseConfig";
 import { LoadingSpinner } from "./LoadingSpinner";
+import useFetchUser from "@/app/hooks/useFetchUser";
+import { motion } from "framer-motion";
 
-const UserProfile = ({ userData }) => {
-  const { inputStyles, setShowMessage, setPopUpMessageTrigger } =
+const UserProfile = ({ userData, uid }) => {
+  const { inputStyles, theme, setShowMessage, setPopUpMessageTrigger } =
     useContext(UserContext);
   const [showDialog, setShowDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [accountNumber, setAccountNumber] = useState("");
   const [allowEdit, setAllowEdit] = useState(false);
-  const shareLink = "http://localhost:3000/user?share=" + userData.uid;
+  const shareLink = "http://localhost:3000/user?share=" + userData?.uid;
+  const { user, loading } = useFetchUser(uid);
+  const displayUser = uid ? user : userData;
 
   const handleShareProfile = async (phoneNumber) => {
     try {
@@ -81,14 +85,39 @@ const UserProfile = ({ userData }) => {
 
   return (
     <div className="p-4 text-center">
-      <h3 className="text-2xl font-bold">User Profile</h3>
+      <motion.div
+        className={`p-4 text-center rounded-xl backdrop-blur-xl bg-opacity-90 border ${theme.colorBorder}`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <h3 className="text-2xl font-bold">
+          {uid ? "Shared" : "Your"} Profile
+        </h3>
 
-      <SimpleButton
-        btnText={"Share Profile"}
-        icon={<i className="fas fa-share"></i>}
-        onClick={() => setShowDialog(true)}
-      />
-
+        <div className="mt-4">
+          {displayUser ? (
+            <>
+              <p className="text-lg font-semibold">{displayUser.fullName}</p>
+              <p className="text-sm">{displayUser.email}</p>
+              <p className="text-sm">{displayUser.phone}</p>
+            </>
+          ) : (
+            <div className="mt-4">
+              <LoadingSpinner size={30} />
+            </div>
+          )}
+          <div className="flex items-center justify-center mt-5">
+            {!uid && displayUser && (
+              <SimpleButton
+                btnText={"Share Profile"}
+                icon={<i className="fas fa-share"></i>}
+                onClick={() => setShowDialog(true)}
+              />
+            )}
+          </div>
+        </div>
+      </motion.div>
       <AnimatePresence>
         {showDialog && (
           <DialogBox
@@ -105,7 +134,7 @@ const UserProfile = ({ userData }) => {
                 <input
                   type="text"
                   className={inputStyles}
-                  placeholder="Account Number"
+                  placeholder="Tailor Phone Number"
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
                 />

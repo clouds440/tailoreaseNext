@@ -200,7 +200,7 @@ const NotificationPanel = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className={`fixed bottom-[6rem] right-2 sm:right-8 max-w-full w-[300px] h-[70%] sm:w-[400px] sm:h-[75%] rounded-lg shadow-lg flex flex-col z-[99999] ${theme.colorBg} ${theme.mainTheme} ${theme.colorBorder}`}
+            className={`fixed bottom-[6rem] right-2 sm:right-8 max-w-full w-[300px] h-[70%] sm:w-[400px] sm:h-[75%] rounded-lg shadow-lg flex flex-col z-[99999] ${theme.mainTheme} ${theme.colorBorder}`}
             ref={panelRef}
             variants={panelVariants}
             initial="hidden"

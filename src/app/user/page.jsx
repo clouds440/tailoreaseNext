@@ -87,7 +87,7 @@ const UserDashboard = () => {
         <div
           className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
         >
-          <UserProfile />
+          <UserProfile uid={sharedId} />
           {/* Here, the autorization will be provided when the user has added the viewer (tailor) in "My tailors" (uses database) */}
           <BodyMeasurements uid={sharedId} />
         </div>
