@@ -1,14 +1,25 @@
 "use client";
 
 import { useState, useEffect, useRef, useContext } from "react";
+import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "@/components/SimpleButton";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { db } from "@/utils/firebaseConfig";
+import {
+  doc,
+  collection,
+  getDocs,
+  query,
+  where,
+  getDoc,
+} from "firebase/firestore";
 
 const Market = () => {
-  const { theme } = useContext(UserContext);
+  const { theme, userData } = useContext(UserContext);
+  const router = useRouter();
 
   const categories = [
     { name: "Male", icon: "male" },
@@ -39,32 +50,58 @@ const Market = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 
-  // Mock data for products
-  const mockProducts = [
-    {
-      id: 1,
-      name: "Classic White Shirt",
-      image: "/images/products/shirt.png",
-      tailor: "Stitch Masters",
-      rating: 4.5,
-      price: 49.99,
-      category: "Male",
-    },
-  ];
-
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // Fetch all active tailor products
+      const productsQuery = query(
+        collection(db, "tailorProducts"),
+        where("isActive", "==", true)
+      );
+      const productsSnapshot = await getDocs(productsQuery);
 
-      let products = [...mockProducts];
+      // Process each product to get tailor details
+      const productsData = await Promise.all(
+        productsSnapshot.docs.map(async (Doc) => {
+          const productData = Doc.data();
+
+          // Get tailor's business name using userData.tId structure
+          let tailorName = "Unknown Tailor";
+          try {
+            if (productData.tailorId) {
+              const tailorDocReference = doc(
+                db,
+                "tailors",
+                productData.tailorId
+              );
+              const tailorDoc = await getDoc(tailorDocReference);
+              if (tailorDoc.exists()) {
+                tailorName = tailorDoc.data().businessName || tailorName;
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching tailor data:", error);
+          }
+
+          return {
+            id: doc.id,
+            ...productData,
+            tailor: tailorName,
+            rating: 0, // Default zero rating
+            category: productData.baseProductData?.category || "Uncategorized",
+          };
+        })
+      );
+
+      let products = [...productsData];
 
       // Apply search filter
       if (searchQuery) {
         products = products.filter(
           (product) =>
-            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.baseProductData?.name
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
             product.tailor.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
@@ -86,7 +123,10 @@ const Market = () => {
           break;
         case "Recommended":
         default:
-          products.sort((a, b) => b.rating - a.rating);
+          // Sort by newest first as default
+          products.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
           break;
       }
 
@@ -198,6 +238,12 @@ const Market = () => {
     }
 
     return stars;
+  };
+
+  const handleProductClick = (product) => {
+    const category =
+      product.baseProductData?.category?.toLowerCase() || "shirt";
+    router.push(`/outfit-customization?outfit=${category}`);
   };
 
   return (
@@ -372,17 +418,21 @@ const Market = () => {
               ) : (
                 productList.map((product, index) => (
                   <motion.div
-                    key={product.id}
+                    key={product.id || `product-${index}`}
                     variants={productVariants}
                     initial="hidden"
                     animate="visible"
                     transition={{ duration: 0.3, delay: index * 0.05 }}
                     className={`cursor-pointer overflow-hidden rounded-xl border transition-all duration-300 ${theme.colorBorder} ${theme.hoverShadow} flex flex-col`}
+                    onClick={() => handleProductClick(product)}
                   >
                     <div className="relative overflow-hidden aspect-square w-full">
                       <Image
-                        src={product.image}
-                        alt={product.name}
+                        src={
+                          product.baseProductData?.imageUrl ||
+                          "/images/default-product.png"
+                        }
+                        alt={product.baseProductData?.name || "Product"}
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
@@ -395,7 +445,7 @@ const Market = () => {
                       <h3
                         className={`font-semibold line-clamp-2 ${theme.colorText}`}
                       >
-                        {product.name}
+                        {product.baseProductData?.name || "Unnamed Product"}
                       </h3>
                       <p
                         className={`text-sm mt-1 ${theme.colorText} opacity-80 flex items-center`}
@@ -416,14 +466,14 @@ const Market = () => {
                           {renderStars(product.rating)}
                         </div>
                         <span className={`text-xs ml-1 ${theme.colorText}`}>
-                          ({product.rating.toFixed(1)})
+                          (0)
                         </span>
                       </div>
                       <p
                         className={`mt-2 font-bold text-lg ${theme.colorText} flex items-center`}
                       >
-                        <i className="fas fa-dollar-sign mr-1 text-sm"></i>
-                        {product.price.toFixed(2)}
+                        <span className="text-xs mr-1">PKR</span>
+                        {product.price.toLocaleString("en-PK")}
                       </p>
                     </div>
                   </motion.div>

@@ -322,7 +322,7 @@ const Navbar = () => {
       label: "Profile",
     },
     {
-      path: "/products",
+      path: "/business-dashboard/products",
       icon: <i className="fas fa-box-open" />,
       label: "Products",
     },
