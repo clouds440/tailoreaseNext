@@ -215,6 +215,15 @@ const TailorBusinessProfile = () => {
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Image upload failed: ${errorText}`);
+      } else {
+        let oldImagePath = formData.businessPictureUrl;
+        await fetch("/api/imageDelete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            imagePath: oldImagePath,
+          }),
+        });
       }
 
       const { url } = await response.json();
@@ -401,7 +410,7 @@ const TailorBusinessProfile = () => {
 
   return (
     <div
-      className={`h-full overflow-y-auto ${theme.mainTheme} ${theme.colorText} py-8 px-4 sm:px-6 lg:px-8`}
+      className={`h-full overflow-y-auto ${theme.mainTheme} py-8 px-4 sm:px-6 lg:px-8`}
     >
       <motion.div
         initial={{ opacity: 0 }}
@@ -443,7 +452,7 @@ const TailorBusinessProfile = () => {
 
         {/* Profile Card */}
         <motion.div
-          className={`rounded-2xl shadow-xl overflow-hidden ${theme.colorBg} border ${theme.colorBorder}`}
+          className={`rounded-lg overflow-hidden ${theme.mainTheme}`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -472,8 +481,9 @@ const TailorBusinessProfile = () => {
                         <Image
                           src={previewImage}
                           alt="Business Preview"
-                          layout="fill"
-                          objectFit="cover"
+                          width={300} // adjust as needed
+                          height={500} // adjust as needed
+                          style={{ objectFit: "cover" }}
                           className="transition-all duration-300 group-hover:opacity-90"
                         />
                       ) : (
@@ -494,7 +504,7 @@ const TailorBusinessProfile = () => {
                         type="file"
                         ref={fileInputRef}
                         onChange={handleImageChange}
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/svg+xml"
                         className="hidden"
                       />
                     </motion.label>
@@ -773,8 +783,9 @@ const TailorBusinessProfile = () => {
                       <Image
                         src={tailorData.businessPictureUrl}
                         alt={tailorData.businessName}
-                        layout="fill"
-                        objectFit="cover"
+                        width={300} // adjust as needed
+                        height={300} // adjust as needed
+                        style={{ objectFit: "cover" }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-300 flex items-center justify-center">
@@ -898,7 +909,7 @@ const TailorBusinessProfile = () => {
                     <i className="fas fa-calendar-check"></i>
                   </div>
                   <div className="text-sm">Orders Completed</div>
-                  <div className="text-xl font-bold mt-1">120+</div>
+                  <div className="text-xl font-bold mt-1">1620+</div>
                 </motion.div>
 
                 <motion.div
