@@ -241,7 +241,7 @@ const NotificationPanel = () => {
                   onClick={() => setActiveTab("user")}
                 >
                   <SimpleButton
-                    btnText="User"
+                    btnText="Personal"
                     type={
                       theme.themeName === "lunarGlow"
                         ? activeTab === "user"
