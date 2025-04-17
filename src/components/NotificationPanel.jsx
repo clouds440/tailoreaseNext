@@ -255,6 +255,7 @@ const NotificationPanel = () => {
                       activeTab === "business" && "opacity-50"
                     }`}
                     onClick={() => setActiveTab("user")}
+                    icon={<i className="fas fa-user"></i>}
                   />
                   {userUnreadCount > 0 && (
                     <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full z-20">
@@ -281,6 +282,7 @@ const NotificationPanel = () => {
                       activeTab === "user" && "opacity-30"
                     }`}
                     onClick={() => setActiveTab("business")}
+                    icon={<i className="fas fa-store"></i>}
                   />
                   {businessUnreadCount > 0 && (
                     <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
