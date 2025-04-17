@@ -234,60 +234,62 @@ const NotificationPanel = () => {
             </div>
 
             {/* Notification Tabs with badges */}
-            <div className="flex">
-              <div
-                className="flex-1 relative"
-                onClick={() => setActiveTab("user")}
-              >
-                <SimpleButton
-                  btnText="User"
-                  type={
-                    theme.themeName === "lunarGlow"
-                      ? activeTab === "user"
-                        ? "primary"
-                        : "default"
-                      : activeTab === "user"
-                      ? "default"
-                      : "primary"
-                  }
-                  extraclasses={`w-full rounded-none ${
-                    activeTab === "business" && "opacity-50"
-                  }`}
+            {userData.bId && (
+              <div className="flex">
+                <div
+                  className="flex-1 relative"
                   onClick={() => setActiveTab("user")}
-                />
-                {userUnreadCount > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full z-20">
-                    {userUnreadCount}
-                  </span>
-                )}
-              </div>
-              <div
-                className="flex-1 relative"
-                onClick={() => setActiveTab("business")}
-              >
-                <SimpleButton
-                  btnText="Business"
-                  type={
-                    theme.themeName === "lunarGlow"
-                      ? activeTab === "business"
-                        ? "primary"
-                        : "default"
-                      : activeTab === "business"
-                      ? "default"
-                      : "primary"
-                  }
-                  extraclasses={`w-full rounded-none ${
-                    activeTab === "user" && "opacity-30"
-                  }`}
+                >
+                  <SimpleButton
+                    btnText="User"
+                    type={
+                      theme.themeName === "lunarGlow"
+                        ? activeTab === "user"
+                          ? "primary"
+                          : "default"
+                        : activeTab === "user"
+                        ? "default"
+                        : "primary"
+                    }
+                    extraclasses={`w-full rounded-none ${
+                      activeTab === "business" && "opacity-50"
+                    }`}
+                    onClick={() => setActiveTab("user")}
+                  />
+                  {userUnreadCount > 0 && (
+                    <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full z-20">
+                      {userUnreadCount}
+                    </span>
+                  )}
+                </div>
+                <div
+                  className="flex-1 relative"
                   onClick={() => setActiveTab("business")}
-                />
-                {businessUnreadCount > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                    {businessUnreadCount}
-                  </span>
-                )}
+                >
+                  <SimpleButton
+                    btnText="Business"
+                    type={
+                      theme.themeName === "lunarGlow"
+                        ? activeTab === "business"
+                          ? "primary"
+                          : "default"
+                        : activeTab === "business"
+                        ? "default"
+                        : "primary"
+                    }
+                    extraclasses={`w-full rounded-none ${
+                      activeTab === "user" && "opacity-30"
+                    }`}
+                    onClick={() => setActiveTab("business")}
+                  />
+                  {businessUnreadCount > 0 && (
+                    <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                      {businessUnreadCount}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Notification List */}
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
