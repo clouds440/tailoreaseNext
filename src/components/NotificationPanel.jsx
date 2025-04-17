@@ -317,10 +317,10 @@ const NotificationPanel = () => {
                     </div>
                     <div className="absolute top-2 right-2">
                       {/* Delete button */}
-                      <div className="md:hidden block md:group-hover:block absolute -right-4 -top-3 bg-red-300 shadow-lg rounded-full z-10">
+                      <div className="md:hidden block md:group-hover:block absolute -right-4 -top-3 bg-red-100 hover:bg-red-400 shadow-lg rounded-full z-10">
                         <button
                           onClick={() => handleDeleteNotification(notif.id)}
-                          className="px-3 py-2 text-sm text-red-700 w-full text-left"
+                          className="px-3 py-2 text-sm text-red-900 w-full text-left"
                         >
                           <i className="fas fa-trash"> </i>
                         </button>
