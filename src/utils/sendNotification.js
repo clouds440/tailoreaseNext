@@ -1,4 +1,4 @@
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, doc, serverTimestamp } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
 const sendNotification = async (reciever, type, message, redirect) => {
@@ -10,9 +10,11 @@ const sendNotification = async (reciever, type, message, redirect) => {
       reciever,
       "userNotifications"
     );
+    const newDocRef = doc(notificationsRef); // auto-generates ID
 
     // Add a new notification with a unique ID
     const newNotification = {
+      id: newDocRef.id,
       type,
       message,
       read: false,

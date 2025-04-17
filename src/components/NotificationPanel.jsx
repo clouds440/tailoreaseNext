@@ -7,15 +7,13 @@ import { db } from "@/utils/firebaseConfig";
 import {
   doc,
   collection,
-  getDoc,
   updateDoc,
-  query,
-  where,
   getDocs,
   writeBatch,
 } from "firebase/firestore";
 import { formatDistanceToNow } from "date-fns";
 import SimpleButton from "./SimpleButton";
+import deleteNotification from "@/utils/deleteNotification";
 
 const NotificationPanel = () => {
   const { theme, userData, userLoggedIn } = useContext(UserContext);
@@ -100,6 +98,15 @@ const NotificationPanel = () => {
       setIsOpen(false);
     } catch (error) {
       console.error("Error updating notification:", error);
+    }
+  };
+
+  const handleDeleteNotification = async (notifId) => {
+    try {
+      await deleteNotification(userData.uid, notifId);
+      setNotifications((prev) => prev.filter((notif) => notif.id !== notifId));
+    } catch (err) {
+      console.error("Failed to delete notification", err);
     }
   };
 
@@ -272,23 +279,33 @@ const NotificationPanel = () => {
                 notificationsToDisplay.map((notif) => (
                   <div
                     key={notif.id}
-                    className={`p-3 rounded-lg cursor-pointer ring-2 ${
+                    className={`relative p-3 rounded-lg cursor-pointer ring-2 ${
                       notif.read ? theme.colorBg : theme.mainTheme
-                    } ${theme.hoverBg}`}
-                    onClick={() => handleNotificationClick(notif.id)}
+                    } ${theme.hoverBg} group`} // make whole notif container the group
                   >
-                    <p className={`${theme.colorText} text-sm`}>
-                      {notif.message}
-                    </p>
-                    <span className="text-xs text-gray-500">
-                      {notif.createdAt &&
-                        formatDistanceToNow(
-                          new Date(notif.createdAt.seconds * 1000),
-                          {
-                            addSuffix: true,
-                          }
-                        )}
-                    </span>
+                    <div onClick={() => handleNotificationClick(notif.id)}>
+                      <p className={`${theme.colorText} text-sm`}>
+                        {notif.message}
+                      </p>
+                      <span className="text-xs text-gray-500">
+                        {notif.createdAt &&
+                          formatDistanceToNow(
+                            new Date(notif.createdAt.seconds * 1000),
+                            { addSuffix: true }
+                          )}
+                      </span>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      {/* Delete button */}
+                      <div className="md:hidden block md:group-hover:block absolute -right-4 -top-3 bg-red-300 shadow-lg rounded-full z-10">
+                        <button
+                          onClick={() => handleDeleteNotification(notif.id)}
+                          className="px-3 py-2 text-sm text-red-600 w-full text-left"
+                        >
+                          <i className="fas fa-trash"> </i>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ))
               )}
