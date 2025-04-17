@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, { useState, useRef, useEffect, useContext, act } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import UserContext from "@/utils/UserContext";
 import { useRouter } from "next/navigation";
@@ -241,8 +241,18 @@ const NotificationPanel = () => {
               >
                 <SimpleButton
                   btnText="User"
-                  type={activeTab === "user" ? "default" : "primary"}
-                  extraclasses="w-full rounded-none"
+                  type={
+                    theme.themeName === "lunarGlow"
+                      ? activeTab === "user"
+                        ? "primary"
+                        : "default"
+                      : activeTab === "user"
+                      ? "default"
+                      : "primary"
+                  }
+                  extraclasses={`w-full rounded-none ${
+                    activeTab === "business" && "opacity-50"
+                  }`}
                   onClick={() => setActiveTab("user")}
                 />
                 {userUnreadCount > 0 && (
@@ -257,8 +267,18 @@ const NotificationPanel = () => {
               >
                 <SimpleButton
                   btnText="Business"
-                  type={activeTab === "business" ? "default" : "primary"}
-                  extraclasses="w-full rounded-none"
+                  type={
+                    theme.themeName === "lunarGlow"
+                      ? activeTab === "business"
+                        ? "primary"
+                        : "default"
+                      : activeTab === "business"
+                      ? "default"
+                      : "primary"
+                  }
+                  extraclasses={`w-full rounded-none ${
+                    activeTab === "user" && "opacity-30"
+                  }`}
                   onClick={() => setActiveTab("business")}
                 />
                 {businessUnreadCount > 0 && (
@@ -300,7 +320,7 @@ const NotificationPanel = () => {
                       <div className="md:hidden block md:group-hover:block absolute -right-4 -top-3 bg-red-300 shadow-lg rounded-full z-10">
                         <button
                           onClick={() => handleDeleteNotification(notif.id)}
-                          className="px-3 py-2 text-sm text-red-600 w-full text-left"
+                          className="px-3 py-2 text-sm text-red-700 w-full text-left"
                         >
                           <i className="fas fa-trash"> </i>
                         </button>
@@ -318,6 +338,7 @@ const NotificationPanel = () => {
                 type={"primary"}
                 onClick={handleMarkAllRead}
                 extraclasses="w-full"
+                disabled={totalUnreadCount <= 0}
               />
             </div>
           </motion.div>

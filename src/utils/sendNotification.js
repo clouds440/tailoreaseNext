@@ -10,11 +10,8 @@ const sendNotification = async (reciever, type, message, redirect) => {
       reciever,
       "userNotifications"
     );
-    const newDocRef = doc(notificationsRef); // auto-generates ID
-
     // Add a new notification with a unique ID
     const newNotification = {
-      id: newDocRef.id,
       type,
       message,
       read: false,
