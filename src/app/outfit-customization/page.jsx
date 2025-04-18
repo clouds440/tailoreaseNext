@@ -247,6 +247,13 @@ const OutfitCustomization = () => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
+  const outfitKeyMap = {
+    F: "jacket",
+    P: "shirt",
+    G: "pants",
+    X: "femaleDress",
+  };
+
   return (
     <div
       className={`max-w-[99.5%] mx-auto flex flex-col md:flex-row items-center p-6 my-4 md:my-1 rounded-lg h-full overflow-y-auto select-none justify-center ${theme.mainTheme}`}
@@ -275,75 +282,82 @@ const OutfitCustomization = () => {
         } ${theme.mainTheme}`}
       >
         {/* Morph sliders for each outfit */}
-        {Object.keys(morphTargets).map((outfit) => (
-          <div key={outfit} className="mb-6">
-            <h3 className="text-lg font-semibold mb-2">
-              {outfit.toUpperCase()}
-            </h3>
-            {morphTargets[outfit]?.map((target, index) => (
-              <div key={`${outfit}-${index}`} className="mb-3">
-                <label className="block text-sm font-medium">{target}</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={morphValues[outfit]?.[index] || 0}
-                  onChange={(e) =>
-                    handleMorphChange(outfit, index, parseFloat(e.target.value))
-                  }
-                  className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-blue-500 
+        {Object.keys(morphTargets).map((key) => {
+          const outfit = outfitKeyMap[key] || key;
+          return (
+            <div key={outfit} className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">
+                {outfit.toUpperCase()}
+              </h3>
+              {morphTargets[outfit]?.map((target, index) => (
+                <div key={`${outfit}-${index}`} className="mb-3">
+                  <label className="block text-sm font-medium">{target}</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={morphValues[outfit]?.[index] || 0}
+                    onChange={(e) =>
+                      handleMorphChange(
+                        outfit,
+                        index,
+                        parseFloat(e.target.value)
+                      )
+                    }
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-blue-500 
              [&::-webkit-slider-thumb]:appearance-none 
              [&::-webkit-slider-thumb]:w-4 
              [&::-webkit-slider-thumb]:h-4 
              [&::-webkit-slider-thumb]:bg-blue-500 
              [&::-webkit-slider-thumb]:rounded-full"
-                />
-              </div>
-            ))}
+                  />
+                </div>
+              ))}
 
-            <div className="flex items-center justify-between mb-6">
-              {/* Color Picker Button on the left */}
-              <SimpleButton
-                btnText={selectedOutfit === outfit ? "Hide" : "Color Picker"}
-                type={"primary"}
-                onClick={() => {
-                  if (selectedOutfit === outfit) {
-                    setSelectedOutfit(null); // If the same outfit is clicked, hide the picker
-                  } else {
-                    setSelectedOutfit(outfit); // Show the picker for this outfit
-                  }
-                }}
-              />
-
-              {/* Texture image input on the right */}
-              <div className="flex items-center">
-                <label
-                  htmlFor={`file-input-${outfit}`}
-                  className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.colorBg} ${theme.hoverBg}`}
-                >
-                  {texture[outfit] ? "Change Texture" : "Choose a Texture"}
-                </label>
-                <input
-                  id={`file-input-${outfit}`}
-                  type="file"
-                  accept=".jpg, .png"
-                  onChange={(e) => handleTextureUpload(outfit, e)}
-                  className="hidden" // Hide the default input element
+              <div className="flex items-center justify-between mb-6">
+                {/* Color Picker Button on the left */}
+                <SimpleButton
+                  btnText={selectedOutfit === outfit ? "Hide" : "Color Picker"}
+                  type={"primary"}
+                  onClick={() => {
+                    if (selectedOutfit === outfit) {
+                      setSelectedOutfit(null); // If the same outfit is clicked, hide the picker
+                    } else {
+                      setSelectedOutfit(outfit); // Show the picker for this outfit
+                    }
+                  }}
                 />
+
+                {/* Texture image input on the right */}
+                <div className="flex items-center">
+                  <label
+                    htmlFor={`file-input-${outfit}`}
+                    className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.colorBg} ${theme.hoverBg}`}
+                  >
+                    {texture[outfit] ? "Change Texture" : "Choose a Texture"}
+                  </label>
+                  <input
+                    id={`file-input-${outfit}`}
+                    type="file"
+                    accept=".jpg, .png"
+                    onChange={(e) => handleTextureUpload(outfit, e)}
+                    className="hidden" // Hide the default input element
+                  />
+                </div>
               </div>
+
+              {/* Color Picker */}
+              {selectedOutfit === outfit && (
+                <ColorPicker
+                  onColorChange={(color) =>
+                    handleColorPickerChange(outfit, color)
+                  } // Pass the outfit name along with the color
+                />
+              )}
             </div>
-
-            {/* Color Picker */}
-            {selectedOutfit === outfit && (
-              <ColorPicker
-                onColorChange={(color) =>
-                  handleColorPickerChange(outfit, color)
-                } // Pass the outfit name along with the color
-              />
-            )}
-          </div>
-        ))}
+          );
+        })}
 
         {/* Skin Tone slider */}
         <div className={`border-y pb-5 ${theme.borderColor}`}>
