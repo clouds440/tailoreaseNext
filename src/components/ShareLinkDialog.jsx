@@ -152,23 +152,23 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
                   onChange={(e) => setAccountNumber(e.target.value)}
                 />
 
-                {shareType === "tailor" && (
-                  <label className="inline-flex items-center mt-4 space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={allowEdit}
-                      onChange={(e) => setAllowEdit(e.target.checked)}
-                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium">
-                      Allow Measurements Editing
+                {shareType === "tailor" && subject !== "Custom Outfit" && (
+                  <>
+                    <label className="inline-flex items-center mt-4 space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={allowEdit}
+                        onChange={(e) => setAllowEdit(e.target.checked)}
+                        className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                      />
+                      <span className="text-sm font-medium">
+                        Allow Measurements Editing
+                      </span>
+                    </label>
+                    <span className="flex text-xs">
+                      This will also add the tailor to My Tailors
                     </span>
-                  </label>
-                )}
-                {shareType === "tailor" && (
-                  <span className="flex text-xs">
-                    This will also add the tailor to My Tailors
-                  </span>
+                  </>
                 )}
 
                 <div className="mt-6 flex justify-end space-x-3">

@@ -6,6 +6,7 @@ import ProgressBar from "@/components/ProgressBar";
 import UserContext from "@/utils/UserContext";
 import { ClipLoader } from "react-spinners";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import useImageUpload from "../hooks/useImageUpload";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { db, auth } from "@/utils/firebaseConfig";
@@ -34,6 +35,7 @@ const BecomeTailor = () => {
   const [formData, setFormData] = useState({});
   const [disableResendButton, setDisableResendButton] = useState(false);
   const router = useRouter();
+  const { uploadImage } = useImageUpload();
 
   const [hasBusinessAccount, setHasBusinessAccount] = useState(null);
 
@@ -117,29 +119,13 @@ const BecomeTailor = () => {
       // 1. Upload the image to a local directory in the project at "./images/profile/business"
       let businessPictureUrl = "";
       if (businessPicture) {
-        const fileName = `business-${Date.now()}.jpg`; // Unique file name
-        const targetPath = "images/profile/business"; // Dynamic storage path
+        const { url, error } = await uploadImage(businessPicture); // No old image to delete
 
-        // Fetch API call to the reusable route.js route
-        const response = await fetch("/api/imageUpload", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            imageData: businessPicture, // Base64 encoded image
-            fileName,
-            targetPath,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Image upload failed: ${errorText}`);
+        if (error) {
+          throw new Error(`Image upload failed: ${error}`);
         }
 
-        const { url } = await response.json();
-        businessPictureUrl = "/" + url; // Public URL of the uploaded image
+        businessPictureUrl = url; // Already includes the "/" in the hook
       }
 
       // 2. Add business details to the "tailors" collection in Firestore

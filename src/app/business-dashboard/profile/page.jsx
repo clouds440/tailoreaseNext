@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect, useContext, useRef } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { db, auth } from "@/utils/firebaseConfig";
+import useImageUpload from "@/app/hooks/useImageUpload";
+import { db } from "@/utils/firebaseConfig";
 import {
   doc,
   getDoc,
@@ -12,7 +12,7 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ClipLoader } from "react-spinners";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SimpleButton from "@/components/SimpleButton";
@@ -37,7 +37,6 @@ const TailorBusinessProfile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
-  const router = useRouter();
   const {
     theme,
     userLoggedIn,
@@ -66,6 +65,7 @@ const TailorBusinessProfile = () => {
     businessAddress: "",
     specialities: [],
   });
+  const { uploadImage } = useImageUpload();
 
   useEffect(() => {
     const fetchTailorData = async () => {
@@ -155,87 +155,6 @@ const TailorBusinessProfile = () => {
     }
   };
 
-  // Helper function to convert a file to a Base64 string
-  function convertToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result); // Base64 string
-      reader.onerror = (error) => reject(error);
-      reader.readAsDataURL(file); // Read file as Base64
-    });
-  }
-
-  const uploadImage = async (file) => {
-    if (!file) return null;
-
-    try {
-      setIsUploading(true);
-
-      const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
-      if (!allowedTypes.includes(file.type)) {
-        setShowMessage({
-          type: "warning",
-          message: "Please upload a JPG or PNG image file.",
-        });
-        setPopUpMessageTrigger(true);
-        return;
-      }
-
-      // Convert file to Base64
-      let base64;
-      try {
-        base64 = await convertToBase64(file);
-        setPreviewImage(URL.createObjectURL(file));
-      } catch (error) {
-        console.error("Error converting file to Base64:", error);
-        setShowMessage({
-          type: "error",
-          message: "Failed to process the image. Please try again.",
-        });
-        setPopUpMessageTrigger(true);
-        return; // Stop further execution
-      }
-
-      // Upload the image to server
-      const fileName = `business-${Date.now()}.jpg`;
-      const targetPath = "images/profile/business";
-
-      const response = await fetch("/api/imageUpload", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          imageData: base64, // Use the base64 string we just got
-          fileName,
-          targetPath,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Image upload failed: ${errorText}`);
-      } else {
-        let oldImagePath = formData.businessPictureUrl;
-        await fetch("/api/imageDelete", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            imagePath: oldImagePath,
-          }),
-        });
-      }
-
-      const { url } = await response.json();
-      return "/" + url;
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      throw error;
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   const toggleSpeciality = (speciality) => {
     setFormData((prev) => {
       const isSelected = prev.specialities.includes(speciality);
@@ -272,10 +191,23 @@ const TailorBusinessProfile = () => {
         throw new Error("Business ID (bid) not found");
       }
 
-      // Upload new image if changed
       let imageUrl = formData.businessPictureUrl;
       if (selectedFile) {
-        imageUrl = await uploadImage(selectedFile);
+        const { url, error } = await uploadImage(
+          selectedFile,
+          formData.businessPictureUrl
+        );
+
+        if (error) {
+          setShowMessage({
+            message: "Image upload failed",
+            type: "danger",
+          });
+          setPopUpMessageTrigger(true);
+          return;
+        }
+
+        imageUrl = url; // update with the new uploaded URL
       }
 
       const updatedData = {
