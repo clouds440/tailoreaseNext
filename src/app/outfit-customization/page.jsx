@@ -6,6 +6,17 @@ import CustomizationScene from "@/components/3d components/CustomizationScene";
 import { Resizable } from "re-resizable";
 import ColorPicker from "@/components/ColorPicker";
 import SimpleButton from "@/components/SimpleButton";
+import useImageUpload from "../hooks/useImageUpload";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+} from "firebase/firestore";
+import { db } from "@/utils/firebaseConfig";
+import ShareLinkDialog from "@/components/ShareLinkDialog";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const outfitCategories = {
   jacket: { category: "torso", gender: "male" },
@@ -17,12 +28,40 @@ const outfitCategories = {
 };
 
 const OutfitCustomization = () => {
-  const { theme } = useContext(UserContext);
+  const { theme, userData, userLoggedIn } = useContext(UserContext);
   const [selectedGender, setSelectedGender] = useState(null);
   const searchParams = useSearchParams();
+  const [shareLink, setShareLink] = useState(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("share", "");
+    return url.toString();
+  });
+
+  const [linkGenerated, setLinkGenerated] = useState(false);
+  const [generatingLink, setGeneratingLink] = useState(false);
 
   // Get outfit(s) from URL and convert them into an array
   const outfitTypes = searchParams.get("outfit")?.split(",") || [];
+  const shareId = searchParams.get("share");
+
+  const fetchSharedOutfit = async (shareId) => {
+    try {
+      const docRef = doc(db, "myOutfits", shareId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const outfitData = docSnap.data();
+        console.log("Shared outfit:", outfitData);
+        return outfitData;
+      } else {
+        console.log("No such document!");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching shared outfit:", error);
+      throw error;
+    }
+  };
 
   let selectedGenderLocal = null;
   const uniqueOutfits = [];
@@ -68,6 +107,105 @@ const OutfitCustomization = () => {
   const [texture, setTexture] = useState({});
   const [color, setColor] = useState({});
   const [selectedOutfit, setSelectedOutfit] = useState(null); // Track the selected outfit for color picker visibility
+
+  useEffect(() => {
+    const getSharedOutfit = async () => {
+      const outfitData = await fetchSharedOutfit(shareId);
+      if (outfitData) {
+        setColor(outfitData.color);
+        setMorphValues(outfitData.morphValues);
+        setColorValue(outfitData.colorValue);
+        setTexture(outfitData.texture);
+      }
+    };
+
+    if (shareId) {
+      getSharedOutfit();
+    }
+  }, [shareId]);
+
+  const { uploadImage } = useImageUpload();
+
+  const updateShareLink = (id) => {
+    const url = new URL(shareLink);
+    url.searchParams.set("share", id);
+    setShareLink(url.toString());
+  };
+
+  // call this to push all textures up:
+  const handleUploadAllTextures = useCallback(async () => {
+    const newTextures = {};
+
+    for (const [outfit, blobUrl] of Object.entries(texture)) {
+      // only upload real blobs
+      if (!blobUrl.startsWith("blob:")) continue;
+
+      try {
+        // fetch the blob from the blob‑URL
+        const resp = await fetch(blobUrl);
+        const blob = await resp.blob();
+
+        // Extract the file extension from the MIME type
+        const mimeType = blob.type; // e.g., 'image/png'
+        const extension = mimeType.split("/")[1] || "jpg"; // Fallback to 'jpg' if undefined
+
+        // Create a File object with the correct extension
+        const file = new File([blob], `${outfit}-${Date.now()}.${extension}`, {
+          type: mimeType,
+        });
+
+        // upload it; pass oldImagePath if you have one
+        const { url, error } = await uploadImage(
+          file,
+          null,
+          "images/user/customizations"
+        );
+
+        if (error) {
+          console.error(`Failed to upload ${outfit}:`, error);
+        } else {
+          newTextures[outfit] = url;
+        }
+      } catch (e) {
+        console.error(`Error processing ${outfit}:`, e);
+      }
+    }
+
+    return newTextures;
+  }, [texture, uploadImage]);
+
+  const uploadCustomization = async () => {
+    try {
+      if (!userLoggedIn) {
+        throw new Error("User not authenticated");
+      }
+      setGeneratingLink(true);
+      let newTextures = await handleUploadAllTextures();
+      const customizations = {
+        morphValues,
+        colorValue,
+        color,
+        texture: newTextures,
+      };
+      // Reference to the 'myOutfits' collection
+      const outfitsRef = collection(db, "myOutfits");
+
+      // Add a new document with a generated ID
+      const docRef = await addDoc(outfitsRef, {
+        userId: userData.uid,
+        ...customizations,
+        createdAt: serverTimestamp(),
+      });
+
+      setLinkGenerated(true);
+      updateShareLink(docRef.id);
+    } catch (error) {
+      console.error("Error uploading customization: ", error);
+      throw error;
+    } finally {
+      setGeneratingLink(false);
+    }
+  };
 
   const handleMorphChange = (outfit, index, value) => {
     setMorphValues((prev) => ({
@@ -197,7 +335,7 @@ const OutfitCustomization = () => {
                 <input
                   id={`file-input-${outfit}`}
                   type="file"
-                  accept="image/*"
+                  accept=".jpg, .png"
                   onChange={(e) => handleTextureUpload(outfit, e)}
                   className="hidden" // Hide the default input element
                 />
@@ -216,7 +354,7 @@ const OutfitCustomization = () => {
         ))}
 
         {/* Skin Tone slider */}
-        <div className={`border-t ${theme.borderColor}`}>
+        <div className={`border-y pb-5 ${theme.borderColor}`}>
           <h3 className="text-lg font-semibold my-3">Model</h3>
           <h3 className="text-sm font-medium">Skin Tone</h3>
           <input
@@ -234,6 +372,43 @@ const OutfitCustomization = () => {
                [&::-webkit-slider-thumb]:rounded-full"
           />
         </div>
+        {userLoggedIn && (
+          <div className="block mt-5 space-y-3">
+            {!linkGenerated && (
+              <div className="space-y-2">
+                <span>Generate customized outfit sharing link</span>
+                <SimpleButton
+                  btnText={
+                    generatingLink ? (
+                      <>
+                        <LoadingSpinner size={24} />
+                        <span className="ml-2">Generating...</span>
+                      </>
+                    ) : (
+                      "Generate"
+                    )
+                  }
+                  type={"default"}
+                  onClick={uploadCustomization}
+                  disabled={generatingLink}
+                />
+              </div>
+            )}
+            {linkGenerated && (
+              <div className="space-y-2">
+                <span>
+                  Link Generated{" "}
+                  <i className="fas fa-check ml-3 font-bold text-lg text-green-500"></i>
+                </span>
+                <ShareLinkDialog
+                  sender={userData}
+                  shareLink={shareLink}
+                  subject={"Custom Outfit"}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </Resizable>
 
       {/* Preview panel (Right Side) */}

@@ -10,7 +10,7 @@ import { db } from "@/utils/firebaseConfig";
 import { LoadingSpinner } from "./LoadingSpinner";
 
 const ShareLinkDialog = ({ sender, shareLink, subject }) => {
-  const { inputStyles, theme, setShowMessage, setPopUpMessageTrigger } =
+  const { inputStyles, setShowMessage, setPopUpMessageTrigger } =
     useContext(UserContext);
   const [showDialog, setShowDialog] = useState(false);
   const [shareType, setShareType] = useState("tailor"); // or 'user'

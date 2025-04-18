@@ -1,14 +1,26 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { LoadingSpinner } from "./LoadingSpinner";
 import useFetchUser from "@/app/hooks/useFetchUser";
 import ShareLinkDialog from "./ShareLinkDialog";
+import { useRouter } from "next/navigation";
 
 const UserProfile = ({ userData, uid }) => {
-  const shareLink = "http://localhost:3000/user?share=" + userData?.uid;
+  const shareLink = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("share", userData.uid);
+    return url.toString();
+  };
   const { user, loading } = useFetchUser(uid);
   const displayUser = uid ? user : userData;
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user && !userData) {
+      router.push("/404");
+    }
+  }, [loading, router, user, userData]);
 
   return (
     <div className="p-4 text-center">
@@ -39,7 +51,7 @@ const UserProfile = ({ userData, uid }) => {
             {!uid && displayUser && (
               <ShareLinkDialog
                 sender={userData}
-                shareLink={shareLink}
+                shareLink={shareLink()}
                 subject={"Profile"}
               />
             )}

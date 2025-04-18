@@ -195,7 +195,8 @@ const TailorBusinessProfile = () => {
       if (selectedFile) {
         const { url, error } = await uploadImage(
           selectedFile,
-          formData.businessPictureUrl
+          formData.businessPictureUrl,
+          "images/profile/business"
         );
 
         if (error) {
