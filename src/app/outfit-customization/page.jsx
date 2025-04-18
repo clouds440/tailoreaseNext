@@ -19,13 +19,14 @@ import ShareLinkDialog from "@/components/ShareLinkDialog";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const outfitCategories = {
-  jacket: { category: "torso", gender: "male" },
-  pants: { category: "legs", gender: "male" },
-  shirt: { category: "torso", gender: "male" },
-  jeans: { category: "legs", gender: "unisex" },
-  femaleDress: { category: "full", gender: "female" },
+  "jacket": { category: "torso", gender: "male" },
+  "pants": { category: "legs", gender: "male" },
+  "shirt": { category: "torso", gender: "male" },
+  "jeans": { category: "legs", gender: "unisex" },
+  "femaleDress": { category: "full", gender: "female" },
   // Add more here...
 };
+
 
 const OutfitCustomization = () => {
   const { theme, userData, userLoggedIn } = useContext(UserContext);
