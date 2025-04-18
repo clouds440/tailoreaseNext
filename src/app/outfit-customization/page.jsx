@@ -7,6 +7,7 @@ import { Resizable } from "re-resizable";
 import ColorPicker from "@/components/ColorPicker";
 import SimpleButton from "@/components/SimpleButton";
 import useImageUpload from "../hooks/useImageUpload";
+import outfitCategories from "../../../outfitCategories.json";
 import {
   collection,
   addDoc,
@@ -17,16 +18,6 @@ import {
 import { db } from "@/utils/firebaseConfig";
 import ShareLinkDialog from "@/components/ShareLinkDialog";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-
-const outfitCategories = {
-  "jacket": { category: "torso", gender: "male" },
-  "pants": { category: "legs", gender: "male" },
-  "shirt": { category: "torso", gender: "male" },
-  "jeans": { category: "legs", gender: "unisex" },
-  "femaleDress": { category: "full", gender: "female" },
-  // Add more here...
-};
-
 
 const OutfitCustomization = () => {
   const { theme, userData, userLoggedIn } = useContext(UserContext);

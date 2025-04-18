@@ -1,0 +1,8 @@
+{
+    "jacket": { "category": "torso", "gender": "male" },
+    "pants": { "category": "legs", "gender": "male" },
+    "shirt": { "category": "torso", "gender": "male" },
+    "jeans": { "category": "legs", "gender": "unisex" },
+    "femaleDress": { "category": "full", "gender": "female" }
+  }
+  
