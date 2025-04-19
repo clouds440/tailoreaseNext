@@ -32,6 +32,7 @@ const BodyMeasurements = ({ uid, authorization }) => {
   const [editingField, setEditingField] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [measurements, setMeasurements] = useState({});
+  const [useInches, setUseInches] = useState(null);
   const [savingMeasurements, setSavingMeasurements] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [userInfo, setUserInfo] = useState({
@@ -86,6 +87,7 @@ const BodyMeasurements = ({ uid, authorization }) => {
         message: "Measurements saved successfully!",
       });
       setPopUpMessageTrigger(true);
+      localStorage.setItem("useInches." + uid, useInches);
     } catch (error) {
       setShowMessage({
         type: "danger",
@@ -186,11 +188,32 @@ Guidelines:
         });
         setPopUpMessageTrigger(true);
       }
+      setUseInches(false);
     } catch (error) {
       console.log(error.message);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem("useInches." + uid);
+    setUseInches(saved === "true");
+  }, [uid]);
+
+  const toggleMeasurementUnits = () => {
+    setMeasurements((prev) => {
+      const toInches = !useInches;
+      const converted = {};
+      for (const key in prev) {
+        const value = prev[key];
+        converted[key] = toInches
+          ? Math.round((value / 2.54) * 2) / 2 // cm ➜ inches (0.5 precision)
+          : Math.round(value * 2.54); // inches ➜ cm (nearest whole number)
+      }
+      return converted;
+    });
+    setUseInches((prev) => !prev);
   };
 
   const handleEdit = (key) => {
@@ -216,9 +239,27 @@ Guidelines:
           <h2 className={`text-2xl font-bold ${theme.colorText}`}>
             Body Measurements
             <span className="block text-sm font-normal opacity-80">
-              All values in centimeters (cm)
+              All values in {useInches ? "inches (in)" : "centimeters (cm)"}
             </span>
           </h2>
+          <div
+            className={`flex items-center gap-2 ml-5 mt-8 rounded-lg px-3 py-2 ${theme.colorBg}`}
+          >
+            <span className="text-sm font-medium">cm</span>
+            <button
+              onClick={toggleMeasurementUnits}
+              className={`w-10 h-5 flex items-center rounded-full p-0.5 transition duration-300 ${
+                useInches ? "bg-blue-600" : "bg-gray-600"
+              }`}
+            >
+              <div
+                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition duration-300 ${
+                  useInches ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+            <span className="text-sm font-medium">in</span>
+          </div>
         </div>
 
         {/* BUTTONS — Only show if authorized */}

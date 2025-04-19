@@ -10,7 +10,8 @@ import ClipLoader from "react-spinners/ClipLoader";
 const dummyThumbnail = "/images/assets/dummy-outfit.png";
 
 const MyOutfits = () => {
-  const { theme, userData } = useContext(UserContext);
+  const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
+    useContext(UserContext);
   const [outfits, setOutfits] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,6 +43,17 @@ const MyOutfits = () => {
     fetchOutfits();
   }, [userData?.uid]);
 
+  const handleDeleteOutfit = async (id) => {
+    // handle deletion of the outfit
+  };
+
+  const handleShareOutfit = async (link) => {
+    navigator.clipboard.writeText(link).then(() => {
+      setShowMessage({ message: "Link copied to clipboard!", type: "success" });
+      setPopUpMessageTrigger(true);
+    });
+  };
+
   return (
     <div className={`p-4 ${theme?.text}`}>
       <h3 className="text-3xl font-bold text-center mb-6">
@@ -61,7 +73,7 @@ const MyOutfits = () => {
           and selecting an outfit
         </p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {outfits.map((outfit, index) => {
             const textures = Object.values(outfit.texture || {});
             const outfitName = outfit.outfitNames || "Unnamed Outfit";
@@ -78,7 +90,7 @@ const MyOutfits = () => {
                   ease: "easeOut",
                 }}
                 whileHover={{ scale: 1.03 }}
-                className={`relative rounded-lg overflow-hidden border shadow-md cursor-pointer ${theme?.colorBg}`}
+                className={`relative rounded-lg overflow-hidden border shadow-md cursor-pointer ${theme?.colorBg} group`}
                 style={{
                   height: "16rem",
                   display: "flex",
@@ -105,6 +117,32 @@ const MyOutfits = () => {
                 )}
                 <div className="absolute bottom-0 w-full bg-black bg-opacity-60 text-white text-sm px-2 py-1 text-center truncate z-10">
                   {outfitName}
+                </div>
+
+                {/* Delete button */}
+                <div className="md:hidden block md:group-hover:block absolute w-10 h-10 right-10 top-0 bg-red-100 hover:bg-red-400 shadow-lg rounded-full z-20">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      handleDeleteOutfit(outfit.id);
+                    }}
+                    className="px-[14px] py-[10px] text-sm text-red-900 w-full h-full"
+                  >
+                    <i className="fas fa-trash"> </i>
+                  </button>
+                </div>
+                <div className="md:hidden block md:group-hover:block absolute top-0 right-0 w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-800 py-2 text-white text-center z-20">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      handleShareOutfit(outfit.link + outfit.id);
+                    }}
+                    className="w-full h-full"
+                  >
+                    <i className="fas fa-share"></i>
+                  </button>
                 </div>
               </motion.a>
             );
