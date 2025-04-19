@@ -18,19 +18,21 @@ import {
 } from "firebase/firestore";
 
 const Market = () => {
-  const { theme, userData } = useContext(UserContext);
+  const { theme, userData, setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
   const router = useRouter();
 
   const categories = [
     { name: "Male", icon: "male" },
     { name: "Female", icon: "female" },
     { name: "Kids", icon: "child" },
+    { name: "Unisex", icon: "tshirt" },
   ];
 
   const sortOptions = [
     { name: "Recommended", icon: "star" },
     { name: "Price: Low to High", icon: "dollar-sign" },
     { name: "Price: High to Low", icon: "dollar-sign" },
+    { name: "Newest First", icon: "clock" },
   ];
 
   const [filters, setFilters] = useState({
@@ -39,11 +41,15 @@ const Market = () => {
     page: 1,
   });
   const [categoryFilter, setCategoryFilter] = useState([]);
+  const [genderFilter, setGenderFilter] = useState([]);
   const [appliedFilters, setAppliedFilters] = useState([]);
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchActive, setSearchActive] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const dropdownRef = useRef(null);
   const dropdownButtonRef = useRef(null);
@@ -65,18 +71,17 @@ const Market = () => {
         productsSnapshot.docs.map(async (Doc) => {
           const productData = Doc.data();
 
-          // Get tailor's business name using userData.tId structure
+          // Get tailor's business name
           let tailorName = "Unknown Tailor";
+          let tailorImage = "/images/default-tailor.png";
           try {
             if (productData.tailorId) {
-              const tailorDocReference = doc(
-                db,
-                "tailors",
-                productData.tailorId
-              );
+              const tailorDocReference = doc(db, "tailors", productData.tailorId);
               const tailorDoc = await getDoc(tailorDocReference);
               if (tailorDoc.exists()) {
-                tailorName = tailorDoc.data().businessName || tailorName;
+                const tailorData = tailorDoc.data();
+                tailorName = tailorData.businessName || tailorName;
+                tailorImage = tailorData.businessPictureUrl || tailorImage;
               }
             }
           } catch (error) {
@@ -87,8 +92,10 @@ const Market = () => {
             id: doc.id,
             ...productData,
             tailor: tailorName,
-            rating: 0, // Default zero rating
+            tailorImage,
+            rating: 4.5, // Mock rating for now
             category: productData.baseProductData?.category || "Uncategorized",
+            gender: productData.baseProductData?.gender || "Unisex",
           };
         })
       );
@@ -102,7 +109,10 @@ const Market = () => {
             product.baseProductData?.name
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
-            product.tailor.toLowerCase().includes(searchQuery.toLowerCase())
+            product.tailor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.baseProductData?.material
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase())
         );
       }
 
@@ -110,6 +120,13 @@ const Market = () => {
       if (appliedFilters.length > 0) {
         products = products.filter((product) =>
           appliedFilters.includes(product.category)
+        );
+      }
+
+      // Apply gender filters
+      if (genderFilter.length > 0) {
+        products = products.filter((product) =>
+          genderFilter.includes(product.gender)
         );
       }
 
@@ -121,12 +138,16 @@ const Market = () => {
         case "Price: High to Low":
           products.sort((a, b) => b.price - a.price);
           break;
+        case "Newest First":
+          products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          break;
         case "Recommended":
         default:
-          // Sort by newest first as default
-          products.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
+          // Sort by rating then by newest
+          products.sort((a, b) => {
+            if (b.rating !== a.rating) return b.rating - a.rating;
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
           break;
       }
 
@@ -140,7 +161,7 @@ const Market = () => {
   useEffect(() => {
     fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appliedFilters, filters.sortBy, searchQuery]);
+  }, [appliedFilters, genderFilter, filters.sortBy, searchQuery]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -170,6 +191,27 @@ const Market = () => {
     visible: { opacity: 1, y: 0 },
   };
 
+  const quickViewVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: 50 },
+  };
+
+  const imageVariants = {
+    enter: (direction) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction) => ({
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0,
+    }),
+  };
+
   const toggleDropdown = () => {
     if (!dropdownOpen && dropdownButtonRef.current) {
       const rect = dropdownButtonRef.current.getBoundingClientRect();
@@ -189,6 +231,14 @@ const Market = () => {
     );
   };
 
+  const handleGenderChange = (value) => {
+    setGenderFilter((prev) =>
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
+    );
+  };
+
   const applyFilters = () => {
     setAppliedFilters([...categoryFilter]);
     setDropdownOpen(false);
@@ -196,6 +246,7 @@ const Market = () => {
 
   const clearFilters = () => {
     setCategoryFilter([]);
+    setGenderFilter([]);
     setAppliedFilters([]);
     setSearchQuery("");
   };
@@ -241,9 +292,51 @@ const Market = () => {
   };
 
   const handleProductClick = (product) => {
-    const category =
-      product.baseProductData?.category?.toLowerCase() || "shirt";
+    setSelectedProduct(product);
+    setCurrentImageIndex(0);
+    setQuickViewOpen(true);
+  };
+
+  const handleCustomizeClick = () => {
+    if (!selectedProduct) return;
+    const category = selectedProduct.baseProductData?.category?.toLowerCase() || "shirt";
     router.push(`/outfit-customization?outfit=${category}`);
+  };
+
+  const handleActionButtonClick = (action) => {
+    setShowMessage({
+      type: "info",
+      message: `We're adding ${action} functionality later. Stay tuned!`,
+    });
+    setPopUpMessageTrigger(true);
+    setQuickViewOpen(false);
+  };
+
+  const nextImage = () => {
+    const images = selectedProduct?.isCustom 
+      ? selectedProduct.images 
+      : [selectedProduct?.baseProductData?.imageUrl];
+    
+    setCurrentImageIndex((prev) => 
+      prev === images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    const images = selectedProduct?.isCustom 
+      ? selectedProduct.images 
+      : [selectedProduct?.baseProductData?.imageUrl];
+    
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
+
+  const getProductImages = () => {
+    if (!selectedProduct) return [];
+    return selectedProduct.isCustom 
+      ? selectedProduct.images 
+      : [selectedProduct.baseProductData?.imageUrl];
   };
 
   return (
@@ -309,7 +402,7 @@ const Market = () => {
           </div>
 
           {/* Active Filters */}
-          {(appliedFilters.length > 0 || searchQuery) && (
+          {(appliedFilters.length > 0 || genderFilter.length > 0 || searchQuery) && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -321,7 +414,18 @@ const Market = () => {
               </span>
               {appliedFilters.map((filter) => (
                 <motion.span
-                  key={filter}
+                  key={`cat-${filter}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className={`px-3 py-1 text-xs rounded-full ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} flex items-center`}
+                >
+                  <i className="fas fa-tag mr-1"></i>
+                  {filter}
+                </motion.span>
+              ))}
+              {genderFilter.map((filter) => (
+                <motion.span
+                  key={`gen-${filter}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className={`px-3 py-1 text-xs rounded-full ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} flex items-center`}
@@ -332,7 +436,9 @@ const Market = () => {
                         ? "male"
                         : filter === "Female"
                         ? "female"
-                        : "child"
+                        : filter === "Kids"
+                        ? "child"
+                        : "tshirt"
                     } mr-1`}
                   ></i>
                   {filter}
@@ -429,8 +535,10 @@ const Market = () => {
                     <div className="relative overflow-hidden aspect-square w-full">
                       <Image
                         src={
-                          product.baseProductData?.imageUrl ||
-                          "/images/default-product.png"
+                          product.isCustom && product.images?.length > 0
+                            ? product.images[0]
+                            : product.baseProductData?.imageUrl ||
+                              "/images/default-product.png"
                         }
                         alt={product.baseProductData?.name || "Product"}
                         fill
@@ -438,6 +546,12 @@ const Market = () => {
                         sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                         priority={index < 5}
                       />
+                      {product.has3DTryOn && (
+                        <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
+                          <i className="fas fa-vr-cardboard mr-1"></i>
+                          3D Try-On
+                        </div>
+                      )}
                     </div>
                     <div
                       className={`p-3 rounded-b-xl ${theme.colorBg} overflow-hidden flex-grow`}
@@ -452,11 +566,13 @@ const Market = () => {
                       >
                         <i
                           className={`fas fa-${
-                            product.category === "Male"
+                            product.gender === "Male"
                               ? "male"
-                              : product.category === "Female"
+                              : product.gender === "Female"
                               ? "female"
-                              : "child"
+                              : product.gender === "Kids"
+                              ? "child"
+                              : "tshirt"
                           } mr-2 text-xs`}
                         ></i>
                         by {product.tailor}
@@ -466,7 +582,7 @@ const Market = () => {
                           {renderStars(product.rating)}
                         </div>
                         <span className={`text-xs ml-1 ${theme.colorText}`}>
-                          (0)
+                          ({Math.floor(Math.random() * 100)})
                         </span>
                       </div>
                       <p
@@ -505,32 +621,79 @@ const Market = () => {
                   className={`font-bold text-lg mb-2 ${theme.colorText} flex items-center`}
                 >
                   <i className="fas fa-filter mr-2"></i>
-                  Filter by Category
+                  Filter Products
                 </h3>
-                <div className="grid grid-cols-1 gap-2">
+                
+                <h4 className={`font-semibold mt-4 mb-2 ${theme.colorText} flex items-center`}>
+                  <i className="fas fa-venus-mars mr-2"></i>
+                  Gender
+                </h4>
+                <div className="grid grid-cols-2 gap-2">
                   {categories.map((category) => (
                     <motion.div
-                      key={category.name}
+                      key={`gender-${category.name}`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => handleCategoryChange(category.name)}
+                      onClick={() => handleGenderChange(category.name)}
                       className={`p-3 border rounded-lg cursor-pointer flex items-center ${
-                        categoryFilter.includes(category.name)
+                        genderFilter.includes(category.name)
                           ? `${theme.hoverBg} bg-opacity-50`
                           : `${theme.colorBg}`
                       } ${theme.colorBorder}`}
                     >
-                      {categoryFilter.includes(category.name) && (
+                      {genderFilter.includes(category.name) && (
                         <i className="fas fa-check text-green-500 mr-3"></i>
                       )}
                       <i
                         className={`fas fa-${category.icon} mr-3 ${
-                          categoryFilter.includes(category.name)
+                          genderFilter.includes(category.name)
                             ? "text-blue-400"
                             : ""
                         }`}
                       ></i>
                       <span className={theme.colorText}>{category.name}</span>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <h4 className={`font-semibold mt-4 mb-2 ${theme.colorText} flex items-center`}>
+                  <i className="fas fa-tags mr-2"></i>
+                  Categories
+                </h4>
+                <div className="grid grid-cols-1 gap-2">
+                  {["Shirt", "Pants", "Dress", "Suit", "Traditional"].map((category) => (
+                    <motion.div
+                      key={`cat-${category}`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleCategoryChange(category)}
+                      className={`p-3 border rounded-lg cursor-pointer flex items-center ${
+                        categoryFilter.includes(category)
+                          ? `${theme.hoverBg} bg-opacity-50`
+                          : `${theme.colorBg}`
+                      } ${theme.colorBorder}`}
+                    >
+                      {categoryFilter.includes(category) && (
+                        <i className="fas fa-check text-green-500 mr-3"></i>
+                      )}
+                      <i
+                        className={`fas fa-${
+                          category === "Shirt"
+                            ? "tshirt"
+                            : category === "Pants"
+                            ? "jeans"
+                            : category === "Dress"
+                            ? "female"
+                            : category === "Suit"
+                            ? "user-tie"
+                            : "hat-cowboy"
+                        } mr-3 ${
+                          categoryFilter.includes(category)
+                            ? "text-blue-400"
+                            : ""
+                        }`}
+                      ></i>
+                      <span className={theme.colorText}>{category}</span>
                     </motion.div>
                   ))}
                 </div>
@@ -560,6 +723,232 @@ const Market = () => {
                 />
               </div>
             </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Quick View Modal */}
+        <AnimatePresence>
+          {quickViewOpen && selectedProduct && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+              <motion.div
+                className={`relative w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden ${theme.colorBg} shadow-2xl flex flex-col md:flex-row`}
+                variants={quickViewVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              >
+                {/* Close Button */}
+                <button
+                  className={`absolute top-4 right-4 z-10 p-2 rounded-full ${theme.colorBgSecondary} ${theme.colorText} hover:bg-red-500 hover:text-white transition-colors`}
+                  onClick={() => setQuickViewOpen(false)}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+
+                {/* Image Gallery */}
+                <div className="relative w-full md:w-1/2 h-64 md:h-auto overflow-hidden">
+                  <AnimatePresence custom={1} initial={false}>
+                    <motion.div
+                      key={currentImageIndex}
+                      custom={1}
+                      variants={imageVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <Image
+                        src={
+                          getProductImages()[currentImageIndex] ||
+                          "/images/default-product.png"
+                        }
+                        alt={selectedProduct.baseProductData?.name || "Product"}
+                        fill
+                        className="object-contain"
+                        priority
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+
+                  {/* Navigation Arrows */}
+                  {getProductImages().length > 1 && (
+                    <>
+                      <button
+                        className={`absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full ${theme.colorBgSecondary} ${theme.colorText} hover:bg-blue-500 hover:text-white transition-colors`}
+                        onClick={prevImage}
+                      >
+                        <i className="fas fa-chevron-left"></i>
+                      </button>
+                      <button
+                        className={`absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full ${theme.colorBgSecondary} ${theme.colorText} hover:bg-blue-500 hover:text-white transition-colors`}
+                        onClick={nextImage}
+                      >
+                        <i className="fas fa-chevron-right"></i>
+                      </button>
+                    </>
+                  )}
+
+                  {/* Image Indicators */}
+                  {getProductImages().length > 1 && (
+                    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                      {getProductImages().map((_, index) => (
+                        <button
+                          key={index}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            currentImageIndex === index
+                              ? "bg-blue-500 w-4"
+                              : "bg-gray-300"
+                          }`}
+                          onClick={() => setCurrentImageIndex(index)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Product Details */}
+                <div className="w-full md:w-1/2 p-6 overflow-y-auto">
+                  <div className="flex items-center mb-4">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3">
+                      <Image
+                        src={selectedProduct.tailorImage}
+                        alt={selectedProduct.tailor}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <span className={`font-medium ${theme.colorText}`}>
+                      {selectedProduct.tailor}
+                    </span>
+                  </div>
+
+                  <h2 className={`text-2xl font-bold mb-2 ${theme.colorText}`}>
+                    {selectedProduct.baseProductData?.name || "Unnamed Product"}
+                  </h2>
+
+                  <div className="flex items-center mb-4">
+                    <div className="flex mr-2">
+                      {renderStars(selectedProduct.rating)}
+                    </div>
+                    <span className={`text-sm ${theme.colorText} opacity-80`}>
+                      ({Math.floor(Math.random() * 100)} reviews)
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm ${theme.colorBgSecondary} ${theme.colorText}`}
+                    >
+                      <i
+                        className={`fas fa-${
+                          selectedProduct.gender === "Male"
+                            ? "male"
+                            : selectedProduct.gender === "Female"
+                            ? "female"
+                            : selectedProduct.gender === "Kids"
+                            ? "child"
+                            : "tshirt"
+                        } mr-1`}
+                      ></i>
+                      {selectedProduct.gender}
+                    </span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm ${theme.colorBgSecondary} ${theme.colorText}`}
+                    >
+                      <i className="fas fa-tag mr-1"></i>
+                      {selectedProduct.baseProductData?.category || "Uncategorized"}
+                    </span>
+                    {selectedProduct.baseProductData?.material && (
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm ${theme.colorBgSecondary} ${theme.colorText}`}
+                      >
+                        <i className="fas fa-cut mr-1"></i>
+                        {selectedProduct.baseProductData.material}
+                      </span>
+                    )}
+                    {selectedProduct.has3DTryOn && (
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`}
+                      >
+                        <i className="fas fa-vr-cardboard mr-1"></i>
+                        3D Try-On Available
+                      </span>
+                    )}
+                    {selectedProduct.isCustom && (
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200`}
+                      >
+                        <i className="fas fa-magic mr-1"></i>
+                        Custom Product
+                      </span>
+                    )}
+                  </div>
+
+                  <p className={`text-lg font-bold mb-4 ${theme.colorText}`}>
+                    PKR {selectedProduct.price.toLocaleString("en-PK")}
+                  </p>
+
+                  <p className={`mb-6 ${theme.colorText} opacity-90`}>
+                    {selectedProduct.description ||
+                      selectedProduct.baseProductData?.name +
+                        " stitching service"}
+                  </p>
+
+                  <div className="flex flex-col gap-3">
+                    <SimpleButton
+                      btnText={
+                        <>
+                          <i className="fas fa-shopping-cart mr-2"></i>
+                          Add to Cart
+                        </>
+                      }
+                      type="primary"
+                      fullWidth
+                      onClick={() => handleActionButtonClick("Add to Cart")}
+                    />
+                    
+                    {selectedProduct.has3DTryOn && (
+                      <SimpleButton
+                        btnText={
+                          <>
+                            <i className="fas fa-magic mr-2"></i>
+                            Customize Now
+                          </>
+                        }
+                        type="secondary"
+                        fullWidth
+                        onClick={handleCustomizeClick}
+                      />
+                    )}
+                    
+                    <SimpleButton
+                      btnText={
+                        <>
+                          <i className="fas fa-bolt mr-2"></i>
+                          Buy Now
+                        </>
+                      }
+                      type="primary-outline"
+                      fullWidth
+                      onClick={() => handleActionButtonClick("Buy Now")}
+                    />
+                  </div>
+
+                  <div className={`mt-6 pt-6 border-t ${theme.colorBorder}`}>
+                    <h3 className={`font-bold mb-2 ${theme.colorText}`}>
+                      <i className="fas fa-truck mr-2"></i>
+                      Delivery Information
+                    </h3>
+                    <p className={`text-sm ${theme.colorText} opacity-80`}>
+                      Ready in {selectedProduct.deliveryTime || "7-14 days"} • 
+                      Free shipping on orders over PKR 5,000
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </div>
