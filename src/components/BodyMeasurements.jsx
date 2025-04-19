@@ -259,7 +259,7 @@ Guidelines:
           <motion.div
             key={key}
             whileHover={{ scale: 1.04 }}
-            className={`p-4 ${theme.colorBg} rounded-lg border ${theme.colorBorder} ${theme.hoverBg} transition-all duration-200`}
+            className={`p-4 ${theme.colorBg} rounded-lg border ${theme.colorBorder} transition-all duration-200`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center">

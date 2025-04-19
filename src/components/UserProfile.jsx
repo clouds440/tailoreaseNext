@@ -26,9 +26,9 @@ const UserProfile = ({ userData, uid }) => {
     <div className="p-4 text-center">
       <motion.div
         className="p-4 text-center rounded-xl backdrop-blur-xl bg-opacity-90 border"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.7, delay: 0.3 }}
       >
         <h3 className="text-2xl font-bold">
           {uid ? "Shared" : "Your"} Profile

@@ -51,7 +51,6 @@ const OutfitCustomization = () => {
 
       if (docSnap.exists()) {
         const outfitData = docSnap.data();
-        console.log("Shared outfit:", outfitData);
         return outfitData;
       } else {
         console.log("No such document!");
@@ -154,7 +153,7 @@ const OutfitCustomization = () => {
           type: mimeType,
         });
 
-        // upload it; pass oldImagePath if you have one
+        // upload it
         const { url, error } = await uploadImage(
           file,
           null,
@@ -181,7 +180,10 @@ const OutfitCustomization = () => {
       }
       setGeneratingLink(true);
       let newTextures = await handleUploadAllTextures();
+      let outfitNames = uniqueOutfits.toString().toUpperCase()
       const customizations = {
+        outfitNames,
+        link: shareLink,
         morphValues,
         colorValue,
         color,
@@ -300,7 +302,7 @@ const OutfitCustomization = () => {
                   onChange={(e) =>
                     handleMorphChange(outfit, index, parseFloat(e.target.value))
                   }
-                  className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-blue-500 
+                  className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer accent-blue-500 
              [&::-webkit-slider-thumb]:appearance-none 
              [&::-webkit-slider-thumb]:w-4 
              [&::-webkit-slider-thumb]:h-4 
@@ -328,7 +330,7 @@ const OutfitCustomization = () => {
               <div className="flex items-center">
                 <label
                   htmlFor={`file-input-${outfit}`}
-                  className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.colorBg} ${theme.hoverBg}`}
+                  className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.mainTheme} ${theme.hoverBg}`}
                 >
                   {texture[outfit] ? "Change Texture" : "Choose a Texture"}
                 </label>
@@ -354,7 +356,7 @@ const OutfitCustomization = () => {
         ))}
 
         {/* Skin Tone slider */}
-        <div className={`border-y pb-5 ${theme.borderColor}`}>
+        <div className={`border-y pb-5 ${theme.colorBorder}`}>
           <h3 className="text-lg font-semibold my-3">Model</h3>
           <h3 className="text-sm font-medium">Skin Tone</h3>
           <input
@@ -364,7 +366,7 @@ const OutfitCustomization = () => {
             step="0.01"
             value={colorValue}
             onChange={(e) => setColorValue(parseFloat(e.target.value))}
-            className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-blue-500 
+            className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer accent-blue-500 
                [&::-webkit-slider-thumb]:appearance-none 
                [&::-webkit-slider-thumb]:w-4 
                [&::-webkit-slider-thumb]:h-4 

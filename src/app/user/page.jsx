@@ -26,7 +26,7 @@ const UserDashboard = () => {
 
   // State for dashboard mode (ignored if shared mode is active)
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   // If not in shared mode, ensure the user is logged in; if not, redirect to login page.
@@ -154,7 +154,7 @@ const UserDashboard = () => {
                     }}
                     className={`rounded-2xl py-3 px-6 text-sm font-medium flex items-center gap-2 transition-colors duration-300 ${
                       activeTab === tab.key ? theme.colorBg : "bg-transparent"
-                    } hover:${theme.hoverBg} ${theme.hoverText}`}
+                    } ${theme.hoverBg}`}
                   >
                     <i className={tab.icon}></i>
                     {tab.label}

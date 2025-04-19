@@ -28,7 +28,7 @@ export const UserProvider = ({ children }) => {
       iconColor: "text-blue-500",
       hoverText: "hover:text-blue-400",
       colorBg: "bg-slate-700 backdrop-blur-xl bg-opacity-90",
-      hoverBg: "hover:bg-indigo-400 hover:bg-opacity-40",
+      hoverBg: "hover:bg-indigo-300 hover:bg-opacity-30",
       hoverShadow: "hover:shadow-md hover:shadow-amber-300",
     },
     lunarGlow: {
@@ -38,9 +38,9 @@ export const UserProvider = ({ children }) => {
       colorText: "text-black",
       colorBorder: "border-black",
       iconColor: "text-blue-600",
-      hoverText: "hover:text-gray-600",
+      hoverText: "hover:text-gray-700",
       colorBg: "bg-gray-300 backdrop-blur-xl bg-opacity-85",
-      hoverBg: "hover:bg-gray-500 hover:bg-opacity-70",
+      hoverBg: "hover:bg-gray-500 hover:bg-opacity-80",
       hoverShadow: "hover:shadow-md hover:shadow-gray-800",
     },
     neonPunk: {
