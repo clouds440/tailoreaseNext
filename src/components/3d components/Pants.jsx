@@ -4,6 +4,8 @@ import { useFrame } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as THREE from "three";
 
+export const pantsMorphTargets = ["Waist", "Length", "Legs"];
+
 const Pants = ({ morphValues, morphTargets, texture, color }) => {
   const modelRef = useRef();
   const [gltf, setGltf] = useState(null);
@@ -67,7 +69,5 @@ const Pants = ({ morphValues, morphTargets, texture, color }) => {
     />
   ) : null;
 };
-
-Pants.morphTargets = ["Waist", "Length", "Legs"];
 
 export default Pants;

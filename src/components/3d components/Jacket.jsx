@@ -4,6 +4,8 @@ import { useFrame } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as THREE from "three";
 
+export const jacketMorphTargets = ["Length", "Belly", "Chest"];
+
 const Jacket = ({
   morphValues,
   morphTargets,
@@ -96,7 +98,5 @@ const Jacket = ({
     />
   ) : null;
 };
-
-Jacket.morphTargets = ["Length", "Belly", "Chest"];
 
 export default Jacket;

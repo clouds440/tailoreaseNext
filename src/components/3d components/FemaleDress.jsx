@@ -4,6 +4,14 @@ import { useFrame } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as THREE from "three";
 
+export const femaleDressMorphTargets = [
+  "Belly",
+  "Waist",
+  "Skirt",
+  "Chest",
+  "Arms",
+];
+
 const FemaleDress = ({ morphValues, morphTargets, texture, color }) => {
   const modelRef = useRef();
   const [gltf, setGltf] = useState(null);
@@ -67,7 +75,5 @@ const FemaleDress = ({ morphValues, morphTargets, texture, color }) => {
     />
   ) : null;
 };
-
-FemaleDress.morphTargets = ["Belly", "Waist", "Skirt", "Chest", "Arms"];
 
 export default FemaleDress;

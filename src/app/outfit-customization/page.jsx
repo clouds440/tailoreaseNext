@@ -369,6 +369,11 @@ const OutfitCustomization = () => {
                 />
               </div>
             )}
+            {/* test for vercel */}
+            {console.log("Outfit Name: " + outfit)}
+            {console.log("morphTarget Keys: ", Object.keys(morphTargets))}
+            {console.log("morphTargets for an outfit: " + morphTargets[outfit])}
+            {console.log("type of morphTargets obj : ", morphTargets)}
           </div>
         ))}
 
