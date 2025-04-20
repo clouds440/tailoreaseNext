@@ -24,6 +24,7 @@ const CustomizationScene = ({
   texture,
   color,
   gender,
+  buttonTexturePath,
 }) => {
   const [selectedOutfits, setSelectedOutfits] = useState([]);
   const [morphTargets, localSetMorphTargets] = useState({});
@@ -102,10 +103,11 @@ const CustomizationScene = ({
           morphTargets={morphTargets[Outfit.name] || []}
           texture={texture[Outfit.name]}
           color={color[Outfit.name]}
+          buttonTexturePath={buttonTexturePath}
         />
       ))}
 
-      <OrbitControls enableZoom={false} />
+      <OrbitControls />
     </Canvas>
   );
 };

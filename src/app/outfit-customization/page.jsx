@@ -17,6 +17,7 @@ import {
 import { db } from "@/utils/firebaseConfig";
 import ShareLinkDialog from "@/components/ShareLinkDialog";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import ButtonSelector from "@/components/3d components/ButtonSelector";
 
 const outfitCategories = {
   jacket: { category: "torso", gender: "male" },
@@ -106,6 +107,9 @@ const OutfitCustomization = () => {
   const [texture, setTexture] = useState({});
   const [color, setColor] = useState({});
   const [selectedOutfit, setSelectedOutfit] = useState(null); // Track the selected outfit for color picker visibility
+  const [buttonTexturePath, setbuttonTexturePath] = useState(
+    "/models/buttons/button3.jpg"
+  );
 
   useEffect(() => {
     const getSharedOutfit = async () => {
@@ -180,7 +184,7 @@ const OutfitCustomization = () => {
       }
       setGeneratingLink(true);
       let newTextures = await handleUploadAllTextures();
-      let outfitNames = uniqueOutfits.toString().toUpperCase()
+      let outfitNames = uniqueOutfits.toString().toUpperCase();
       const customizations = {
         outfitNames,
         link: shareLink,
@@ -352,6 +356,21 @@ const OutfitCustomization = () => {
                 } // Pass the outfit name along with the color
               />
             )}
+
+            {/* Button Texture Selector */}
+            {outfitCategories[outfit.toLocaleLowerCase()].category ===
+              "torso" && (
+              <div className="mt-4">
+                <h4 className="text-sm font-semibold mb-2">
+                  Choose Button Type
+                </h4>
+                <ButtonSelector
+                  onSelect={(texturePath) => {
+                    setbuttonTexturePath(texturePath);
+                  }}
+                />
+              </div>
+            )}
           </div>
         ))}
 
@@ -428,6 +447,7 @@ const OutfitCustomization = () => {
           texture={texture}
           color={color}
           gender={selectedGender}
+          buttonTexturePath={buttonTexturePath}
         />
       </div>
     </div>
