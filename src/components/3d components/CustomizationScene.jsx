@@ -3,19 +3,16 @@ import React, { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Mannequin from "./Mannequin";
-import Jacket, { jacketMorphTargets } from "./Jacket";
-import Shirt, { shirtMorphTargets } from "./Shirt";
-import Pants, { pantsMorphTargets } from "./Pants";
-import FemaleDress, { femaleDressMorphTargets } from "./FemaleDress";
+import Jacket from "./Jacket";
+import Shirt from "./Shirt";
+import Pants from "./Pants";
+import FemaleDress from "./FemaleDress";
 
 const outfitComponents = {
-  jacket: { component: Jacket, morphTargets: jacketMorphTargets },
-  shirt: { component: Shirt, morphTargets: shirtMorphTargets },
-  pants: { component: Pants, morphTargets: pantsMorphTargets },
-  femaleDress: {
-    component: FemaleDress,
-    morphTargets: femaleDressMorphTargets,
-  },
+  jacket: Jacket,
+  shirt: Shirt,
+  pants: Pants,
+  femaleDress: FemaleDress,
 };
 
 const CustomizationScene = ({
@@ -40,8 +37,10 @@ const CustomizationScene = ({
     setSelectedOutfits(newOutfits);
 
     const newMorphTargets = {};
-    newOutfits.forEach(({ component, morphTargets }) => {
-      newMorphTargets[component.name] = morphTargets || [];
+    newOutfits.forEach((OutfitComponent) => {
+      const targets = OutfitComponent.morphTargets || [];
+      newMorphTargets[OutfitComponent.name] = targets;
+      console.log(OutfitComponent.name);
     });
 
     localSetMorphTargets(newMorphTargets);
@@ -53,6 +52,7 @@ const CustomizationScene = ({
       }
       return prevTargets;
     });
+
     setMorphValues((prev) => {
       const updatedMorphValues = { ...prev };
       newOutfits.forEach((OutfitComponent) => {
@@ -97,13 +97,13 @@ const CustomizationScene = ({
         }
       />
 
-      {selectedOutfits.map(({ component: OutfitComponent }, index) => (
-        <OutfitComponent
+      {selectedOutfits.map((Outfit, index) => (
+        <Outfit
           key={index}
-          morphValues={morphValues[OutfitComponent.name] || []}
-          morphTargets={morphTargets[OutfitComponent.name] || []}
-          texture={texture[OutfitComponent.name]}
-          color={color[OutfitComponent.name]}
+          morphValues={morphValues[Outfit.name] || []}
+          morphTargets={morphTargets[Outfit.name] || []}
+          texture={texture[Outfit.name]}
+          color={color[Outfit.name]}
           buttonTexturePath={buttonTexturePath}
         />
       ))}
