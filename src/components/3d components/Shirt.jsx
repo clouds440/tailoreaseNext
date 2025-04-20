@@ -67,7 +67,7 @@ const Shirt = ({ morphValues, morphTargets, texture, color }) => {
     />
   ) : null;
 };
-Shirt.name = "Shirt";
+Shirt.componentName = "Shirt";
 Shirt.morphTargets = ["Belly", "Chest", "Arms", "Length"];
 
 export default Shirt;

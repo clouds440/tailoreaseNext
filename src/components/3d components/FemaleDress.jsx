@@ -67,7 +67,7 @@ const FemaleDress = ({ morphValues, morphTargets, texture, color }) => {
     />
   ) : null;
 };
-FemaleDress.name = "FemaleDress";
+FemaleDress.componentName = "FemaleDress";
 FemaleDress.morphTargets = ["Belly", "Waist", "Skirt", "Chest", "Arms"];
 
 export default FemaleDress;

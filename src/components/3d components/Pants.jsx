@@ -67,7 +67,7 @@ const Pants = ({ morphValues, morphTargets, texture, color }) => {
     />
   ) : null;
 };
-Pants.name = "Pants";
+Pants.componentName = "Pants";
 Pants.morphTargets = ["Waist", "Length", "Legs"];
 
 export default Pants;
