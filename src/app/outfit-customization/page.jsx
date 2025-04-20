@@ -115,6 +115,7 @@ const OutfitCustomization = () => {
     const getSharedOutfit = async () => {
       const outfitData = await fetchSharedOutfit(shareId);
       if (outfitData) {
+        setbuttonTexturePath(outfitData.buttonTexturePath);
         setColor(outfitData.color);
         setMorphValues(outfitData.morphValues);
         setColorValue(outfitData.colorValue);
