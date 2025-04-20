@@ -138,23 +138,25 @@ const TailorProductDashboard = () => {
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
-  
+
     try {
       setIsUploading(true);
       setUploadProgress(0);
-  
+
       // Convert files to base64 and upload
       const uploadPromises = files.map(async (file) => {
         const reader = new FileReader();
         const base64Image = await new Promise((resolve, reject) => {
-          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onload = () => resolve(reader.result.split(",")[1]);
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
-  
-        const fileName = `product-${Date.now()}-${Math.random().toString(36).substring(2, 9)}.jpg`;
+
+        const fileName = `product-${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(2, 9)}.jpg`;
         const targetPath = "images/products";
-  
+
         const response = await fetch("/api/imageUpload", {
           method: "POST",
           headers: {
@@ -166,16 +168,16 @@ const TailorProductDashboard = () => {
             targetPath,
           }),
         });
-  
+
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Image upload failed: ${errorText}`);
         }
-  
+
         const { url } = await response.json();
         return "/" + url; // Return the public URL
       });
-  
+
       const imageUrls = await Promise.all(uploadPromises);
       setCustomProductImages((prev) => [...prev, ...imageUrls]);
     } catch (error) {
@@ -223,9 +225,11 @@ const TailorProductDashboard = () => {
         tailorId: userData.bId,
         price: parseFloat(formData.price),
         deliveryTime: `${formData.deliveryTime} days`,
-        description: formData.description || (isCustom 
-          ? `${formData.name} custom product` 
-          : `${selectedProduct.name} stitching service`),
+        description:
+          formData.description ||
+          (isCustom
+            ? `${formData.name} custom product`
+            : `${selectedProduct.name} stitching service`),
         isActive: formData.isActive,
         has3DTryOn: isCustom ? false : formData.has3DTryOn,
         createdAt: new Date().toISOString(),
@@ -239,7 +243,7 @@ const TailorProductDashboard = () => {
               material: formData.material,
               imageUrl: customProductImages[0] || "",
               gender: formData.gender,
-              isPredefined: false
+              isPredefined: false,
             }
           : {
               name: selectedProduct.name,
@@ -247,9 +251,9 @@ const TailorProductDashboard = () => {
               material: selectedProduct.material,
               imageUrl: selectedProduct.imageUrl,
               gender: selectedProduct.gender,
-              isPredefined: true
+              isPredefined: true,
             },
-        productId: isCustom ? uuidv4() : selectedProduct.id
+        productId: isCustom ? uuidv4() : selectedProduct.id,
       };
 
       await addDoc(collection(db, "tailorProducts"), productData);
@@ -336,7 +340,9 @@ const TailorProductDashboard = () => {
       );
 
       showSuccessMessage(
-        `Product ${!product.isActive ? "activated" : "deactivated"} successfully!`
+        `Product ${
+          !product.isActive ? "activated" : "deactivated"
+        } successfully!`
       );
     } catch (error) {
       console.error("Error updating product status:", error);
@@ -504,7 +510,9 @@ const TailorProductDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center h-full ${theme.mainTheme}`}>
+      <div
+        className={`flex items-center justify-center h-full ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -531,7 +539,9 @@ const TailorProductDashboard = () => {
 
   if (error) {
     return (
-      <div className={`flex items-center justify-center h-full ${theme.mainTheme}`}>
+      <div
+        className={`flex items-center justify-center h-full ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -557,7 +567,9 @@ const TailorProductDashboard = () => {
   }
 
   return (
-    <div className={`h-full overflow-y-auto ${theme.mainTheme} ${theme.colorText} py-8 px-4 sm:px-6 lg:px-8`}>
+    <div
+      className={`h-full overflow-y-auto ${theme.mainTheme} ${theme.colorText} py-8 px-4 sm:px-6 lg:px-8`}
+    >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -576,41 +588,35 @@ const TailorProductDashboard = () => {
           </motion.h1>
 
           <motion.div
-            className="flex rounded-lg p-1 bg-gray-200 dark:bg-gray-700"
+            className="flex rounded-lg p-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <button
-              className={`px-4 py-2 rounded-md transition-all ${
-                selectedTab === "add"
-                  ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}`
-                  : `${theme.colorText} opacity-80 hover:opacity-100`
-              }`}
+            <SimpleButton
+              btnText={"Add Product"}
+              icon={<i className="fas fa-plus mr-2"></i>}
+              extraclasses={`px-4 py-2 rounded-r-none`}
+              type={selectedTab === "add" ? `primary` : `default`}
               onClick={() => setSelectedTab("add")}
-            >
-              <i className="fas fa-plus mr-2"></i> Add Product
-            </button>
-            <button
-              className={`px-4 py-2 rounded-md transition-all ${
-                selectedTab === "manage"
-                  ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}`
-                  : `${theme.colorText} opacity-80 hover:opacity-100`
-              }`}
+            />
+
+            <SimpleButton
+              btnText={"My Products"}
+              icon={<i className="fas fa-list mr-2"></i>}
+              extraclasses={`rounded-l-none`}
+              type={selectedTab === "add" ? `default` : `primary`}
               onClick={() => setSelectedTab("manage")}
-            >
-              <i className="fas fa-list mr-2"></i> My Products (
-              {tailorProducts.length})
-            </button>
+            />
           </motion.div>
         </div>
 
         {/* Main Content */}
         {selectedTab === "add" ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
             {/* Products List */}
             <motion.div
-              className={`lg:col-span-1 rounded-2xl shadow-xl overflow-hidden ${theme.colorBg} border ${theme.colorBorder}`}
+              className={`lg:col-span-2 xl:col-span-1 rounded-xl shadow-xl overflow-hidden ${theme.colorBg} border ${theme.colorBorder}`}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
@@ -619,29 +625,24 @@ const TailorProductDashboard = () => {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold flex items-center">
                     <i className={`fas fa-boxes mr-2 ${theme.iconColor}`}></i>
-                    {viewMode === "predefined" ? "Base Products" : "Custom Product"}
+                    {viewMode === "predefined"
+                      ? "Base Products"
+                      : "Custom Product"}
                   </h2>
-                  <div className="flex space-x-2">
-                    <button
-                      className={`px-3 py-1 rounded-md text-sm ${
-                        viewMode === "predefined"
-                          ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}`
-                          : `${theme.colorBgSecondary}`
-                      }`}
+                  <div className="flex translate-x-4">
+                    <SimpleButton
+                      btnText={"Predefined"}
+                      extraclasses={`py-1 rounded-r-none text-sm`}
+                      type={viewMode === "predefined" ? `primary` : `default`}
                       onClick={() => setViewMode("predefined")}
-                    >
-                      Predefined
-                    </button>
-                    <button
-                      className={`px-3 py-1 rounded-md text-sm ${
-                        viewMode === "custom"
-                          ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}`
-                          : `${theme.colorBgSecondary}`
-                      }`}
+                    />
+
+                    <SimpleButton
+                      btnText={"Custom"}
+                      extraclasses={`py-1 rounded-l-none text-sm`}
+                      type={viewMode === "predefined" ? `default` : `primary`}
                       onClick={() => setViewMode("custom")}
-                    >
-                      Custom
-                    </button>
+                    />
                   </div>
                 </div>
 
@@ -699,7 +700,8 @@ const TailorProductDashboard = () => {
                         No Base Products Available
                       </h3>
                       <p className="opacity-80">
-                        There are currently no predefined products in the system.
+                        There are currently no predefined products in the
+                        system.
                       </p>
                     </motion.div>
                   )
@@ -771,7 +773,7 @@ const TailorProductDashboard = () => {
                       {/* Image Upload */}
                       <div>
                         <label className={`block mb-2 ${theme.colorText}`}>
-                          Product Images (First image will be main image)
+                          Product Images (First image will be the thumbnail)
                         </label>
                         <div
                           className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer ${theme.colorBorder} hover:${theme.colorPrimaryBorder}`}
@@ -783,12 +785,14 @@ const TailorProductDashboard = () => {
                             onChange={handleImageUpload}
                             className="hidden"
                             multiple
-                            accept="image/*"
+                            accept=".jpg, .png"
                           />
-                          <i className={`fas fa-cloud-upload-alt text-3xl mb-2 ${theme.iconColor}`}></i>
+                          <i
+                            className={`fas fa-cloud-upload-alt text-3xl mb-2 ${theme.iconColor}`}
+                          ></i>
                           <p className="mb-1">Click or drag images to upload</p>
                           <p className="text-sm opacity-70">
-                            Upload multiple images (max 5MB each)
+                            Upload multiple images (max 2MB each)
                           </p>
                         </div>
 
@@ -899,7 +903,9 @@ const TailorProductDashboard = () => {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                            <i className={`fas fa-image text-4xl ${theme.iconColor}`}></i>
+                            <i
+                              className={`fas fa-image text-4xl ${theme.iconColor}`}
+                            ></i>
                           </div>
                         )}
                       </motion.div>
@@ -1067,9 +1073,7 @@ const TailorProductDashboard = () => {
                             <label
                               htmlFor="has3DTryOn"
                               className={`${theme.colorText} ${
-                                !selectedProduct?.has3DTryOn
-                                  ? "opacity-50"
-                                  : ""
+                                !selectedProduct?.has3DTryOn ? "opacity-50" : ""
                               }`}
                             >
                               Enable 3D Try-On for this product
@@ -1268,13 +1272,14 @@ const TailorProductDashboard = () => {
                                   3D Try-On
                                 </span>
                               )}
-                              {product.isCustom && product.images?.length > 1 && (
-                                <span
-                                  className={`px-2 py-1 rounded-full ${theme.colorBgTertiary}`}
-                                >
-                                  {product.images.length} photos
-                                </span>
-                              )}
+                              {product.isCustom &&
+                                product.images?.length > 1 && (
+                                  <span
+                                    className={`px-2 py-1 rounded-full ${theme.colorBgTertiary}`}
+                                  >
+                                    {product.images.length} photos
+                                  </span>
+                                )}
                             </div>
                           </div>
                         </div>
