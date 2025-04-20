@@ -57,8 +57,8 @@ const CustomizationScene = ({
     setMorphValues((prev) => {
       const updatedMorphValues = { ...prev };
       newOutfits.forEach((OutfitComponent) => {
-        if (!updatedMorphValues[OutfitComponent.name]) {
-          updatedMorphValues[OutfitComponent.name] = Array(
+        if (!updatedMorphValues[OutfitComponent.componentName]) {
+          updatedMorphValues[OutfitComponent.componentName] = Array(
             OutfitComponent.morphTargets?.length || 0
           ).fill(0);
         }
