@@ -24,8 +24,8 @@ const ButtonSelector = ({ onSelect }) => {
             alt={`Button ${btn.id}`}
             width={64}
             height={64}
-            className="rounded-full border-2 border-gray-300 hover:border-black cursor-pointer transition-all"
-            onClick={() => onSelect(btn.src)} // <-- this passes the texture path string
+            className="rounded-full border-2 border-gray-300 hover:border-black hover:scale-[130%] cursor-pointer transition-all"
+            onClick={() => onSelect(btn.src)}
           />
         </div>
       ))}

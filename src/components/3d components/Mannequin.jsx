@@ -16,6 +16,7 @@ const Mannequin = ({ colorValue, gender, useSkirtAsDefaultLegs = true }) => {
 
   const [femaleParts, setFemaleParts] = useState(null);
   const [femaleSkirt, setFemaleSkirt] = useState(null);
+  const [boxers, setBoxers] = useState(null);
 
   const getSkinTone = (value) => {
     const skinTones = [
@@ -36,6 +37,11 @@ const Mannequin = ({ colorValue, gender, useSkirtAsDefaultLegs = true }) => {
 
   useEffect(() => {
     const loadFemaleExtras = async () => {
+      const transform = (obj) => {
+        obj.scale.set(1.7, 1.7, 1.7);
+        obj.position.set(-0.03, -3.3, 1);
+      };
+
       if (gender === "female") {
         const [partsGLB, skirtGLB] = await Promise.all([
           new GLTFLoader().loadAsync(
@@ -46,17 +52,20 @@ const Mannequin = ({ colorValue, gender, useSkirtAsDefaultLegs = true }) => {
           ),
         ]);
 
-        const transform = (obj) => {
-          obj.scale.set(1.7, 1.7, 1.7);
-          obj.position.set(-0.03, -3.3, 1);
-        };
-
         transform(partsGLB.scene);
         transform(skirtGLB.scene);
 
         setFemaleParts(partsGLB.scene);
         setFemaleSkirt(skirtGLB.scene);
-      } else {
+      } else if (gender === "male") {
+        const boxersGLB = await new GLTFLoader().loadAsync(
+          "/models/mannequin/boxers.glb"
+        );
+
+        transform(boxersGLB.scene);
+
+        setBoxers(boxersGLB.scene);
+
         setFemaleParts(null);
         setFemaleSkirt(null);
       }
@@ -89,6 +98,9 @@ const Mannequin = ({ colorValue, gender, useSkirtAsDefaultLegs = true }) => {
       {gender === "female" && femaleParts && <primitive object={femaleParts} />}
       {gender === "female" && useSkirtAsDefaultLegs && femaleSkirt && (
         <primitive object={femaleSkirt} />
+      )}
+      {gender === "male" && useSkirtAsDefaultLegs && boxers && (
+        <primitive object={boxers} />
       )}
     </>
   );
