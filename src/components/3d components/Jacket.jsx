@@ -96,7 +96,6 @@ const Jacket = ({
     />
   ) : null;
 };
-Jacket.componentName = "Jacket";
 Jacket.morphTargets = ["Length", "Belly", "Chest"];
 
 export default Jacket;

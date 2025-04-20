@@ -39,9 +39,7 @@ const CustomizationScene = ({
     const newMorphTargets = {};
     newOutfits.forEach((OutfitComponent) => {
       const targets = OutfitComponent.morphTargets || [];
-      const componentName = OutfitComponent.componentName; // Use custom property here
-      newMorphTargets[componentName] = targets;
-      console.log(componentName);
+      newMorphTargets[OutfitComponent.name] = targets;
     });
 
     localSetMorphTargets(newMorphTargets);
@@ -57,8 +55,8 @@ const CustomizationScene = ({
     setMorphValues((prev) => {
       const updatedMorphValues = { ...prev };
       newOutfits.forEach((OutfitComponent) => {
-        if (!updatedMorphValues[OutfitComponent.componentName]) {
-          updatedMorphValues[OutfitComponent.componentName] = Array(
+        if (!updatedMorphValues[OutfitComponent.name]) {
+          updatedMorphValues[OutfitComponent.name] = Array(
             OutfitComponent.morphTargets?.length || 0
           ).fill(0);
         }
