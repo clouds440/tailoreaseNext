@@ -107,7 +107,7 @@ const CustomizationScene = ({
         />
       ))}
 
-      <OrbitControls />
+      <OrbitControls minDistance={1} maxDistance={5} />
     </Canvas>
   );
 };

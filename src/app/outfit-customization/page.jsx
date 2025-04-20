@@ -186,6 +186,7 @@ const OutfitCustomization = () => {
       let newTextures = await handleUploadAllTextures();
       let outfitNames = uniqueOutfits.toString().toUpperCase();
       const customizations = {
+        buttonTexturePath,
         outfitNames,
         link: shareLink,
         morphValues,
@@ -290,10 +291,8 @@ const OutfitCustomization = () => {
       >
         {/* Morph sliders for each outfit */}
         {Object.keys(morphTargets).map((outfit) => (
-          <div key={outfit} className="mb-6">
-            <h3 className="text-lg font-semibold mb-2">
-              {outfit.toUpperCase()}
-            </h3>
+          <div key={outfit} className="mb-4 border-b pb-4">
+            <h3 className="text-lg font-semibold mb-2">{outfit}</h3>
             {morphTargets[outfit]?.map((target, index) => (
               <div key={`${outfit}-${index}`} className="mb-3">
                 <label className="block text-sm font-medium">{target}</label>
@@ -358,11 +357,10 @@ const OutfitCustomization = () => {
             )}
 
             {/* Button Texture Selector */}
-            {outfitCategories[outfit.toLocaleLowerCase()].category ===
-              "torso" && (
+            {outfit === "Jacket" && (
               <div className="mt-4">
                 <h4 className="text-sm font-semibold mb-2">
-                  Choose Button Type
+                  Choose Button Type for {outfit}
                 </h4>
                 <ButtonSelector
                   onSelect={(texturePath) => {
@@ -371,11 +369,15 @@ const OutfitCustomization = () => {
                 />
               </div>
             )}
+            {/* test for vercel */}
+            {console.log("Outfit Name: " + outfit)}
+            {console.log("morphTarget Keys: " + Object.keys(morphTargets))}
+            {console.log("morphTargets for an outfit: " + morphTargets[outfit])}
           </div>
         ))}
 
         {/* Skin Tone slider */}
-        <div className={`border-y pb-5 ${theme.colorBorder}`}>
+        <div className={`border-b pb-5 ${theme.colorBorder}`}>
           <h3 className="text-lg font-semibold my-3">Model</h3>
           <h3 className="text-sm font-medium">Skin Tone</h3>
           <input
