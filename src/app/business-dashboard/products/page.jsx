@@ -42,6 +42,7 @@ const TailorProductDashboard = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [viewMode, setViewMode] = useState("predefined"); // 'predefined' or 'custom'
   const fileInputRef = useRef(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const {
     theme,
@@ -59,7 +60,6 @@ const TailorProductDashboard = () => {
     price: "",
     deliveryTime: "7",
     description: "",
-    has3DTryOn: false,
     isActive: true,
     gender: "unisex",
   });
@@ -121,7 +121,6 @@ const TailorProductDashboard = () => {
       price: "",
       deliveryTime: "7",
       description: "",
-      has3DTryOn: product.has3DTryOn || false,
       isActive: true,
       gender: product.gender || "unisex",
     });
@@ -135,16 +134,24 @@ const TailorProductDashboard = () => {
     }));
   };
 
-  const handleImageUpload = async (e) => {
+  const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
+    setSelectedFiles(files);
+    
+    // Create preview URLs for selected files
+    const previewUrls = files.map(file => URL.createObjectURL(file));
+    setCustomProductImages(previewUrls);
+  };
+
+  const uploadImages = async () => {
+    if (selectedFiles.length === 0) return [];
 
     try {
       setIsUploading(true);
       setUploadProgress(0);
 
-      // Convert files to base64 and upload
-      const uploadPromises = files.map(async (file) => {
+      const uploadPromises = selectedFiles.map(async (file) => {
         const reader = new FileReader();
         const base64Image = await new Promise((resolve, reject) => {
           reader.onload = () => resolve(reader.result.split(",")[1]);
@@ -175,21 +182,23 @@ const TailorProductDashboard = () => {
         }
 
         const { url } = await response.json();
-        return "/" + url; // Return the public URL
+        return "/" + url;
       });
 
       const imageUrls = await Promise.all(uploadPromises);
-      setCustomProductImages((prev) => [...prev, ...imageUrls]);
+      return imageUrls;
     } catch (error) {
       console.error("Error uploading images:", error);
-      showErrorMessage("Failed to upload images. Please try again.");
+      throw error;
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
     }
   };
+
   const removeImage = (index) => {
-    setCustomProductImages((prev) => prev.filter((_, i) => i !== index));
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setCustomProductImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -220,6 +229,15 @@ const TailorProductDashboard = () => {
         throw new Error("Please enter a valid price");
       }
 
+      // Upload images only when submitting for custom products
+      let uploadedImageUrls = [];
+      if (viewMode === "custom") {
+        uploadedImageUrls = await uploadImages();
+        if (uploadedImageUrls.length === 0) {
+          throw new Error("Please upload at least one image for custom products");
+        }
+      }
+
       const isCustom = viewMode === "custom";
       const productData = {
         tailorId: userData.bId,
@@ -231,17 +249,17 @@ const TailorProductDashboard = () => {
             ? `${formData.name} custom product`
             : `${selectedProduct.name} stitching service`),
         isActive: formData.isActive,
-        has3DTryOn: isCustom ? false : formData.has3DTryOn,
+        has3DTryOn: !isCustom, // Always true for predefined products
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         isCustom,
-        images: isCustom ? customProductImages : [],
+        images: isCustom ? uploadedImageUrls : [],
         baseProductData: isCustom
           ? {
               name: formData.name,
               category: formData.category,
               material: formData.material,
-              imageUrl: customProductImages[0] || "",
+              imageUrl: uploadedImageUrls[0] || "",
               gender: formData.gender,
               isPredefined: false,
             }
@@ -283,18 +301,17 @@ const TailorProductDashboard = () => {
           price: "",
           deliveryTime: "7",
           description: "",
-          has3DTryOn: false,
           isActive: true,
           gender: "unisex",
         });
         setCustomProductImages([]);
+        setSelectedFiles([]);
       } else {
         setSelectedProduct(null);
         setFormData({
           price: "",
           deliveryTime: "7",
           description: "",
-          has3DTryOn: false,
           isActive: true,
           gender: "unisex",
         });
@@ -782,7 +799,7 @@ const TailorProductDashboard = () => {
                           <input
                             type="file"
                             ref={fileInputRef}
-                            onChange={handleImageUpload}
+                            onChange={handleFileSelect}
                             className="hidden"
                             multiple
                             accept=".jpg, .png"
@@ -795,21 +812,6 @@ const TailorProductDashboard = () => {
                             Upload multiple images (max 2MB each)
                           </p>
                         </div>
-
-                        {/* Upload Progress */}
-                        {isUploading && (
-                          <div className="mt-2">
-                            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                              <div
-                                className="bg-blue-600 h-2.5 rounded-full"
-                                style={{ width: `${uploadProgress}%` }}
-                              ></div>
-                            </div>
-                            <p className="text-xs text-right mt-1">
-                              Uploading... {uploadProgress}%
-                            </p>
-                          </div>
-                        )}
 
                         {/* Image Previews */}
                         {customProductImages.length > 0 && (
@@ -1052,36 +1054,6 @@ const TailorProductDashboard = () => {
                             Custom Description (optional)
                           </label>
                         </motion.div>
-
-                        {/* 3D Try On - Only for predefined products */}
-                        {viewMode === "predefined" && (
-                          <motion.div
-                            className="flex items-center"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4 }}
-                          >
-                            <input
-                              type="checkbox"
-                              name="has3DTryOn"
-                              id="has3DTryOn"
-                              checked={formData.has3DTryOn}
-                              onChange={handleInputChange}
-                              disabled={!selectedProduct?.has3DTryOn}
-                              className="w-4 h-4 rounded mr-3"
-                            />
-                            <label
-                              htmlFor="has3DTryOn"
-                              className={`${theme.colorText} ${
-                                !selectedProduct?.has3DTryOn ? "opacity-50" : ""
-                              }`}
-                            >
-                              Enable 3D Try-On for this product
-                              {!selectedProduct?.has3DTryOn &&
-                                " (Not available for this product)"}
-                            </label>
-                          </motion.div>
-                        )}
 
                         {/* Status */}
                         <motion.div

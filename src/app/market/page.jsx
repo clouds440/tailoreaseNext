@@ -21,7 +21,7 @@ const Market = () => {
   const { theme, userData, setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
   const router = useRouter();
 
-  const categories = [
+  const genders = [
     { name: "Male", icon: "male" },
     { name: "Female", icon: "female" },
     { name: "Kids", icon: "child" },
@@ -40,9 +40,7 @@ const Market = () => {
     showCount: 60,
     page: 1,
   });
-  const [categoryFilter, setCategoryFilter] = useState([]);
   const [genderFilter, setGenderFilter] = useState([]);
-  const [appliedFilters, setAppliedFilters] = useState([]);
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -94,7 +92,6 @@ const Market = () => {
             tailor: tailorName,
             tailorImage,
             rating: 4.5, // Mock rating for now
-            category: productData.baseProductData?.category || "Uncategorized",
             gender: productData.baseProductData?.gender || "Unisex",
           };
         })
@@ -113,13 +110,6 @@ const Market = () => {
             product.baseProductData?.material
               ?.toLowerCase()
               .includes(searchQuery.toLowerCase())
-        );
-      }
-
-      // Apply category filters
-      if (appliedFilters.length > 0) {
-        products = products.filter((product) =>
-          appliedFilters.includes(product.category)
         );
       }
 
@@ -160,8 +150,7 @@ const Market = () => {
 
   useEffect(() => {
     fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appliedFilters, genderFilter, filters.sortBy, searchQuery]);
+  }, [genderFilter, filters.sortBy, searchQuery]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -223,14 +212,6 @@ const Market = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
-  const handleCategoryChange = (value) => {
-    setCategoryFilter((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
-    );
-  };
-
   const handleGenderChange = (value) => {
     setGenderFilter((prev) =>
       prev.includes(value)
@@ -240,14 +221,11 @@ const Market = () => {
   };
 
   const applyFilters = () => {
-    setAppliedFilters([...categoryFilter]);
     setDropdownOpen(false);
   };
 
   const clearFilters = () => {
-    setCategoryFilter([]);
     setGenderFilter([]);
-    setAppliedFilters([]);
     setSearchQuery("");
   };
 
@@ -402,7 +380,7 @@ const Market = () => {
           </div>
 
           {/* Active Filters */}
-          {(appliedFilters.length > 0 || genderFilter.length > 0 || searchQuery) && (
+          {(genderFilter.length > 0 || searchQuery) && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -412,17 +390,6 @@ const Market = () => {
                 <i className="fas fa-filter mr-1"></i>
                 Active filters:
               </span>
-              {appliedFilters.map((filter) => (
-                <motion.span
-                  key={`cat-${filter}`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className={`px-3 py-1 text-xs rounded-full ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} flex items-center`}
-                >
-                  <i className="fas fa-tag mr-1"></i>
-                  {filter}
-                </motion.span>
-              ))}
               {genderFilter.map((filter) => (
                 <motion.span
                   key={`gen-${filter}`}
@@ -620,80 +587,33 @@ const Market = () => {
                 <h3
                   className={`font-bold text-lg mb-2 ${theme.colorText} flex items-center`}
                 >
-                  <i className="fas fa-filter mr-2"></i>
-                  Filter Products
-                </h3>
-                
-                <h4 className={`font-semibold mt-4 mb-2 ${theme.colorText} flex items-center`}>
                   <i className="fas fa-venus-mars mr-2"></i>
-                  Gender
-                </h4>
+                  Filter by Gender
+                </h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {categories.map((category) => (
+                  {genders.map((gender) => (
                     <motion.div
-                      key={`gender-${category.name}`}
+                      key={gender.name}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => handleGenderChange(category.name)}
+                      onClick={() => handleGenderChange(gender.name)}
                       className={`p-3 border rounded-lg cursor-pointer flex items-center ${
-                        genderFilter.includes(category.name)
+                        genderFilter.includes(gender.name)
                           ? `${theme.hoverBg} bg-opacity-50`
                           : `${theme.colorBg}`
                       } ${theme.colorBorder}`}
                     >
-                      {genderFilter.includes(category.name) && (
+                      {genderFilter.includes(gender.name) && (
                         <i className="fas fa-check text-green-500 mr-3"></i>
                       )}
                       <i
-                        className={`fas fa-${category.icon} mr-3 ${
-                          genderFilter.includes(category.name)
+                        className={`fas fa-${gender.icon} mr-3 ${
+                          genderFilter.includes(gender.name)
                             ? "text-blue-400"
                             : ""
                         }`}
                       ></i>
-                      <span className={theme.colorText}>{category.name}</span>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <h4 className={`font-semibold mt-4 mb-2 ${theme.colorText} flex items-center`}>
-                  <i className="fas fa-tags mr-2"></i>
-                  Categories
-                </h4>
-                <div className="grid grid-cols-1 gap-2">
-                  {["Shirt", "Pants", "Dress", "Suit", "Traditional"].map((category) => (
-                    <motion.div
-                      key={`cat-${category}`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleCategoryChange(category)}
-                      className={`p-3 border rounded-lg cursor-pointer flex items-center ${
-                        categoryFilter.includes(category)
-                          ? `${theme.hoverBg} bg-opacity-50`
-                          : `${theme.colorBg}`
-                      } ${theme.colorBorder}`}
-                    >
-                      {categoryFilter.includes(category) && (
-                        <i className="fas fa-check text-green-500 mr-3"></i>
-                      )}
-                      <i
-                        className={`fas fa-${
-                          category === "Shirt"
-                            ? "tshirt"
-                            : category === "Pants"
-                            ? "jeans"
-                            : category === "Dress"
-                            ? "female"
-                            : category === "Suit"
-                            ? "user-tie"
-                            : "hat-cowboy"
-                        } mr-3 ${
-                          categoryFilter.includes(category)
-                            ? "text-blue-400"
-                            : ""
-                        }`}
-                      ></i>
-                      <span className={theme.colorText}>{category}</span>
+                      <span className={theme.colorText}>{gender.name}</span>
                     </motion.div>
                   ))}
                 </div>
