@@ -39,6 +39,7 @@ const CustomizationScene = ({
     const newMorphTargets = {};
     newOutfits.forEach((OutfitComponent) => {
       const targets = OutfitComponent.morphTargets || [];
+      console.log(`Outfit: ${OutfitComponent.name}, Morph Targets:`, targets);
       newMorphTargets[OutfitComponent.name] = targets;
     });
 
