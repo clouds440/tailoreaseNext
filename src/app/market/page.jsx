@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef, useContext, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import UserContext from "@/utils/UserContext";
@@ -16,9 +16,11 @@ import {
   where,
   getDoc,
 } from "firebase/firestore";
+import TrendPop from "@/components/TrendPop";
 
 const Market = () => {
-  const { theme, userData, setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
+  const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
+    useContext(UserContext);
   const router = useRouter();
 
   const genders = [
@@ -54,7 +56,7 @@ const Market = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       // Fetch all active tailor products
@@ -74,7 +76,11 @@ const Market = () => {
           let tailorImage = "/images/default-tailor.png";
           try {
             if (productData.tailorId) {
-              const tailorDocReference = doc(db, "tailors", productData.tailorId);
+              const tailorDocReference = doc(
+                db,
+                "tailors",
+                productData.tailorId
+              );
               const tailorDoc = await getDoc(tailorDocReference);
               if (tailorDoc.exists()) {
                 const tailorData = tailorDoc.data();
@@ -129,7 +135,9 @@ const Market = () => {
           products.sort((a, b) => b.price - a.price);
           break;
         case "Newest First":
-          products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          products.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
           break;
         case "Recommended":
         default:
@@ -146,11 +154,11 @@ const Market = () => {
       console.error("Error fetching products:", error);
     }
     setLoading(false);
-  };
+  }, [filters.sortBy, genderFilter, searchQuery]);
 
   useEffect(() => {
     fetchProducts();
-  }, [genderFilter, filters.sortBy, searchQuery]);
+  }, [fetchProducts]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -277,7 +285,8 @@ const Market = () => {
 
   const handleCustomizeClick = () => {
     if (!selectedProduct) return;
-    const category = selectedProduct.baseProductData?.category?.toLowerCase() || "shirt";
+    const category =
+      selectedProduct.baseProductData?.category?.toLowerCase() || "shirt";
     router.push(`/outfit-customization?outfit=${category}`);
   };
 
@@ -291,29 +300,25 @@ const Market = () => {
   };
 
   const nextImage = () => {
-    const images = selectedProduct?.isCustom 
-      ? selectedProduct.images 
+    const images = selectedProduct?.isCustom
+      ? selectedProduct.images
       : [selectedProduct?.baseProductData?.imageUrl];
-    
-    setCurrentImageIndex((prev) => 
-      prev === images.length - 1 ? 0 : prev + 1
-    );
+
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
   const prevImage = () => {
-    const images = selectedProduct?.isCustom 
-      ? selectedProduct.images 
+    const images = selectedProduct?.isCustom
+      ? selectedProduct.images
       : [selectedProduct?.baseProductData?.imageUrl];
-    
-    setCurrentImageIndex((prev) => 
-      prev === 0 ? images.length - 1 : prev - 1
-    );
+
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
   const getProductImages = () => {
     if (!selectedProduct) return [];
-    return selectedProduct.isCustom 
-      ? selectedProduct.images 
+    return selectedProduct.isCustom
+      ? selectedProduct.images
       : [selectedProduct.baseProductData?.imageUrl];
   };
 
@@ -676,7 +681,11 @@ const Market = () => {
                       initial="enter"
                       animate="center"
                       exit="exit"
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                      }}
                       className="absolute inset-0 flex items-center justify-center"
                     >
                       <Image
@@ -778,7 +787,8 @@ const Market = () => {
                       className={`px-3 py-1 rounded-full text-sm ${theme.colorBgSecondary} ${theme.colorText}`}
                     >
                       <i className="fas fa-tag mr-1"></i>
-                      {selectedProduct.baseProductData?.category || "Uncategorized"}
+                      {selectedProduct.baseProductData?.category ||
+                        "Uncategorized"}
                     </span>
                     {selectedProduct.baseProductData?.material && (
                       <span
@@ -828,7 +838,7 @@ const Market = () => {
                       fullWidth
                       onClick={() => handleActionButtonClick("Add to Cart")}
                     />
-                    
+
                     {selectedProduct.has3DTryOn && (
                       <SimpleButton
                         btnText={
@@ -842,7 +852,7 @@ const Market = () => {
                         onClick={handleCustomizeClick}
                       />
                     )}
-                    
+
                     <SimpleButton
                       btnText={
                         <>
@@ -862,7 +872,7 @@ const Market = () => {
                       Delivery Information
                     </h3>
                     <p className={`text-sm ${theme.colorText} opacity-80`}>
-                      Ready in {selectedProduct.deliveryTime || "7-14 days"} • 
+                      Ready in {selectedProduct.deliveryTime || "7-14 days"} •
                       Free shipping on orders over PKR 5,000
                     </p>
                   </div>
@@ -872,6 +882,7 @@ const Market = () => {
           )}
         </AnimatePresence>
       </div>
+      <TrendPop />
     </div>
   );
 };
