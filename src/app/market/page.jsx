@@ -696,6 +696,7 @@ const Market = () => {
                         alt={selectedProduct.baseProductData?.name || "Product"}
                         fill
                         className="object-contain"
+                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                         priority
                       />
                     </motion.div>
@@ -746,6 +747,7 @@ const Market = () => {
                         alt={selectedProduct.tailor}
                         fill
                         className="object-cover"
+                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                       />
                     </div>
                     <span className={`font-medium ${theme.colorText}`}>

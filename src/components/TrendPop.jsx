@@ -32,20 +32,21 @@ const TrendPop = () => {
 
   const getUserCity = async () => {
     try {
-      const res = await axios.get("https://ipapi.co/json/");
-      return res.data.city || "Pakistan";
-    } catch {
-      return "Pakistan";
+      const res = await axios.get("https://ipwhois.app/json/");
+      return res.data.city || "Unknown";
+    } catch (error) {
+      console.error(error);
+      return "Unknown";
     }
   };
 
   const getSeasonFromDate = (date = new Date()) => {
     const month = date.getMonth() + 1; // Jan = 0, so add 1
-
-    if ([12, 1, 2].includes(month)) return "Winter";
-    if ([3, 4, 5].includes(month)) return "Spring";
-    if ([6, 7, 8].includes(month)) return "Summer";
-    if ([9, 10, 11].includes(month)) return "Autumn";
+    const year = date.getFullYear();
+    if ([12, 1, 2].includes(month)) return "Winter, " + year;
+    if ([3, 4, 5].includes(month)) return "Spring, " + year;
+    if ([6, 7, 8].includes(month)) return "Summer, " + year;
+    if ([9, 10, 11].includes(month)) return "Autumn, " + year;
 
     return "Unknown";
   };
