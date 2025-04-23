@@ -382,7 +382,7 @@ const OutfitCustomization = () => {
                 <input
                   id={`file-input-${outfit}`}
                   type="file"
-                  accept=".jpg, .png"
+                  accept=".jpg, jpeg, .png"
                   onChange={(e) => handleTextureUpload(outfit, null, e)}
                   className="hidden" // Hide the default input element
                 />
