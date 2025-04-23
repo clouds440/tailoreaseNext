@@ -110,7 +110,7 @@ const OutfitCustomization = () => {
   const [texture, setTexture] = useState({});
   const [color, setColor] = useState({});
   const [selectedOutfit, setSelectedOutfit] = useState(null); // Track the selected outfit for color picker visibility
-  const [shalwarTexure, setShalwarTexture] = useState(null);
+  const [shalwarTexure, setshalwarTexure] = useState(null);
   const [collarVisible, setCollarVisible] = useState(true);
   const [buttonTexturePath, setbuttonTexturePath] = useState(
     "/models/buttons/button3.jpg"
@@ -126,7 +126,7 @@ const OutfitCustomization = () => {
         setColorValue(outfitData.colorValue);
         setTexture(outfitData.texture);
         setCollarVisible(outfitData.collarVisible);
-        setShalwarTexture(outfitData.shalwarTexure);
+        setshalwarTexure(outfitData.shalwarTexureURL);
       }
     };
 
@@ -181,9 +181,37 @@ const OutfitCustomization = () => {
         console.error(`Error processing ${outfit}:`, e);
       }
     }
+    // Manually check and upload shalwarTexure if it exists
+    let shalwarTexureURL = "";
+    if (shalwarTexure && shalwarTexure.startsWith("blob:")) {
+      try {
+        const resp = await fetch(shalwarTexure);
+        const blob = await resp.blob();
+        const mimeType = blob.type;
+        const extension = mimeType.split("/")[1] || "jpg";
 
-    return newTextures;
-  }, [texture, uploadImage]);
+        const file = new File([blob], `shalwar-${Date.now()}.${extension}`, {
+          type: mimeType,
+        });
+
+        const { url, error } = await uploadImage(
+          file,
+          null,
+          "images/user/customizations"
+        );
+
+        if (error) {
+          console.error("Failed to upload shalwarTexure:", error);
+        } else {
+          shalwarTexureURL = url;
+        }
+      } catch (e) {
+        console.error("Error processing shalwarTexure:", e);
+      }
+    }
+
+    return { newTextures, shalwarTexureURL };
+  }, [shalwarTexure, texture, uploadImage]);
 
   const uploadCustomization = async () => {
     try {
@@ -191,10 +219,10 @@ const OutfitCustomization = () => {
         throw new Error("User not authenticated");
       }
       setGeneratingLink(true);
-      let newTextures = await handleUploadAllTextures();
+      let { newTextures, shalwarTexureURL } = await handleUploadAllTextures();
       let outfitNames = uniqueOutfits.toString().toUpperCase();
       const customizations = {
-        shalwarTexure,
+        shalwarTexureURL,
         collarVisible,
         buttonTexturePath,
         outfitNames,
@@ -245,7 +273,7 @@ const OutfitCustomization = () => {
       const file = e.target.files[0];
       const objectURL = URL.createObjectURL(file); // Convert file to URL
       if (shalwar) {
-        setShalwarTexture(objectURL);
+        setshalwarTexure(objectURL);
       } else {
         setTexture((prevTextures) => ({
           ...prevTextures,
