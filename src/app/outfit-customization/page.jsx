@@ -25,8 +25,11 @@ const outfitCategories = {
   shirt: { category: "torso", gender: "male" },
   jeans: { category: "legs", gender: "unisex" },
   femaleDress: { category: "full", gender: "female" },
+  kameezShalwar: { category: "full", gender: "male" },
   // Add more here...
 };
+
+const hasButtonsTypes = ["Jacket", "KameezShalwar"];
 
 const OutfitCustomization = () => {
   const { theme, userData, userLoggedIn } = useContext(UserContext);
@@ -107,6 +110,7 @@ const OutfitCustomization = () => {
   const [texture, setTexture] = useState({});
   const [color, setColor] = useState({});
   const [selectedOutfit, setSelectedOutfit] = useState(null); // Track the selected outfit for color picker visibility
+  const [shalwarTexure, setShalwarTexture] = useState(null);
   const [buttonTexturePath, setbuttonTexturePath] = useState(
     "/models/buttons/button3.jpg"
   );
@@ -231,14 +235,18 @@ const OutfitCustomization = () => {
     setMorphValues(values);
   }, []);
 
-  const handleTextureUpload = (outfit, e) => {
+  const handleTextureUpload = (outfit, shalwar, e) => {
     if (e.target.files.length > 0) {
       const file = e.target.files[0];
       const objectURL = URL.createObjectURL(file); // Convert file to URL
-      setTexture((prevTextures) => ({
-        ...prevTextures,
-        [outfit]: objectURL, // Store texture per outfit
-      }));
+      if (shalwar) {
+        setShalwarTexture(objectURL);
+      } else {
+        setTexture((prevTextures) => ({
+          ...prevTextures,
+          [outfit]: objectURL, // Store texture per outfit
+        }));
+      }
     }
   };
 
@@ -342,10 +350,27 @@ const OutfitCustomization = () => {
                   id={`file-input-${outfit}`}
                   type="file"
                   accept=".jpg, .png"
-                  onChange={(e) => handleTextureUpload(outfit, e)}
+                  onChange={(e) => handleTextureUpload(outfit, null, e)}
                   className="hidden" // Hide the default input element
                 />
               </div>
+              {outfit === "KameezShalwar" && (
+                <div className="flex items-center">
+                  <label
+                    htmlFor={`file-shalwar-${outfit}`}
+                    className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.mainTheme} ${theme.hoverBg}`}
+                  >
+                    {texture[outfit] ? "Change Shalwar" : "Shalwar Texture"}
+                  </label>
+                  <input
+                    id={`file-shalwar-${outfit}`}
+                    type="file"
+                    accept=".jpg, .png"
+                    onChange={(e) => handleTextureUpload(outfit, "shalwar", e)}
+                    className="hidden" // Hide the default input element
+                  />
+                </div>
+              )}
             </div>
 
             {/* Color Picker */}
@@ -358,7 +383,7 @@ const OutfitCustomization = () => {
             )}
 
             {/* Button Texture Selector */}
-            {outfit === "Jacket" && (
+            {hasButtonsTypes.includes(outfit) && (
               <div className="mt-4">
                 <h4 className="text-sm font-semibold mb-2">
                   Choose Button Type for {outfit}
@@ -447,6 +472,7 @@ const OutfitCustomization = () => {
           color={color}
           gender={selectedGender}
           buttonTexturePath={buttonTexturePath}
+          shalwarTexurePath={shalwarTexure}
         />
       </div>
     </div>

@@ -7,12 +7,14 @@ import Jacket from "./Jacket";
 import Shirt from "./Shirt";
 import Pants from "./Pants";
 import FemaleDress from "./FemaleDress";
+import KameezShalwar from "./KameezShalwar";
 
 const outfitComponents = {
   jacket: Jacket,
   shirt: Shirt,
   pants: Pants,
   femaleDress: FemaleDress,
+  kameezShalwar: KameezShalwar,
 };
 
 const CustomizationScene = ({
@@ -25,6 +27,7 @@ const CustomizationScene = ({
   color,
   gender,
   buttonTexturePath,
+  shalwarTexurePath,
 }) => {
   const [selectedOutfits, setSelectedOutfits] = useState([]);
   const [morphTargets, localSetMorphTargets] = useState({});
@@ -91,7 +94,14 @@ const CustomizationScene = ({
         gender={gender}
         useSkirtAsDefaultLegs={
           !outfitTypes.some((type) =>
-            ["pants", "shorts", "skirt", "jeans", "femaleDress"].includes(type)
+            [
+              "pants",
+              "shorts",
+              "skirt",
+              "jeans",
+              "femaleDress",
+              "kameezShalwar",
+            ].includes(type)
           )
         }
       />
@@ -104,6 +114,7 @@ const CustomizationScene = ({
           texture={texture[Outfit.name]}
           color={color[Outfit.name]}
           buttonTexturePath={buttonTexturePath}
+          shalwarTexturePath={shalwarTexurePath}
         />
       ))}
 
