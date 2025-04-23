@@ -125,6 +125,8 @@ const OutfitCustomization = () => {
         setMorphValues(outfitData.morphValues);
         setColorValue(outfitData.colorValue);
         setTexture(outfitData.texture);
+        setCollarVisible(outfitData.collarVisible);
+        setShalwarTexture(outfitData.shalwarTexure);
       }
     };
 
@@ -192,6 +194,8 @@ const OutfitCustomization = () => {
       let newTextures = await handleUploadAllTextures();
       let outfitNames = uniqueOutfits.toString().toUpperCase();
       const customizations = {
+        shalwarTexure,
+        collarVisible,
         buttonTexturePath,
         outfitNames,
         link: shareLink,
