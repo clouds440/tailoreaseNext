@@ -61,7 +61,7 @@ const TailorProductDashboard = () => {
     deliveryTime: "7",
     description: "",
     isActive: true,
-    gender: "unisex",
+    gender: "Unisex",
   });
 
   useEffect(() => {
@@ -122,7 +122,7 @@ const TailorProductDashboard = () => {
       deliveryTime: "7",
       description: "",
       isActive: true,
-      gender: product.gender || "unisex",
+      gender: product.gender || "Unisex",
     });
   };
 
@@ -465,10 +465,10 @@ const TailorProductDashboard = () => {
   const GenderDropdown = ({ value, onChange }) => {
     const [isOpen, setIsOpen] = useState(false);
     const options = [
-      { value: "male", label: "Male" },
-      { value: "female", label: "Female" },
-      { value: "kids", label: "Kids" },
-      { value: "unisex", label: "Unisex" },
+      { value: "Male", label: "Male" },
+      { value: "Female", label: "Female" },
+      { value: "Kids", label: "Kids" },
+      { value: "Unisex", label: "Unisex" },
     ];
 
     return (

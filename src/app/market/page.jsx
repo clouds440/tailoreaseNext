@@ -98,7 +98,7 @@ const Market = () => {
             tailor: tailorName,
             tailorImage,
             rating: 4.5, // Mock rating for now
-            gender: productData.baseProductData?.gender || "Unisex",
+            gender: productData.baseProductData.gender,
           };
         })
       );
