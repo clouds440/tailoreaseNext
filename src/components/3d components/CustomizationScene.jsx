@@ -28,6 +28,7 @@ const CustomizationScene = ({
   gender,
   buttonTexturePath,
   shalwarTexurePath,
+  collarVisible,
 }) => {
   const [selectedOutfits, setSelectedOutfits] = useState([]);
   const [morphTargets, localSetMorphTargets] = useState({});
@@ -115,6 +116,7 @@ const CustomizationScene = ({
           color={color[Outfit.name]}
           buttonTexturePath={buttonTexturePath}
           shalwarTexturePath={shalwarTexurePath}
+          collarVisible={collarVisible}
         />
       ))}
 

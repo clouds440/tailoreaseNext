@@ -111,6 +111,7 @@ const OutfitCustomization = () => {
   const [color, setColor] = useState({});
   const [selectedOutfit, setSelectedOutfit] = useState(null); // Track the selected outfit for color picker visibility
   const [shalwarTexure, setShalwarTexture] = useState(null);
+  const [collarVisible, setCollarVisible] = useState(true);
   const [buttonTexturePath, setbuttonTexturePath] = useState(
     "/models/buttons/button3.jpg"
   );
@@ -384,14 +385,28 @@ const OutfitCustomization = () => {
 
             {/* Button Texture Selector */}
             {hasButtonsTypes.includes(outfit) && (
-              <div className="mt-4">
+              <div className="mt-4 border-t pt-3">
                 <h4 className="text-sm font-semibold mb-2">
-                  Choose Button Type for {outfit}
+                  Choose Button Style for {outfit}
                 </h4>
                 <ButtonSelector
                   onSelect={(texturePath) => {
                     setbuttonTexturePath(texturePath);
                   }}
+                />
+              </div>
+            )}
+
+            {outfit === "KameezShalwar" && (
+              <div className="mt-4 border-t pt-3">
+                <h4 className="text-sm font-semibold mb-2">
+                  Choose Collar Type for {outfit}
+                </h4>
+                <SimpleButton
+                  btnText={collarVisible ? "Double Collar" : "Band Collar"}
+                  extraclasses={`mt-3`}
+                  type={collarVisible ? "primary" : "default"}
+                  onClick={() => setCollarVisible(!collarVisible)}
                 />
               </div>
             )}
@@ -473,6 +488,7 @@ const OutfitCustomization = () => {
           gender={selectedGender}
           buttonTexturePath={buttonTexturePath}
           shalwarTexurePath={shalwarTexure}
+          collarVisible={collarVisible}
         />
       </div>
     </div>

@@ -11,6 +11,7 @@ const KameezShalwar = ({
   buttonTexturePath,
   color,
   shalwarTexturePath,
+  collarVisible,
 }) => {
   const modelRef = useRef();
   const [gltf, setGltf] = useState(null);
@@ -36,6 +37,15 @@ const KameezShalwar = ({
       setLoadedTexture(null);
     }
   }, [texture, gltf]);
+
+  useEffect(() => {
+    if (!gltf) return;
+
+    const collarMesh = gltf.scene.getObjectByName("Collar"); // use the actual mesh name here
+    if (collarMesh) {
+      collarMesh.visible = collarVisible;
+    }
+  }, [gltf, collarVisible]);
 
   useEffect(() => {
     if (gltf && shalwarTexturePath) {
