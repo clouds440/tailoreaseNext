@@ -29,7 +29,7 @@ const outfitCategories = {
   // Add more here...
 };
 
-const hasButtonsTypes = ["Jacket", "KameezShalwar"];
+const hasButtonsTypes = ["Jacket", "KameezShalwar", "Shirt"];
 
 const OutfitCustomization = () => {
   const { theme, userData, userLoggedIn } = useContext(UserContext);
