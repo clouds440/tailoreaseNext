@@ -3,7 +3,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import UserContext from "@/utils/UserContext";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "@/utils/firebaseConfig";
 import ClipLoader from "react-spinners/ClipLoader";
 
@@ -44,7 +51,14 @@ const MyOutfits = () => {
   }, [userData?.uid]);
 
   const handleDeleteOutfit = async (id) => {
-    // handle deletion of the outfit
+    if (!id) return;
+
+    try {
+      await deleteDoc(doc(db, "myOutfits", id));
+      setOutfits((prevOutfits) => prevOutfits.filter((o) => o.id !== id));
+    } catch (err) {
+      console.error("Error deleting outfit:", err);
+    }
   };
 
   const handleShareOutfit = async (link) => {
@@ -52,6 +66,19 @@ const MyOutfits = () => {
       setShowMessage({ message: "Link copied to clipboard!", type: "success" });
       setPopUpMessageTrigger(true);
     });
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (index) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.2,
+        delay: index * 0.25,
+        ease: "easeOut",
+      },
+    }),
   };
 
   return (
@@ -82,13 +109,10 @@ const MyOutfits = () => {
               <motion.a
                 key={index}
                 href={`${outfit.link}${outfit.id}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.2,
-                  delay: index * 0.25,
-                  ease: "easeOut",
-                }}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                custom={index}
                 whileHover={{ scale: 1.03 }}
                 className={`relative rounded-lg overflow-hidden border shadow-md cursor-pointer ${theme?.colorBg} group`}
                 style={{
@@ -100,7 +124,7 @@ const MyOutfits = () => {
                 {(textures.length > 0 ? textures : [dummyThumbnail]).map(
                   (imgUrl, i) => (
                     <div
-                      key={i}
+                      key={`texture-${i}`}
                       className="relative"
                       style={{ flex: 1, width: "100%" }}
                     >
@@ -114,6 +138,19 @@ const MyOutfits = () => {
                       />
                     </div>
                   )
+                )}
+
+                {outfit.shalwarTexureURL && (
+                  <div className="relative" style={{ flex: 1, width: "100%" }}>
+                    <Image
+                      src={outfit.shalwarTexureURL}
+                      alt="Shalwar Texture"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                      priority={false}
+                    />
+                  </div>
                 )}
                 <div className="absolute bottom-0 w-full bg-black bg-opacity-60 text-white text-sm px-2 py-1 text-center truncate z-10">
                   {outfitName}

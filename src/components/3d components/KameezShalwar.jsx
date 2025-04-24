@@ -78,11 +78,16 @@ const KameezShalwar = ({
         });
       }
 
-      if (shalwarTexture) {
+      if (shalwarTexture || color) {
         // Traverse the scene and apply the button texture
         gltf.scene.traverse((child) => {
           if (child.isMesh && child.material?.name === "Shalwar") {
-            child.material.map = shalwarTexture;
+            child.material.map = shalwarTexture
+              ? shalwarTexture
+              : child.material.map;
+            child.material.color = color
+              ? new THREE.Color(color)
+              : child.material.color;
             child.material.needsUpdate = true; // Ensure it triggers material update
           }
         });
