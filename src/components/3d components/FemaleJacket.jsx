@@ -4,23 +4,22 @@ import { useFrame } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as THREE from "three";
 
-const FemaleGown = ({
+const FemaleJacket = ({
   morphValues,
   morphTargets,
   texture,
+  buttonTexturePath,
   color,
-  shalwarTexturePath,
-  collarVisible,
 }) => {
   const modelRef = useRef();
   const [gltf, setGltf] = useState(null);
   const textureLoader = useRef(new THREE.TextureLoader());
   const [loadedTexture, setLoadedTexture] = useState(null);
-  const [shalwarTexture, setShalwarTexture] = useState(null);
+  const [buttonTexture, setButtonTexture] = useState(null);
 
   useEffect(() => {
     const loader = new GLTFLoader();
-    loader.load("/models/female-gown/female-gown.glb", (loadedGltf) => {
+    loader.load("/models/female-jacket/female-jacket.glb", (loadedGltf) => {
       setGltf(loadedGltf);
     });
   }, []);
@@ -37,45 +36,44 @@ const FemaleGown = ({
   }, [texture, gltf]);
 
   useEffect(() => {
-    if (!gltf) return;
-
-    const collarMesh = gltf.scene.getObjectByName("Collar"); // use the actual mesh name here
-    if (collarMesh) {
-      collarMesh.visible = collarVisible;
-    }
-  }, [gltf, collarVisible]);
-
-  useEffect(() => {
-    if (gltf && shalwarTexturePath) {
-      textureLoader.current.load(shalwarTexturePath, (shalwarTex) => {
-        shalwarTex.colorSpace = THREE.SRGBColorSpace;
-        setShalwarTexture(shalwarTex);
+    if (gltf && buttonTexturePath) {
+      textureLoader.current.load(buttonTexturePath, (btTex) => {
+        btTex.colorSpace = THREE.SRGBColorSpace;
+        setButtonTexture(btTex);
       });
     }
-  }, [gltf, shalwarTexturePath]);
+  }, [gltf, buttonTexturePath]);
 
   useEffect(() => {
     if (gltf) {
       // Ensure that the texture is fully loaded before applying it
+      if (buttonTexture) {
+        // Traverse the scene and apply the button texture
+        gltf.scene.traverse((child) => {
+          if (child.isMesh && child.material?.name === "Buttons") {
+            child.material.map = buttonTexture;
+            child.material.needsUpdate = true; // Ensure it triggers material update
+          }
+        });
+      }
+
+      // Now, apply main texture for other parts
       gltf.scene.traverse((child) => {
         if (child.isMesh) {
-          if (child.material?.name === "Skirt") {
-            child.material.map = shalwarTexture || child.material.map;
-            child.material.color = color
-              ? new THREE.Color(color)
-              : child.material.color;
-            child.material.needsUpdate = true;
-          } else if (child.material?.name === "Top") {
-            child.material.map = loadedTexture || child.material.map;
-            child.material.color = color
-              ? new THREE.Color(color)
-              : child.material.color;
+          if (child.material?.name !== "Buttons") {
+            child.material = new THREE.MeshStandardMaterial({
+              map: loadedTexture || child.material.map, // Use main texture or keep existing
+              color: color ? new THREE.Color(color) : child.material.color, // Update color if provided
+              metalness: 0.1,
+              roughness: 0.6,
+              side: THREE.DoubleSide,
+            });
             child.material.needsUpdate = true;
           }
         }
       });
     }
-  }, [gltf, loadedTexture, color, shalwarTexture]);
+  }, [gltf, loadedTexture, buttonTexture, color]);
 
   useFrame(() => {
     if (modelRef.current && gltf) {
@@ -98,6 +96,6 @@ const FemaleGown = ({
     />
   ) : null;
 };
-FemaleGown.morphTargets = ["Arms", "Belly", "Chest"];
+FemaleJacket.morphTargets = ["Length", "Belly", "Arms"];
 
-export default FemaleGown;
+export default FemaleJacket;

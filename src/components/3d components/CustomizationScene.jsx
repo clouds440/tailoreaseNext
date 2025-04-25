@@ -10,6 +10,7 @@ import FemaleDress from "./FemaleDress";
 import KameezShalwar from "./KameezShalwar";
 import FemaleCoat from "./FemaleCoat";
 import FemaleGown from "./FemaleGown";
+import FemaleJacket from "./FemaleJacket";
 
 const outfitComponents = {
   jacket: Jacket,
@@ -19,6 +20,7 @@ const outfitComponents = {
   kameezShalwar: KameezShalwar,
   femaleCoat: FemaleCoat,
   femaleGown: FemaleGown,
+  femaleJacket: FemaleJacket,
 };
 
 const CustomizationScene = ({
@@ -124,7 +126,7 @@ const CustomizationScene = ({
         />
       ))}
 
-      <OrbitControls minDistance={1} maxDistance={5} />
+      <OrbitControls minDistance={1} maxDistance={7} />
     </Canvas>
   );
 };
