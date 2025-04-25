@@ -15,8 +15,12 @@ import {
   query,
   where,
   getDoc,
+  setDoc,
+  updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import TrendPop from "@/components/TrendPop";
+import AddToCart from "@/components/AddToCart";
 
 const Market = () => {
   const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
@@ -42,7 +46,8 @@ const Market = () => {
     showCount: 60,
     page: 1,
   });
-  const [genderFilter, setGenderFilter] = useState([]);
+  const [selectedGenderFilter, setSelectedGenderFilter] = useState([]); // Temporary selection
+  const [appliedGenderFilter, setAppliedGenderFilter] = useState([]); // Applied filters
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,6 +55,7 @@ const Market = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showAddToCart, setShowAddToCart] = useState(false);
 
   const dropdownRef = useRef(null);
   const dropdownButtonRef = useRef(null);
@@ -120,9 +126,9 @@ const Market = () => {
       }
 
       // Apply gender filters
-      if (genderFilter.length > 0) {
+      if (appliedGenderFilter.length > 0) {
         products = products.filter((product) =>
-          genderFilter.includes(product.gender)
+          appliedGenderFilter.includes(product.gender)
         );
       }
 
@@ -154,7 +160,7 @@ const Market = () => {
       console.error("Error fetching products:", error);
     }
     setLoading(false);
-  }, [filters.sortBy, genderFilter, searchQuery]);
+  }, [filters.sortBy, appliedGenderFilter, searchQuery]);
 
   useEffect(() => {
     fetchProducts();
@@ -220,8 +226,8 @@ const Market = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
-  const handleGenderChange = (value) => {
-    setGenderFilter((prev) =>
+  const handleGenderSelection = (value) => {
+    setSelectedGenderFilter((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
         : [...prev, value]
@@ -229,11 +235,13 @@ const Market = () => {
   };
 
   const applyFilters = () => {
+    setAppliedGenderFilter(selectedGenderFilter);
     setDropdownOpen(false);
   };
 
   const clearFilters = () => {
-    setGenderFilter([]);
+    setSelectedGenderFilter([]);
+    setAppliedGenderFilter([]);
     setSearchQuery("");
   };
 
@@ -290,10 +298,22 @@ const Market = () => {
     router.push(`/outfit-customization?outfit=${category}`);
   };
 
-  const handleActionButtonClick = (action) => {
+  const handleAddToCart = () => {
+    if (!userData?.uid) {
+      setShowMessage({
+        type: "error",
+        message: "Please login to add items to cart",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+    setShowAddToCart(true);
+  };
+
+  const handleBuyNow = () => {
     setShowMessage({
       type: "info",
-      message: `We're adding ${action} functionality later. Stay tuned!`,
+      message: "We're adding Buy Now functionality later. Stay tuned!",
     });
     setPopUpMessageTrigger(true);
     setQuickViewOpen(false);
@@ -385,7 +405,7 @@ const Market = () => {
           </div>
 
           {/* Active Filters */}
-          {(genderFilter.length > 0 || searchQuery) && (
+          {(appliedGenderFilter.length > 0 || searchQuery) && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -395,7 +415,7 @@ const Market = () => {
                 <i className="fas fa-filter mr-1"></i>
                 Active filters:
               </span>
-              {genderFilter.map((filter) => (
+              {appliedGenderFilter.map((filter) => (
                 <motion.span
                   key={`gen-${filter}`}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -601,19 +621,19 @@ const Market = () => {
                       key={gender.name}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => handleGenderChange(gender.name)}
+                      onClick={() => handleGenderSelection(gender.name)}
                       className={`p-3 border rounded-lg cursor-pointer flex items-center ${
-                        genderFilter.includes(gender.name)
+                        selectedGenderFilter.includes(gender.name)
                           ? `${theme.hoverBg} bg-opacity-50`
                           : `${theme.colorBg}`
                       } ${theme.colorBorder}`}
                     >
-                      {genderFilter.includes(gender.name) && (
+                      {selectedGenderFilter.includes(gender.name) && (
                         <i className="fas fa-check text-green-500 mr-3"></i>
                       )}
                       <i
                         className={`fas fa-${gender.icon} mr-3 ${
-                          genderFilter.includes(gender.name)
+                          selectedGenderFilter.includes(gender.name)
                             ? "text-blue-400"
                             : ""
                         }`}
@@ -838,7 +858,7 @@ const Market = () => {
                       }
                       type="primary"
                       fullWidth
-                      onClick={() => handleActionButtonClick("Add to Cart")}
+                      onClick={handleAddToCart}
                     />
 
                     {selectedProduct.has3DTryOn && (
@@ -864,7 +884,7 @@ const Market = () => {
                       }
                       type="primary-outline"
                       fullWidth
-                      onClick={() => handleActionButtonClick("Buy Now")}
+                      onClick={handleBuyNow}
                     />
                   </div>
 
@@ -885,6 +905,16 @@ const Market = () => {
         </AnimatePresence>
       </div>
       <TrendPop />
+
+      {/* Add to Cart Animation */}
+      {showAddToCart && selectedProduct && (
+        <AddToCart
+          product={selectedProduct}
+          onClose={() => setShowAddToCart(false)}
+          theme={theme}
+          userId={userData?.uid}
+        />
+      )}
     </div>
   );
 };
