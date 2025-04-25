@@ -29,10 +29,17 @@ const outfitCategories = {
   femaleCoat: { category: "torso", gender: "female" },
   femaleGown: { category: "full", gender: "female" },
   femaleJacket: { category: "torso", gender: "female" },
+  fullShirt: { category: "torso", gender: "male" },
   // Add more here...
 };
 
-const hasButtonsTypes = ["Jacket", "KameezShalwar", "Shirt", "FemaleJacket"];
+const hasButtonsTypes = [
+  "Jacket",
+  "KameezShalwar",
+  "Shirt",
+  "FemaleJacket",
+  "FullShirt",
+];
 
 const OutfitCustomization = () => {
   const { theme, userData, userLoggedIn } = useContext(UserContext);
