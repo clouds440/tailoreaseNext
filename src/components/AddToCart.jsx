@@ -3,12 +3,27 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { db } from "@/utils/firebaseConfig";
-import { doc, collection, getDocs, query, where, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import {
+  doc,
+  collection,
+  getDocs,
+  query,
+  where,
+  setDoc,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import UserContext from "@/utils/UserContext";
 import { useContext } from "react";
-import { FaShoppingCart, FaCheck, FaExclamation, FaTimes, FaChevronRight } from "react-icons/fa";
+import {
+  FaShoppingCart,
+  FaCheck,
+  FaExclamation,
+  FaTimes,
+  FaChevronRight,
+} from "react-icons/fa";
 
 const AddToCart = ({ product, onClose, theme, userId }) => {
   const [animationStage, setAnimationStage] = useState(1);
@@ -31,12 +46,15 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
       quantity: quantity,
       price: product.price,
       name: product.baseProductData?.name || "Unnamed Product",
-      image: product.isCustom && product.images?.length > 0 
-        ? product.images[0] 
-        : product.baseProductData?.imageUrl || "/images/default-product.png",
-      customizedProductLink: product.isCustom ? product.customizationLink || "" : "",
+      image:
+        product.isCustom && product.images?.length > 0
+          ? product.images[0]
+          : product.baseProductData?.imageUrl || "/images/default-product.png",
+      customizedProductLink: product.isCustom
+        ? product.customizationLink || ""
+        : "",
       tailorId: product.tailorId || "",
-      tailorName: product.tailor || "Unknown Tailor"
+      tailorName: product.tailor || "Unknown Tailor",
     };
   };
 
@@ -53,12 +71,12 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
         District: "",
         province: "",
         postalCode: "",
-        Country: ""
+        Country: "",
       },
       orderStatus: "inCart",
       deliveryInstructions: "",
       totalAmount: product.price * quantity,
-      itemCount: quantity
+      itemCount: quantity,
     };
   };
 
@@ -81,7 +99,7 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
         const cartDoc = querySnapshot.docs[0];
         setCartExists(true);
         setCurrentTailorId(cartDoc.data().tailorId);
-        
+
         // If cart has different tailor, show confirmation after animation
         if (cartDoc.data().tailorId !== product.tailorId) {
           setTimeout(() => setShowConfirmation(true), 3000);
@@ -124,32 +142,32 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
       } else {
         const cartDoc = querySnapshot.docs[0];
         const cartData = cartDoc.data();
-        
+
         if (cartData.tailorId !== product.tailorId) {
           // Replace entire cart with new product from different tailor
           await updateDoc(cartDoc.ref, createOrderDocument(userId, product));
         } else {
           // Check if product already exists in cart
           const existingProductIndex = cartData.products.findIndex(
-            p => p.productId === product.id
+            (p) => p.productId === product.id
           );
-          
+
           if (existingProductIndex >= 0) {
             // Update quantity if product exists
             const updatedProducts = [...cartData.products];
             updatedProducts[existingProductIndex].quantity += quantity;
-            
+
             await updateDoc(cartDoc.ref, {
               products: updatedProducts,
-              totalAmount: cartData.totalAmount + (product.price * quantity),
-              itemCount: cartData.itemCount + quantity
+              totalAmount: cartData.totalAmount + product.price * quantity,
+              itemCount: cartData.itemCount + quantity,
             });
           } else {
             // Add new product to existing cart
             await updateDoc(cartDoc.ref, {
               products: arrayUnion(validateProduct(product)),
-              totalAmount: cartData.totalAmount + (product.price * quantity),
-              itemCount: cartData.itemCount + quantity
+              totalAmount: cartData.totalAmount + product.price * quantity,
+              itemCount: cartData.itemCount + quantity,
             });
           }
         }
@@ -182,30 +200,30 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
   };
 
   const incrementQuantity = () => {
-    setQuantity(prev => Math.min(prev + 1, 10));
+    setQuantity((prev) => Math.min(prev + 1, 10));
   };
 
   const decrementQuantity = () => {
-    setQuantity(prev => Math.max(prev - 1, 1));
+    setQuantity((prev) => Math.max(prev - 1, 1));
   };
 
   // Animation variants
   const productVariants = {
     initial: { y: -1000, rotate: -15 },
     animate: { y: 0, rotate: 0 },
-    exit: { y: 100, opacity: 0 }
+    exit: { y: 100, opacity: 0 },
   };
 
   const cartVariants = {
     initial: { x: -1000, scale: 0.8 },
     animate: { x: 0, scale: 1 },
-    exit: { x: 1000, scale: 0.8 }
+    exit: { x: 1000, scale: 0.8 },
   };
 
   const successVariants = {
     initial: { scale: 0.8, opacity: 0 },
     animate: { scale: 1, opacity: 1 },
-    exit: { scale: 0.8, opacity: 0 }
+    exit: { scale: 0.8, opacity: 0 },
   };
 
   return (
@@ -221,11 +239,11 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
               initial="initial"
               animate="animate"
               exit="exit"
-              transition={{ 
-                type: "spring", 
-                damping: 15, 
+              transition={{
+                type: "spring",
+                damping: 15,
                 stiffness: 300,
-                rotate: { duration: 0.4 }
+                rotate: { duration: 0.4 },
               }}
               className="absolute -top-20 left-1/2 transform -translate-x-1/2 z-30 origin-bottom"
             >
@@ -245,9 +263,9 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
                 {/* String animation */}
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full">
                   <motion.div
-                    animate={{ 
+                    animate={{
                       rotate: [0, 15, -15, 0],
-                      transition: { repeat: Infinity, duration: 1.5 }
+                      transition: { repeat: Infinity, duration: 1.5 },
                     }}
                     className="w-6 h-6 flex justify-center origin-bottom"
                   >
@@ -325,9 +343,9 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
             <motion.div
               key="cart-bounce"
               initial={{ y: 0 }}
-              animate={{ 
+              animate={{
                 y: [0, -20, 0],
-                transition: { repeat: 2, duration: 0.3 }
+                transition: { repeat: 2, duration: 0.3 },
               }}
               className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
               onAnimationComplete={() => setAnimationStage(4)}
@@ -365,27 +383,27 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
                   <motion.div
                     key={i}
                     className="absolute w-2 h-2 bg-yellow-400 rounded-full"
-                    initial={{ 
-                      x: Math.random() * 100 - 50, 
+                    initial={{
+                      x: Math.random() * 100 - 50,
                       y: Math.random() * 100 - 50,
-                      opacity: 0
+                      opacity: 0,
                     }}
-                    animate={{ 
-                      x: Math.random() * 300 - 150, 
+                    animate={{
+                      x: Math.random() * 300 - 150,
                       y: Math.random() * 300 - 150,
                       opacity: [0, 1, 0],
-                      scale: [0.5, 1.2, 0]
+                      scale: [0.5, 1.2, 0],
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 1.5,
                       delay: i * 0.05,
                       repeat: Infinity,
-                      repeatDelay: 3
+                      repeatDelay: 3,
                     }}
                   />
                 ))}
               </div>
-              
+
               <div className="relative z-10">
                 <div className="flex justify-center mb-4">
                   <motion.div
@@ -401,16 +419,19 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
                   Added to Cart!
                 </h3>
                 <p className={`mb-6 ${theme.colorText} opacity-90`}>
-                  <span className="font-semibold">{product.baseProductData?.name || "Product"}</span> has been added to your cart.
+                  <span className="font-semibold">
+                    {product.baseProductData?.name || "Product"}
+                  </span>{" "}
+                  has been added to your cart.
                 </p>
-                
+
                 <div className="flex flex-col gap-3">
                   <button
                     onClick={handleViewCart}
                     className="px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all flex items-center justify-center gap-2 font-medium"
                   >
                     <FaShoppingCart />
-                    View Cart ({quantity} item{quantity > 1 ? 's' : ''})
+                    View Cart ({quantity} item{quantity > 1 ? "s" : ""})
                     <FaChevronRight className="ml-1" />
                   </button>
                   <button
@@ -484,23 +505,32 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
                 Cart Conflict
               </h3>
               <p className={`mb-6 ${theme.colorText} opacity-90`}>
-                Your cart contains items from <span className="font-semibold">{currentTailorId === product.tailorId ? "this tailor" : "a different tailor"}</span>. 
-                Adding this item will replace all existing items in your cart.
+                Your cart contains items from{" "}
+                <span className="font-semibold">
+                  {currentTailorId === product.tailorId
+                    ? "this tailor"
+                    : "a different tailor"}
+                </span>
+                . Adding this item will replace all existing items in your cart.
               </p>
-              
+
               {/* Quantity Selector */}
-              <div className={`mb-6 p-4 rounded-lg ${theme.colorBgSecondary} flex items-center justify-between`}>
+              <div
+                className={`mb-6 p-4 rounded-lg ${theme.colorBgSecondary} flex items-center justify-between`}
+              >
                 <span className={`${theme.colorText}`}>Quantity:</span>
                 <div className="flex items-center gap-3">
-                  <button 
+                  <button
                     onClick={decrementQuantity}
                     className={`w-8 h-8 rounded-full ${theme.colorBg} ${theme.colorText} flex items-center justify-center hover:bg-opacity-80`}
                     disabled={quantity <= 1}
                   >
                     -
                   </button>
-                  <span className={`text-lg font-semibold ${theme.colorText}`}>{quantity}</span>
-                  <button 
+                  <span className={`text-lg font-semibold ${theme.colorText}`}>
+                    {quantity}
+                  </span>
+                  <button
                     onClick={incrementQuantity}
                     className={`w-8 h-8 rounded-full ${theme.colorBg} ${theme.colorText} flex items-center justify-center hover:bg-opacity-80`}
                     disabled={quantity >= 10}
@@ -509,7 +539,7 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
                   </button>
                 </div>
               </div>
-              
+
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => handleConfirmation(true)}

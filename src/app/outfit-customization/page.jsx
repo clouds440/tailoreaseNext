@@ -26,6 +26,7 @@ const outfitCategories = {
   jeans: { category: "legs", gender: "unisex" },
   femaleDress: { category: "full", gender: "female" },
   kameezShalwar: { category: "full", gender: "male" },
+  femaleCoat: { category: "torso", gender: "female" },
   // Add more here...
 };
 
