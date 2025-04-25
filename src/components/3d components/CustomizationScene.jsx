@@ -9,6 +9,7 @@ import Pants from "./Pants";
 import FemaleDress from "./FemaleDress";
 import KameezShalwar from "./KameezShalwar";
 import FemaleCoat from "./FemaleCoat";
+import FemaleGown from "./FemaleGown";
 
 const outfitComponents = {
   jacket: Jacket,
@@ -17,6 +18,7 @@ const outfitComponents = {
   femaleDress: FemaleDress,
   kameezShalwar: KameezShalwar,
   femaleCoat: FemaleCoat,
+  femaleGown: FemaleGown,
 };
 
 const CustomizationScene = ({

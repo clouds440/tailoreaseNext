@@ -27,6 +27,7 @@ const outfitCategories = {
   femaleDress: { category: "full", gender: "female" },
   kameezShalwar: { category: "full", gender: "male" },
   femaleCoat: { category: "torso", gender: "female" },
+  femaleGown: { category: "full", gender: "female" },
   // Add more here...
 };
 
@@ -388,23 +389,26 @@ const OutfitCustomization = () => {
                   className="hidden" // Hide the default input element
                 />
               </div>
-              {outfit === "KameezShalwar" && (
-                <div className="flex items-center">
-                  <label
-                    htmlFor={`file-shalwar-${outfit}`}
-                    className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.mainTheme} ${theme.hoverBg}`}
-                  >
-                    {texture[outfit] ? "Change Shalwar" : "Shalwar Texture"}
-                  </label>
-                  <input
-                    id={`file-shalwar-${outfit}`}
-                    type="file"
-                    accept=".jpg, .png"
-                    onChange={(e) => handleTextureUpload(outfit, "shalwar", e)}
-                    className="hidden" // Hide the default input element
-                  />
-                </div>
-              )}
+              {outfit === "KameezShalwar" ||
+                (outfit === "FemaleGown" && (
+                  <div className="flex items-center">
+                    <label
+                      htmlFor={`file-shalwar-${outfit}`}
+                      className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.mainTheme} ${theme.hoverBg}`}
+                    >
+                      {shalwarTexure ? "Change Shalwar" : "Shalwar Texture"}
+                    </label>
+                    <input
+                      id={`file-shalwar-${outfit}`}
+                      type="file"
+                      accept=".jpg, .png"
+                      onChange={(e) =>
+                        handleTextureUpload(outfit, "shalwar", e)
+                      }
+                      className="hidden" // Hide the default input element
+                    />
+                  </div>
+                ))}
             </div>
 
             {/* Color Picker */}
