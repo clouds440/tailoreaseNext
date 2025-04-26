@@ -61,7 +61,7 @@ const TrendPop = () => {
     setCity(cityName);
     const season = (() => {
       const m = new Date().getMonth() + 1;
-      const y = new Date().getFullYear;
+      const y = new Date().getFullYear();
       if ([12, 1, 2].includes(m)) return "Winter, " + y;
       if ([3, 4, 5].includes(m)) return "Spring, " + y;
       if ([6, 7, 8].includes(m)) return "Summer, " + y;
