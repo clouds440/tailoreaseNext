@@ -61,10 +61,11 @@ const TrendPop = () => {
     setCity(cityName);
     const season = (() => {
       const m = new Date().getMonth() + 1;
-      if ([12, 1, 2].includes(m)) return "Winter";
-      if ([3, 4, 5].includes(m)) return "Spring";
-      if ([6, 7, 8].includes(m)) return "Summer";
-      return "Autumn";
+      const y = new Date().getFullYear;
+      if ([12, 1, 2].includes(m)) return "Winter, " + y;
+      if ([3, 4, 5].includes(m)) return "Spring, " + y;
+      if ([6, 7, 8].includes(m)) return "Summer, " + y;
+      return "Autumn, " + y;
     })();
     const prompt = `You're an AI fashion advisor. In ${cityName} this ${season}, a user is looking for "${search}" (if the user has provided irrelavant search keyword, provide general suggestion). Based on global fashion trends, tell me popular styles, colors, and fabrics. Respond in JSON:\n{ \"season\": \"${season}\", \"styles\": [...], \"fabrics\": [...], \"suggestion\": \"...\" }`;
     try {
