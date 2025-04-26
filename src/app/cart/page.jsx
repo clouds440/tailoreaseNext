@@ -17,11 +17,11 @@ import {
 import Image from "next/image";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "@/components/SimpleButton";
-import { FaTrash, FaPlus, FaMinus, FaArrowLeft, FaWallet, FaReceipt } from "react-icons/fa";
+import { FaTrash, FaPlus, FaMinus, FaArrowLeft, FaWallet, FaReceipt, FaSpinner } from "react-icons/fa";
 import { RiSecurePaymentFill } from "react-icons/ri";
 
 const CartPage = () => {
-  const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
+  const { theme, userData, setShowMessage, setPopUpMessageTrigger, inputStyles, placeHolderStyles } =
     useContext(UserContext);
   const router = useRouter();
   const [cart, setCart] = useState(null);
@@ -308,12 +308,27 @@ const CartPage = () => {
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center h-screen ${theme.mainTheme}`}>
+      <div className={`flex flex-col items-center justify-center h-screen ${theme.mainTheme}`}>
         <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
-        ></motion.div>
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="mx-auto rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"
+          ></motion.div>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className={`mt-4 text-lg ${theme.colorText}`}
+          >
+            Loading your cart...
+          </motion.p>
+        </motion.div>
       </div>
     );
   }
@@ -401,13 +416,15 @@ const CartPage = () => {
           transition={{ duration: 0.3 }}
           className="flex items-center justify-between mb-8"
         >
-          <button
+          <motion.button
+            whileHover={{ x: -2 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => router.back()}
             className={`flex items-center ${theme.colorText} hover:text-blue-500 transition-colors`}
           >
             <FaArrowLeft className="mr-2" />
             Back
-          </button>
+          </motion.button>
           <h1 className={`text-3xl font-bold ${theme.colorText}`}>Your Cart</h1>
           <div className="w-8"></div>
         </motion.div>
@@ -434,12 +451,14 @@ const CartPage = () => {
                     {cart.itemCount} {cart.itemCount === 1 ? "item" : "items"}
                   </span>
                 </h2>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => router.push("/market")}
                   className={`text-sm ${theme.colorText} hover:text-blue-500 transition-colors`}
                 >
                   Continue Shopping
-                </button>
+                </motion.button>
               </div>
 
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -451,7 +470,7 @@ const CartPage = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, x: -100 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: 0.3, type: "spring" }}
                       className={`p-4 ${theme.colorBg} flex flex-col sm:flex-row`}
                     >
                       {/* Product Image */}
@@ -491,7 +510,7 @@ const CartPage = () => {
                             className={`p-2 rounded-full ${theme.colorBgSecondary} ${theme.colorText} hover:bg-red-500 hover:text-white transition-colors ml-2 self-start`}
                           >
                             {removing === product.productId ? (
-                              <div className="w-4 h-4 border-2 border-transparent border-t-current border-r-current rounded-full animate-spin"></div>
+                              <FaSpinner className="text-sm animate-spin" />
                             ) : (
                               <FaTrash className="text-sm" />
                             )}
@@ -589,8 +608,22 @@ const CartPage = () => {
                   {checkoutStep === "details" ? "Order Summary" : "Payment Details"}
                 </h2>
                 <div className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mx-1 ${checkoutStep === "details" ? "bg-blue-500" : "bg-gray-400"}`}></div>
-                  <div className={`w-2 h-2 rounded-full mx-1 ${checkoutStep === "payment" ? "bg-blue-500" : "bg-gray-400"}`}></div>
+                  <motion.div 
+                    animate={{ 
+                      scale: checkoutStep === "details" ? [1, 1.2, 1] : 1,
+                      backgroundColor: checkoutStep === "details" ? "#3B82F6" : "#9CA3AF"
+                    }}
+                    transition={{ duration: 0.5 }}
+                    className="w-2 h-2 rounded-full mx-1"
+                  ></motion.div>
+                  <motion.div 
+                    animate={{ 
+                      scale: checkoutStep === "payment" ? [1, 1.2, 1] : 1,
+                      backgroundColor: checkoutStep === "payment" ? "#3B82F6" : "#9CA3AF"
+                    }}
+                    transition={{ duration: 0.5 }}
+                    className="w-2 h-2 rounded-full mx-1"
+                  ></motion.div>
                 </div>
               </div>
 
@@ -646,116 +679,112 @@ const CartPage = () => {
                         Delivery Details
                       </h3>
 
-                      <div className="space-y-3">
-                        <div>
-                          <label
-                            className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                          >
-                            Full Name *
-                          </label>
+                      <div className="space-y-4">
+                        <div className="relative">
                           <input
                             type="text"
+                            id="name"
                             name="name"
                             value={checkoutData.name}
                             onChange={handleCheckoutChange}
-                            className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                            className={`${inputStyles}`}
+                            placeholder=" "
                             required
                           />
+                          <label className={`${placeHolderStyles}`} htmlFor="name">
+                            Full Name *
+                          </label>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label
-                              className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                            >
-                              Phone *
-                            </label>
+                          <div className="relative">
                             <input
                               type="tel"
+                              id="phone"
                               name="phone"
                               value={checkoutData.phone}
                               onChange={handleCheckoutChange}
-                              className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                              className={`${inputStyles}`}
+                              placeholder=" "
                               required
                             />
-                          </div>
-                          <div>
-                            <label
-                              className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                            >
-                              Email
+                            <label className={`${placeHolderStyles}`} htmlFor="phone">
+                              Phone *
                             </label>
+                          </div>
+                          <div className="relative">
                             <input
                               type="email"
+                              id="email"
                               name="email"
                               value={checkoutData.email}
                               onChange={handleCheckoutChange}
-                              className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                              className={`${inputStyles}`}
+                              placeholder=" "
                             />
+                            <label className={`${placeHolderStyles}`} htmlFor="email">
+                              Email
+                            </label>
                           </div>
                         </div>
 
-                        <div>
-                          <label
-                            className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                          >
-                            Street Address *
-                          </label>
+                        <div className="relative">
                           <input
                             type="text"
+                            id="streetAddress"
                             name="streetAddress"
                             value={checkoutData.streetAddress}
                             onChange={handleCheckoutChange}
-                            className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                            className={`${inputStyles}`}
+                            placeholder=" "
                             required
                           />
+                          <label className={`${placeHolderStyles}`} htmlFor="streetAddress">
+                            Street Address *
+                          </label>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label
-                              className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                            >
-                              City *
-                            </label>
+                          <div className="relative">
                             <input
                               type="text"
+                              id="city"
                               name="city"
                               value={checkoutData.city}
                               onChange={handleCheckoutChange}
-                              className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                              className={`${inputStyles}`}
+                              placeholder=" "
                               required
                             />
-                          </div>
-                          <div>
-                            <label
-                              className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                            >
-                              District *
+                            <label className={`${placeHolderStyles}`} htmlFor="city">
+                              City *
                             </label>
+                          </div>
+                          <div className="relative">
                             <input
                               type="text"
+                              id="district"
                               name="district"
                               value={checkoutData.district}
                               onChange={handleCheckoutChange}
-                              className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                              className={`${inputStyles}`}
+                              placeholder=" "
                               required
                             />
+                            <label className={`${placeHolderStyles}`} htmlFor="district">
+                              District *
+                            </label>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label
-                              className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                            >
-                              Province *
-                            </label>
+                          <div className="relative">
                             <select
+                              id="province"
                               name="province"
                               value={checkoutData.province}
                               onChange={handleCheckoutChange}
-                              className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                              className={`${inputStyles}`}
                               required
                             >
                               <option value="">Select Province</option>
@@ -775,49 +804,53 @@ const CartPage = () => {
                                 Azad Jammu and Kashmir
                               </option>
                             </select>
-                          </div>
-                          <div>
-                            <label
-                              className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                            >
-                              Postal Code
+                            <label className={`${placeHolderStyles}`} htmlFor="province">
+                              Province *
                             </label>
+                          </div>
+                          <div className="relative">
                             <input
                               type="text"
+                              id="postalCode"
                               name="postalCode"
                               value={checkoutData.postalCode}
                               onChange={handleCheckoutChange}
-                              className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                              className={`${inputStyles}`}
+                              placeholder=" "
                             />
+                            <label className={`${placeHolderStyles}`} htmlFor="postalCode">
+                              Postal Code
+                            </label>
                           </div>
                         </div>
 
-                        <div>
-                          <label
-                            className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                          >
-                            Delivery Instructions
-                          </label>
+                        <div className="relative">
                           <textarea
+                            id="deliveryInstructions"
                             name="deliveryInstructions"
                             value={checkoutData.deliveryInstructions}
                             onChange={handleCheckoutChange}
                             rows={2}
-                            className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                            placeholder="Any special instructions for delivery..."
+                            className={`${inputStyles} min-h-[60px] max-h-[120px]`}
+                            placeholder=" "
                           ></textarea>
+                          <label className={`${placeHolderStyles}`} htmlFor="deliveryInstructions">
+                            Delivery Instructions
+                          </label>
                         </div>
                       </div>
                     </div>
 
                     {/* Proceed to Payment Button */}
-                    <SimpleButton
-                      btnText="Proceed to Payment"
-                      type="primary"
-                      fullWidth
-                      onClick={proceedToPayment}
-                      extraClasses="py-3 text-lg"
-                    />
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <SimpleButton
+                        btnText="Proceed to Payment"
+                        type="primary"
+                        fullWidth
+                        onClick={proceedToPayment}
+                        extraClasses="py-3 text-lg"
+                      />
+                    </motion.div>
                   </motion.div>
                 )}
 
@@ -845,7 +878,12 @@ const CartPage = () => {
                         Payment Method
                       </h3>
 
-                      <div className={`p-4 rounded-lg ${theme.colorBgSecondary} mb-4`}>
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className={`p-4 rounded-lg ${theme.colorBgSecondary} mb-4`}
+                      >
                         <div className="flex items-center mb-3">
                           <input
                             type="radio"
@@ -867,117 +905,67 @@ const CartPage = () => {
                           </label>
                         </div>
 
-                        <div className={`p-4 rounded-lg ${theme.colorBg} border ${theme.colorBorder}`}>
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                          className={`p-4 rounded-lg ${theme.colorBg} border ${theme.colorBorder}`}
+                        >
                           <p className={`text-sm ${theme.colorText} mb-3`}>
                             Please send <span className="font-bold">PKR {totalAmount.toLocaleString("en-PK")}</span> to:
                           </p>
                           
-                          <div className={`p-3 rounded-lg bg-blue-50 dark:bg-blue-900 mb-3`}>
+                          <motion.div 
+                            whileHover={{ scale: 1.01 }}
+                            className={`p-3 rounded-lg bg-blue-50 dark:bg-blue-900 mb-3`}
+                          >
                             <p className={`text-sm font-bold ${theme.colorText}`}>EasyPaisa Account:</p>
                             <p className={`text-lg font-bold ${theme.colorText}`}>0348-9957248</p>
-                          </div>
+                          </motion.div>
 
-                          <div>
-                            <label
-                              className={`block text-sm mb-1 ${theme.colorText} opacity-80`}
-                            >
-                              Transaction ID *
-                            </label>
+                          <div className="relative mt-4">
                             <input
                               type="text"
+                              id="transactionId"
                               name="transactionId"
                               value={paymentData.transactionId}
                               onChange={handlePaymentChange}
-                              placeholder="Enter your transaction ID"
-                              className={`w-full p-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                              className={`${inputStyles}`}
+                              placeholder=" "
                               required
                             />
+                            <label className={`${placeHolderStyles}`} htmlFor="transactionId">
+                              Transaction ID *
+                            </label>
                             <p className={`text-xs mt-1 ${theme.colorText} opacity-70`}>
                               You can find this in your EasyPaisa app after payment
                             </p>
                           </div>
-                        </div>
-                      </div>
+                        </motion.div>
+                      </motion.div>
                     </div>
 
                     <div className="flex gap-3">
-                      <SimpleButton
-                        btnText="Back"
-                        type="secondary"
-                        fullWidth
-                        onClick={() => setCheckoutStep("details")}
-                        extraClasses="py-3"
-                      />
-                      <SimpleButton
-                        btnText="Complete Payment"
-                        type="primary"
-                        fullWidth
-                        onClick={completePayment}
-                        extraClasses="py-3 text-lg"
-                      />
+                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="flex-1">
+                        <SimpleButton
+                          btnText="Back"
+                          type="secondary"
+                          fullWidth
+                          onClick={() => setCheckoutStep("details")}
+                          extraClasses="py-3"
+                        />
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="flex-1">
+                        <SimpleButton
+                          btnText="Complete Payment"
+                          type="primary"
+                          fullWidth
+                          onClick={completePayment}
+                          extraClasses="py-3 text-lg"
+                        />
+                      </motion.div>
                     </div>
                   </motion.div>
-                )}
-
-                {/* Payment Methods */}
-                {checkoutStep === "details" && (
-                  <div className="mt-4">
-                    <p
-                      className={`text-xs ${theme.colorText} opacity-70 text-center mb-2`}
-                    >
-                      We accept
-                    </p>
-                    <div className="flex justify-center gap-3">
-                      <motion.div 
-                        whileHover={{ y: -2 }}
-                        className="w-10 h-6 bg-white rounded flex items-center justify-center p-1"
-                      >
-                        <Image
-                          src="/images/payment/jazzcash.png"
-                          alt="JazzCash"
-                          width={32}
-                          height={20}
-                          className="object-contain"
-                        />
-                      </motion.div>
-                      <motion.div 
-                        whileHover={{ y: -2 }}
-                        className="w-10 h-6 bg-white rounded flex items-center justify-center p-1"
-                      >
-                        <Image
-                          src="/images/payment/easypaisa.png"
-                          alt="EasyPaisa"
-                          width={32}
-                          height={20}
-                          className="object-contain"
-                        />
-                      </motion.div>
-                      <motion.div 
-                        whileHover={{ y: -2 }}
-                        className="w-10 h-6 bg-white rounded flex items-center justify-center p-1"
-                      >
-                        <Image
-                          src="/images/payment/visa.png"
-                          alt="Visa"
-                          width={32}
-                          height={20}
-                          className="object-contain"
-                        />
-                      </motion.div>
-                      <motion.div 
-                        whileHover={{ y: -2 }}
-                        className="w-10 h-6 bg-white rounded flex items-center justify-center p-1"
-                      >
-                        <Image
-                          src="/images/payment/mastercard.png"
-                          alt="Mastercard"
-                          width={32}
-                          height={20}
-                          className="object-contain"
-                        />
-                      </motion.div>
-                    </div>
-                  </div>
                 )}
               </div>
             </motion.div>
