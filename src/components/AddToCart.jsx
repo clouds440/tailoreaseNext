@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { db } from "@/utils/firebaseConfig";
 import {
@@ -38,8 +38,13 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
   const router = useRouter();
   const { setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
 
+  const didInit = useRef(false);
+
   useEffect(() => {
-    checkCartExistence();
+    if (!didInit.current) {
+      didInit.current = true;
+      checkCartExistence();
+    }
   }, []);
 
   const validateProduct = (product) => {
@@ -121,7 +126,7 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
       }
 
       // Proceed to add after animation if no conflicts
-      setTimeout(() => addToCart(), 3000);
+      addToCart();
 
       // Animation sequence
       setTimeout(() => setAnimationStage(2), 1000);
