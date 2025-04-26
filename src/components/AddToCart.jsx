@@ -30,9 +30,11 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
   const [cartExists, setCartExists] = useState(false);
   const [currentTailorId, setCurrentTailorId] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [totalItemsInCart, setTotalItemsInCart] = useState(0);
   const router = useRouter();
   const { setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
 
@@ -42,7 +44,7 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
 
   const validateProduct = (product) => {
     return {
-      productId: product.id || "",
+      productId: product.productId || "",
       quantity: quantity,
       price: product.price,
       name: product.baseProductData?.name || "Unnamed Product",
@@ -51,7 +53,7 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
           ? product.images[0]
           : product.baseProductData?.imageUrl || "/images/default-product.png",
       customizedProductLink: product.isCustom
-        ? product.customizationLink || ""
+        ? sessionStorage.getItem("customProductUrl") || ""
         : "",
       tailorId: product.tailorId || "",
       tailorName: product.tailor || "Unknown Tailor",
@@ -72,9 +74,9 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
         province: "",
         postalCode: "",
         Country: "",
+        deliveryInstructions: "",
       },
       orderStatus: "inCart",
-      deliveryInstructions: "",
       totalAmount: product.price * quantity,
       itemCount: quantity,
     };
@@ -99,17 +101,27 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
         const cartDoc = querySnapshot.docs[0];
         setCartExists(true);
         setCurrentTailorId(cartDoc.data().tailorId);
+        setTotalItemsInCart(cartDoc.data().itemCount);
 
-        // If cart has different tailor, show confirmation after animation
+        // Check if product already exists in cart
+        const existingProduct = cartDoc
+          .data()
+          .products.find((p) => p.productId === product.productId);
+
+        if (existingProduct) {
+          setShowDuplicateWarning(true);
+          return;
+        }
+
+        // If cart has different tailor, show confirmation
         if (cartDoc.data().tailorId !== product.tailorId) {
           setTimeout(() => setShowConfirmation(true), 3000);
-        } else {
-          setTimeout(() => addToCart(), 3000);
+          return;
         }
-      } else {
-        // No cart exists, proceed to add after animation
-        setTimeout(() => addToCart(), 3000);
       }
+
+      // Proceed to add after animation if no conflicts
+      setTimeout(() => addToCart(), 3000);
 
       // Animation sequence
       setTimeout(() => setAnimationStage(2), 1000);
@@ -120,7 +132,7 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
     }
   };
 
-  const addToCart = async () => {
+  const addToCart = async (replaceCart = false) => {
     try {
       if (!userId) {
         setError("User not logged in");
@@ -136,20 +148,35 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
       const querySnapshot = await getDocs(cartQuery);
 
       if (querySnapshot.empty) {
-        // Create new cart
+        // Create new cart with the product
         const newCartRef = doc(ordersCollection);
         await setDoc(newCartRef, createOrderDocument(userId, product));
+        setTotalItemsInCart(quantity);
       } else {
         const cartDoc = querySnapshot.docs[0];
         const cartData = cartDoc.data();
 
+        // Handle different tailor case
         if (cartData.tailorId !== product.tailorId) {
-          // Replace entire cart with new product from different tailor
-          await updateDoc(cartDoc.ref, createOrderDocument(userId, product));
+          if (replaceCart) {
+            // Replace entire cart with new product from different tailor
+            await updateDoc(cartDoc.ref, {
+              ...createOrderDocument(userId, product),
+              // Keep the same document ID
+              id: cartDoc.id,
+            });
+            setTotalItemsInCart(quantity);
+          } else {
+            // This shouldn't happen as we show confirmation first
+            setError(
+              "Cannot add product from different tailor without confirmation"
+            );
+            return;
+          }
         } else {
           // Check if product already exists in cart
           const existingProductIndex = cartData.products.findIndex(
-            (p) => p.productId === product.id
+            (p) => p.productId === product.productId
           );
 
           if (existingProductIndex >= 0) {
@@ -162,6 +189,7 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
               totalAmount: cartData.totalAmount + product.price * quantity,
               itemCount: cartData.itemCount + quantity,
             });
+            setTotalItemsInCart(cartData.itemCount + quantity);
           } else {
             // Add new product to existing cart
             await updateDoc(cartDoc.ref, {
@@ -169,6 +197,7 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
               totalAmount: cartData.totalAmount + product.price * quantity,
               itemCount: cartData.itemCount + quantity,
             });
+            setTotalItemsInCart(cartData.itemCount + quantity);
           }
         }
       }
@@ -183,6 +212,15 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
 
   const handleConfirmation = (confirmed) => {
     setShowConfirmation(false);
+    if (confirmed) {
+      addToCart(true); // Pass true to indicate we want to replace the cart
+    } else {
+      onClose();
+    }
+  };
+
+  const handleDuplicateConfirmation = (confirmed) => {
+    setShowDuplicateWarning(false);
     if (confirmed) {
       addToCart();
     } else {
@@ -431,7 +469,8 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
                     className="px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all flex items-center justify-center gap-2 font-medium"
                   >
                     <FaShoppingCart />
-                    View Cart ({quantity} item{quantity > 1 ? "s" : ""})
+                    View Cart ({totalItemsInCart} item
+                    {totalItemsInCart > 1 ? "s" : ""})
                     <FaChevronRight className="ml-1" />
                   </button>
                   <button
@@ -486,11 +525,75 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
           )}
         </AnimatePresence>
 
-        {/* Confirmation Dialog */}
+        {/* Confirmation Dialog for Different Tailor */}
         <AnimatePresence>
           {showConfirmation && (
             <motion.div
               key="confirmation"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className={`relative z-40 p-6 rounded-xl ${theme.colorBg} shadow-2xl text-center max-w-sm w-full`}
+            >
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center shadow-lg">
+                  <FaExclamation className="text-white text-2xl" />
+                </div>
+              </div>
+              <h3 className={`text-xl font-bold mb-3 ${theme.colorText}`}>
+                Different Tailor Detected
+              </h3>
+              <p className={`mb-4 text-sm ${theme.colorText} opacity-90`}>
+                Your cart contains items from another tailor. For the best
+                shopping experience, we recommend purchasing from one tailor at
+                a time.
+              </p>
+
+              <div className="mb-6 space-y-3">
+                <button
+                  onClick={() => handleConfirmation(true)}
+                  className={`w-full p-4 rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition-all flex flex-col items-center`}
+                >
+                  <span className="font-bold">Start New Order</span>
+                  <span className="text-xs opacity-90">
+                    Clear current cart and add this item
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowConfirmation(false);
+                    handleViewCart();
+                  }}
+                  className={`w-full p-4 rounded-lg border ${theme.colorBorder} ${theme.colorText} hover:bg-opacity-10 transition-all flex flex-col items-center`}
+                >
+                  <span className="font-bold">Review Current Cart</span>
+                  <span className="text-xs opacity-90">
+                    Keep your existing items
+                  </span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
+                <div className="h-px bg-gray-300 dark:bg-gray-600 flex-1"></div>
+                <span className="px-3">or</span>
+                <div className="h-px bg-gray-300 dark:bg-gray-600 flex-1"></div>
+              </div>
+
+              <button
+                onClick={() => handleConfirmation(false)}
+                className={`w-full py-2.5 rounded-lg ${theme.colorText} hover:bg-opacity-10 transition-all text-sm font-medium`}
+              >
+                Continue Shopping
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {/* Duplicate Product Warning */}
+        <AnimatePresence>
+          {showDuplicateWarning && (
+            <motion.div
+              key="duplicate-warning"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
@@ -502,16 +605,11 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
                 </div>
               </div>
               <h3 className={`text-2xl font-bold mb-2 ${theme.colorText}`}>
-                Cart Conflict
+                Product Already in Cart
               </h3>
               <p className={`mb-6 ${theme.colorText} opacity-90`}>
-                Your cart contains items from{" "}
-                <span className="font-semibold">
-                  {currentTailorId === product.tailorId
-                    ? "this tailor"
-                    : "a different tailor"}
-                </span>
-                . Adding this item will replace all existing items in your cart.
+                This product is already in your cart. Do you want to add it
+                again and increase the quantity?
               </p>
 
               {/* Quantity Selector */}
@@ -542,13 +640,13 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
 
               <div className="flex flex-col gap-3">
                 <button
-                  onClick={() => handleConfirmation(true)}
+                  onClick={() => handleDuplicateConfirmation(true)}
                   className="px-6 py-3 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition-all font-medium"
                 >
-                  Replace Cart Items
+                  Add Anyway
                 </button>
                 <button
-                  onClick={() => handleConfirmation(false)}
+                  onClick={() => handleDuplicateConfirmation(false)}
                   className={`px-6 py-3 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} hover:bg-opacity-80 transition-all font-medium`}
                 >
                   Cancel

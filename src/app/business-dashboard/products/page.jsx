@@ -271,7 +271,7 @@ const TailorProductDashboard = () => {
               gender: selectedProduct.gender,
               isPredefined: true,
             },
-        productId: isCustom ? uuidv4() : selectedProduct.id,
+            productId: uuidv4()
       };
 
       await addDoc(collection(db, "tailorProducts"), productData);
