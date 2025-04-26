@@ -137,23 +137,40 @@ const ChatBot = () => {
     responseMimeType: "text/plain",
   };
 
+  const buildHistory = () => {
+    const lastUserMessage = messages
+      .slice()
+      .reverse()
+      .find((msg) => msg.sender === "user");
+
+    const lastModelMessage = messages
+      .slice()
+      .reverse()
+      .find((msg) => msg.sender === "model");
+
+    const history = [];
+
+    if (lastUserMessage) {
+      history.push({
+        role: "user",
+        parts: [{ text: lastUserMessage.text }],
+      });
+    }
+
+    if (lastModelMessage) {
+      history.push({
+        role: "model",
+        parts: [{ text: lastModelMessage.text }],
+      });
+    }
+
+    return history;
+  };
+
   async function generateResponse(userInput) {
     const chatSession = model.startChat({
       generationConfig,
-      history: [
-        {
-          role: "user",
-          parts: [{ text: "Hi" }],
-        },
-        {
-          role: "model",
-          parts: [
-            {
-              text: "Hi there! How can I help you with your tailoring needs today?",
-            },
-          ],
-        },
-      ], // history is optional. It costs tokens but improves the generated response
+      history: buildHistory(), // history is optional. It costs tokens but improves the generated response
     });
 
     const result = await chatSession.sendMessage(userInput);
@@ -203,6 +220,9 @@ const ChatBot = () => {
     if (!input.trim() && !querySnapshot) {
       return;
     }
+    if (querySnapshot) {
+      setBotQuery(false);
+    }
 
     if (detector.isProfane(input)) {
       const systemMessage = {
@@ -229,7 +249,6 @@ const ChatBot = () => {
       setBotQuery(true);
       return;
     }
-    setBotQuery(false);
     const formattedText = marked.parse(botResponse);
     setMessages((prev) => [
       ...prev,
