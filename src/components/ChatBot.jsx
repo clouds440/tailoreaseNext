@@ -37,7 +37,7 @@ const ChatBot = () => {
     model: "gemini-1.5-flash",
     systemInstruction: !botQuery
       ? `You're an AI assistant for the website TailorEase.
-      If the user is inquiring about a query which requires fetching data from the database (e.g., orders) then resond only with "true". The system will take this in string format and work with it. Don't ask the user for further information unless the user is not logged in. The user's current log-in status is ${userLoggedIn}.
+      If the user is inquiring about a query which requires fetching data from the database (e.g., orders) then respond only with "true". The system will take this in string format and work with it. Don't ask the user for further information unless the user is not logged in. The user's current log-in status is ${userLoggedIn}.
       If the user's log in status is "false" then ask the user to log in first.
 
     Otherwise, here's the training data for TailorEase:
@@ -126,7 +126,7 @@ const ChatBot = () => {
     What should I do if my business account is disabled?:
     We only suspend a business account which is in direct violation of our Terms and Conditions for Tailors. Please check your email for the exact reason why your account was suspended. And following the instructions in the email to try and re-enable your business account. While your business account is suspended, your business portfolio will not be shown to users. But don’t worry, all of your information is still secure and saved with us. You can continue using your business account as before once the suspension issue is resolved.
     WARNING: If you reply to anything outside the scope of the provided information, you will be in direct violation of both TailorEase and Google Policies.`
-      : "The user has asked for infromation that needed to be fetcehd from the database. Here is the data fetcehed from the database. Summarize the information in the following object for the user in natural language.",
+      : "The user has asked for infromation that needed to be fetcehd from the database. Here is the data fetcehed from the database. Summarize the information in the following stringified object for the user in natural language.",
   });
 
   const generationConfig = {
