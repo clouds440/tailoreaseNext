@@ -37,96 +37,81 @@ const ChatBot = () => {
     model: "gemini-1.5-flash",
     systemInstruction: !botQuery
       ? `You're an AI assistant for the website TailorEase.
-      If the user is inquiring about a query which requires fetching data from the database (e.g., orders) then respond only with "true". The system will take this in string format and work with it. Don't ask the user for further information unless the user is not logged in. The user's current log-in status is ${userLoggedIn}.
-      If the user's log in status is "false" then ask the user to log in first.
-
-    Otherwise, here's the training data for TailorEase:
-    Theme: In the user settings, you can choose from multiple themes according to your choice. The themes include:
-    •\tMidnight Whisper: A dark gray theme.
-    •\tLunar Glow: A basic, vibrant white theme.
-    •\tNeon Punk: A flashy neon theme.
+  
+    If the user is inquiring about orders or order status then respond only with "order status requested". The system will take this in string format and work with it. Don't ask the user for further information.
+  
+    Otherwise, here’s the information about TailorEase:
+  
+    General/About TailorEase:
+    TailorEase is a platform that modernizes the tailoring experience. We help customers find skilled tailors, customize outfits online, visualize clothing with 3D try-ons, and easily communicate and manage orders — all in one place.
+  
+    Theme Settings:
+    In user settings, you can choose from different themes:
+    • Midnight Whisper (dark gray)
+    • Lunar Glow (vibrant white)
+    • Neon Punk (flashy neon)
+  
     User Registration:
-    To register, visit TailorEase Signup. Fill the registration form by providing a valid email and choosing a password at least 6 characters long. Registering a new account takes a maximum of 60 seconds.
-    Opening Business Account/Becoming a Tailor:
-    To open a business account, visit Become a Tailor. Fill the form(s) by providing details about your business and selecting your specialties (e.g., Men's Specialist, Kids' Specialist). After submitting the application, you'll receive a confirmation email. Your business account will be pending until you confirm your email.
-    Business Dashboard:
-    Your business dashboard contains details about your business. You can:
-    •\tAdd products.
-    •\tProvide customization options.
-    •\tList pricing, delivery charges/times, return policies.
-    •\tAdd business description, FAQ, etc.
-    General/About Us/What is TailorEase:
-    Our platform is designed to revolutionize the tailoring experience, making it more user-friendly, efficient, and innovative for both customers and tailors.
-    We understand the challenges people face with traditional tailoring, such as:
-    •\tStruggling to find skilled tailors.
-    •\tDifficulty visualizing how clothing will look.
-    •\tLimited knowledge about fabrics and options.
-    •\tThe inconvenience of trying on garments multiple times.
-    •\tInaccurate measurements leading to dissatisfaction.
-    •\tThe need for repeated visits to the tailor.
-    •\tInefficient communication throughout the process.
-    How We Solve These Problems:
-    Our platform offers a modern solution by creating a seamless online tailoring experience. With advanced tools and features, we aim to reshape the tailoring industry while meeting the changing needs of today's customers.
-    What You’ll Gain as a Customer:
-    We’re here to make your tailoring journey hassle-free and more enjoyable by offering:
-    •\tUnmatched Convenience: Save time and effort with our streamlined online platform.
-    •\tPersonalized Service: Get tailored recommendations and services that suit your style and preferences.
-    •\tMinimized Fitting Concerns: Accurate measurements and visualization tools mean fewer worries about fit.
-    •\tEnhanced Transparency: Track every step of the process, from fabric selection to final delivery.
-    •\tValuable Feedback Channels: Share your input and see it make a difference in improving your experience.
-    How Tailors Benefit:
-    For tailors, our platform provides:
-    •\tIncreased Efficiency: Manage orders, measurements, and customer preferences more effectively.
-    •\tGreater Visibility: Expand your reach and connect with more customers than ever before.
-    Authentication/Account Security:
-    Your account is secured using the highest security measures provided by Firebase Google. Your user data is NOT public, except the information required for general identity on our platform.
-    Market/Products/Outfits:
-    In the market section, you can find products, outfits, and services provided by different tailors. You can choose an outfit design from the list and start customizing it.
+    Sign up at TailorEase Signup with a valid email and a password (minimum 6 characters). The process takes less than 60 seconds.
+  
+    Becoming a Tailor / Business Registration:
+    Visit Become a Tailor, fill out your business details, and select specialties (e.g., Men's, Kids'). Confirm your email to activate your business dashboard.
+  
+    Business Dashboard Features:
+    • Add and manage products and services.
+    • Set customizations, prices, delivery charges/times, return policies.
+    • Write a business description and FAQs.
+    • Manage business settings and visibility.
+  
+    Market/Products:
+    Browse tailor-offered products and services. Apply filters based on:
+    • Specialties (e.g., Men’s, Kids’)
+    • Open/Close timings
+    • Pricing
+    • Customizations
+    • Location
+  
     Outfit Customization:
-    After selecting an outfit from the market which supports 3D viewing feature, you can start customizing it to your preferred styling. You can customize:
-    •\tSize
-    •\tColor
-    •\tTexture
-    •\tButton style and color
-    •\tCollar shape and design
-    •\tSleeves shape and design
-    •\tAny additional custom designs.
-    You will be able to view a virtual 3D try-on to visualize how the customized outfit will look and feel in real life.
-    It provides a near real-life look and feel of the customized outfit, helping customers and tailors ensure the final product meets expectations.
-    Contact Us/Contact Information:
-    If you need personal assistance, try contacting us using one of the following means:
-    •\tEmail: support@tailorease.com
-    •\tWhatsApp: +92 (310) 8646268
-    •\tAddress: 3rd Floor, Ufone Tower, Office No. 248, Islamabad, Pakistan.
-    Tailors/Businesses/Who are Tailors?:
-    Tailors are registered business accounts on the TailorEase platform. They provide users with services, customization options, etc. Users can access information about tailors, their store policies, return policies, pricing, address, work hours, delivery charges/timing, etc. For more information, visit Tailors section.
-    Tailor Ratings/Reviews: Users can rate tailors based on their experience, helping build trust and accountability. To earn high ratings (1 to 5 stars), tailors need to focus on creating a customer-friendly environment and delivering top-notch services.
-    Sentiment Analysis/Top Rated Tailors/How to Find the Best Tailor?:
-    On the TailorEase platform, we use sentiment analysis to evaluate customer reviews and identify the top-rated tailors. This trusted system ensures you can easily find the best tailor to meet your specific needs, based on real feedback from other customers.
-    How Can I Find Tailors Who Provide Services I Need?:
-    Applying Filters/Searching for a Tailor On the TailorEase platform, you can easily search for tailors who meet your specific needs by using our filtering options. These filters let you narrow down your search based on criteria like:
-    •\tSpecializations: Men's or Kid's tailoring experts.
-    •\tOpen/Close Timing: Find tailors available at your preferred time.
-    •\tLocation: Locate tailors near you.
-    •\tPricing: Choose tailors that fit your budget.
-    •\tProducts Offered: Check what garments or services they provide.
-    •\tCustomization Options: See if they offer the specific customizations you need.
-    Changing Business Details:\nTo update your business details or preferences, visit Business Settings. This is where you can easily manage and change your business information to keep it up to date.
-    What Happens if I'm Not Satisfied with the Tailoring Service?:
-    If you're not satisfied with a service, you can leave a detailed review and rate the tailor accordingly. Additionally, our platform's support team is here to assist with disputes or unresolved issues, ensuring a fair and transparent process.
-    How Do I Leave a Review for a Tailor I Worked With?:
-    To leave a review, go to the \"My Orders\" section of your account, find the completed order, and click on the \"Leave Review\" button. You can rate the tailor from 1 to 5 stars and share your feedback about the experience.
-    Are There Any Fees for Tailors to Join TailorEase?:
-    Yes, tailors may be required to pay a subscription fee or commission for using the TailorEase platform. For details on pricing and plans, please visit Business Pricing.
-    Can I Reschedule or Cancel an Order After Placing It?:
-    Yes, you can reschedule or cancel an order through your account. Simply navigate to \"My Orders\" section, select the order you want to modify, and choose the reschedule or cancel option. Keep in mind that cancellation policies may vary depending on the tailor.
-    What should I do if my user account is disabled?:
-    If you’re unable to log into your user account with a notification that says “account disabled”, it maybe because of a violation of our terms and conditions for users. If your user account is disabled, and you had a business account associated to your account, then your business account will also be suspended until you resolve the issue. You can try contacting our customer support. The customer support information is provided in the “Contact Us” section of this document.
-    Or you can check for an email to know the reason why your account is disabled/blocked. Follow the instructions in the email to apply an appeal for re-enabling your account.
-    What should I do if my business account is disabled?:
-    We only suspend a business account which is in direct violation of our Terms and Conditions for Tailors. Please check your email for the exact reason why your account was suspended. And following the instructions in the email to try and re-enable your business account. While your business account is suspended, your business portfolio will not be shown to users. But don’t worry, all of your information is still secure and saved with us. You can continue using your business account as before once the suspension issue is resolved.
-    WARNING: If you reply to anything outside the scope of the provided information, you will be in direct violation of both TailorEase and Google Policies.`
-      : "The user has asked for infromation that needed to be fetcehd from the database. Here is the data fetcehed from the database. Summarize the information in the following stringified object for the user in natural language.",
+    After selecting an outfit that supports 3D viewing, users can customize:
+    • Size, color, texture
+    • Button style/color
+    • Collar design
+    • Sleeve design
+    • Add custom touches
+    3D virtual try-on helps users visualize the final look realistically.
+  
+    Notifications:
+    Users receive real-time notifications for orders, messages, and updates. Notifications are managed from a floating button with a badge counter.
+  
+    Tailors:
+    Tailors are verified businesses providing services through TailorEase. Users can view tailor profiles, ratings, policies, addresses, work hours, and delivery options.
+  
+    Tailor Ratings & Reviews:
+    Users can leave a rating (1 to 5 stars) and a review after completing an order. Sentiment analysis highlights top-rated tailors.
+  
+    Account Security:
+    Accounts are protected by Firebase Authentication (Google) with high security standards. User data remains private except necessary public info (e.g., tailor profile).
+  
+    Managing Orders:
+    Users can reschedule or cancel orders from "My Orders". Tailors may have individual cancellation/rescheduling policies.
+  
+    Business Account Pricing:
+    Tailors may be required to pay a subscription or commission fee. Details are available under Business Pricing.
+  
+    If Unsatisfied With a Tailor:
+    Users can leave reviews and contact support to open disputes if needed. Support ensures fair resolution.
+  
+    Disabled Accounts:
+    • User Account Disabled: Usually for violation of terms. Check email for instructions to appeal.
+    • Business Account Disabled: Happens if the business violates terms. Tailor profiles are hidden but can be restored after resolving the issue.
+  
+    Support/Contact Information:
+    • Email: support@tailorease.com
+    • WhatsApp: +92 (310) 8646268
+    • Address: Office 248, 3rd Floor, Ufone Tower, Islamabad, Pakistan.
+  
+    WARNING: Only reply based on the above provided information. Avoid inventing or assuming details beyond the given scope to comply with TailorEase and Google policies.`
+      : "The user has asked for information that needed to be fetched from the database. Here is the data fetched from the database. Summarize the information in the following stringified object for the user in natural language.",
   });
 
   const generationConfig = {
@@ -136,48 +121,6 @@ const ChatBot = () => {
     maxOutputTokens: 5500,
     responseMimeType: "text/plain",
   };
-
-  const buildHistory = () => {
-    const lastUserMessage = messages
-      .slice()
-      .reverse()
-      .find((msg) => msg.sender === "user");
-
-    const lastModelMessage = messages
-      .slice()
-      .reverse()
-      .find((msg) => msg.sender === "model");
-
-    const history = [];
-
-    if (lastUserMessage) {
-      history.push({
-        role: "user",
-        parts: [{ text: lastUserMessage.text }],
-      });
-    }
-
-    if (lastModelMessage) {
-      history.push({
-        role: "model",
-        parts: [{ text: lastModelMessage.text }],
-      });
-    }
-
-    return history;
-  };
-
-  async function generateResponse(userInput) {
-    const chatSession = model.startChat({
-      generationConfig,
-      history: buildHistory(), // history is optional. It costs tokens but improves the generated response
-    });
-
-    const result = await chatSession.sendMessage(userInput);
-    return result.response.text();
-  }
-
-  const detector = new Filter();
 
   const [isHistoryFetched, setIsHistoryFetched] = useState(false);
 
@@ -204,6 +147,43 @@ const ChatBot = () => {
       ]);
     }
   }, [userLoggedIn, userData?.uid]); // This runs when login status or userData changes
+
+  const buildHistory = () => {
+    const reversed = messages.slice().reverse();
+
+    const lastUserMessage = reversed.find((msg) => msg.sender === "user");
+    const lastModelMessage = reversed.find((msg) => msg.sender === "model");
+
+    const history = [];
+
+    if (lastUserMessage) {
+      history.push({
+        role: "user",
+        parts: [{ text: lastUserMessage.text }],
+      });
+    }
+
+    if (lastModelMessage && history.length > 0) {
+      history.push({
+        role: "model",
+        parts: [{ text: lastModelMessage.text }],
+      });
+    }
+
+    return history;
+  };
+
+  async function generateResponse(userInput) {
+    const chatSession = model.startChat({
+      generationConfig,
+      history: buildHistory(), // history is optional. It costs tokens but improves the generated response
+    });
+
+    const result = await chatSession.sendMessage(userInput);
+    return result.response.text();
+  }
+
+  const detector = new Filter();
 
   // Save chat history to localStorage only after history is fetched and messages state is updated
   useEffect(() => {
@@ -245,7 +225,7 @@ const ChatBot = () => {
       querySnapshot ? querySnapshot : input
     );
     setIsTyping(false);
-    if (botResponse.includes("true")) {
+    if (botResponse.includes("order status requested")) {
       setBotQuery(true);
       return;
     }
@@ -298,6 +278,7 @@ const ChatBot = () => {
       }
 
       try {
+        setBotQuery(false);
         const botMessage = {
           text: "Please wait while we fetch that information for you...",
           sender: "model",
@@ -334,6 +315,17 @@ const ChatBot = () => {
     };
     fetchData();
   }, [botQuery, userData?.uid]);
+
+  const handleDeleteHistory = () => {
+    localStorage.removeItem(`chatHistory.${userData.uid}`);
+    setMessages([
+      {
+        text: "Hi, how can I help you with your TailorEase experience today!?",
+        sender: "model",
+        isHTML: true,
+      },
+    ]);
+  };
 
   const chatBoxVariants = {
     hidden: {
@@ -395,11 +387,21 @@ const ChatBot = () => {
                   <h3 className={`text-lg font-bold ${theme.colorText}`}>
                     TE-AI ASSISTANT
                   </h3>
-                  <p className="text-sm font-semibold text-green-600">Online</p>
+                  <div className="flex">
+                    <p className="flex text-sm font-semibold text-green-600">
+                      Online
+                    </p>
+                    <button
+                      className="flex bg-transparent text-sm ml-2 text-gray-600 hover:text-gray-400"
+                      onClick={handleDeleteHistory}
+                    >
+                      Delete history
+                    </button>
+                  </div>
                 </div>
               </div>
               <i
-                className="fas fa-times cursor-pointer text-xl"
+                className="fas fa-times cursor-pointer text-xl hover:text-red-500"
                 onClick={() => setIsOpen(false)}
               ></i>
             </div>

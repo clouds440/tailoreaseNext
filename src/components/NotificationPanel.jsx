@@ -228,7 +228,7 @@ const NotificationPanel = () => {
                 </h3>
               </div>
               <i
-                className="fas fa-times cursor-pointer text-xl"
+                className="fas fa-times cursor-pointer text-xl hover:text-red-500"
                 onClick={() => setIsOpen(false)}
               ></i>
             </div>
