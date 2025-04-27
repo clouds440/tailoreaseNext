@@ -30,6 +30,7 @@ const outfitCategories = {
   femaleGown: { category: "full", gender: "female" },
   femaleJacket: { category: "torso", gender: "female" },
   fullShirt: { category: "torso", gender: "male" },
+  trousers: { category: "legs", gender: "female" },
   // Add more here...
 };
 

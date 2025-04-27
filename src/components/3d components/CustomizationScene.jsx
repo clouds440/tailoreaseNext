@@ -12,6 +12,7 @@ import FemaleCoat from "./FemaleCoat";
 import FemaleGown from "./FemaleGown";
 import FemaleJacket from "./FemaleJacket";
 import FullShirt from "./FullShirt";
+import Trousers from "./Trousers";
 
 const outfitComponents = {
   jacket: Jacket,
@@ -23,6 +24,7 @@ const outfitComponents = {
   femaleGown: FemaleGown,
   femaleJacket: FemaleJacket,
   fullShirt: FullShirt,
+  trousers: Trousers,
 };
 
 const CustomizationScene = ({
@@ -110,6 +112,7 @@ const CustomizationScene = ({
               "jeans",
               "femaleDress",
               "kameezShalwar",
+              "trousers",
             ].includes(type)
           )
         }
