@@ -182,7 +182,7 @@ const AboutUs = () => {
           <a href="/contact-us" className={`text-blue-600 ${theme.hoverText}`}>
             Contact Us
           </a>{" "}
-          today!
+          right now!
         </p>
       </footer>
     </div>

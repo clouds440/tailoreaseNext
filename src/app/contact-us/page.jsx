@@ -104,7 +104,7 @@ const ContactUs = () => {
           {/* Social Media Links */}
           <div className="flex space-x-4 mt-6">
             <a
-              href="https://www.facebook.com"
+              href="https://www.facebook.com/profile.php?id=61575302895431"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-blue-600 hover:text-blue-800"
@@ -120,15 +120,7 @@ const ContactUs = () => {
               <i className="fab fa-twitter"></i>
             </a>
             <a
-              href="https://www.instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xl text-pink-600 hover:text-pink-800"
-            >
-              <i className="fab fa-instagram"></i>
-            </a>
-            <a
-              href="https://www.linkedin.com"
+              href="https://www.linkedin.com/company/107202971"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-blue-700 hover:text-blue-900"
@@ -136,7 +128,7 @@ const ContactUs = () => {
               <i className="fab fa-linkedin-in"></i>
             </a>
             <a
-              href="https://www.youtube.com"
+              href="https://youtube.com/@tailoreaseplatform?si=pXMDwaLdXmXtQkri"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xl text-red-600 hover:text-red-800"

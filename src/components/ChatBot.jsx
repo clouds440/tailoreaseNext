@@ -169,6 +169,7 @@ const ChatBot = () => {
         parts: [{ text: lastModelMessage.text }],
       });
     }
+    if (!lastUserMessage) return [];
 
     return history;
   };
@@ -391,12 +392,14 @@ const ChatBot = () => {
                     <p className="flex text-sm font-semibold text-green-600">
                       Online
                     </p>
-                    <button
-                      className="flex bg-transparent text-sm ml-2 text-gray-600 hover:text-gray-400"
-                      onClick={handleDeleteHistory}
-                    >
-                      Delete history
-                    </button>
+                    {userLoggedIn && (
+                      <button
+                        className="flex bg-transparent text-sm ml-2 text-gray-600 hover:text-gray-400"
+                        onClick={handleDeleteHistory}
+                      >
+                        Delete history
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

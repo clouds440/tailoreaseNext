@@ -143,96 +143,98 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="max-w-[99.5%] min-h-[97%] mx-auto flex items-center justify-center w-auto p-6 rounded-lg select-none">
-      <div
-        className={`p-6 h-full rounded-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
-      >
-        <div className="w-full md:w-1/2 h-auto flex justify-center md:justify-start">
-          <Image
-            className="max-w-full p-12 w-auto"
-            src="/graphics/login-image.png"
-            alt="This is the login Image."
-            width={500} // Specify the width
-            height={500} // Specify the height
-            priority // Optional: for high-priority images like login
-          />
-        </div>
-        <div className="w-full md:w-1/2 mt-6 md:mt-0">
-          <h2
-            className={`flex text-xl md:text-4xl ${theme.colorText} font-bold mb-4`}
-          >
-            Login
-          </h2>
-          <form className="w-full" onSubmit={handleSubmit} noValidate>
-            <div className="relative mb-4">
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`${inputStyles}`}
-                placeholder=" "
-              />
-              <label className={`${placeHolderStyles}`} htmlFor="email">
-                Email
-              </label>
-            </div>
-            <div className="relative mb-4">
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`${inputStyles}`}
-                placeholder=" "
-              />
-              <label className={`${placeHolderStyles}`} htmlFor="password">
-                Password
-              </label>
-            </div>
-            <SimpleButton
-              btnText={isLoading ? <LoadingSpinner size={24} /> : "Login"}
-              type={"primary-submit"}
-              extraclasses={"w-full"}
-              disabled={isLoading}
+    <div className="h-full overflow-y-auto">
+      <div className="max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-lg select-none">
+        <div
+          className={`p-6 h-full rounded-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
+        >
+          <div className="w-full md:w-1/2 h-auto flex justify-center md:justify-start">
+            <Image
+              className="max-w-full p-12 w-auto"
+              src="/graphics/login-image.png"
+              alt="This is the login Image."
+              width={500} // Specify the width
+              height={500} // Specify the height
+              priority // Optional: for high-priority images like login
             />
-            <div className="my-4 flex items-center justify-center">
+          </div>
+          <div className="w-full md:w-1/2 mt-6 md:mt-0">
+            <h2
+              className={`flex text-xl md:text-4xl ${theme.colorText} font-bold mb-4`}
+            >
+              Login
+            </h2>
+            <form className="w-full" onSubmit={handleSubmit} noValidate>
+              <div className="relative mb-4">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`${inputStyles}`}
+                  placeholder=" "
+                />
+                <label className={`${placeHolderStyles}`} htmlFor="email">
+                  Email
+                </label>
+              </div>
+              <div className="relative mb-4">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`${inputStyles}`}
+                  placeholder=" "
+                />
+                <label className={`${placeHolderStyles}`} htmlFor="password">
+                  Password
+                </label>
+              </div>
               <SimpleButton
-                btnText={
-                  <div className="flex items-center justify-center gap-2">
-                    <i className="fab fa-google"></i>
-                    <span>Continue with Google</span>
-                  </div>
-                }
-                type={"danger"}
-                extraclasses={`w-full bg-rose-500`}
-                onClick={handleGoogleLogin}
+                btnText={isLoading ? <LoadingSpinner size={24} /> : "Login"}
+                type={"primary-submit"}
+                extraclasses={"w-full"}
+                disabled={isLoading}
               />
-            </div>
-            <div className="items-start justify-start flex flex-row mt-8">
-              <span>Forgot Password? &nbsp;</span>
-              {isResetLoading ? (
-                <BarLoader color="#0000ff" width={137} />
-              ) : (
-                <span
-                  className={`cursor-pointer ${theme.iconColor} ${theme.hoverText}`}
-                  onClick={handlePasswordReset}
-                >
-                  Reset
-                </span>
-              )}
-            </div>
-            <div className="items-start justify-start flex flex-row mt-8">
-              <span>Need an account? &nbsp;</span>
-              <Link href={"/signup"}>
-                <span className={`${theme.iconColor} ${theme.hoverText}`}>
-                  Singup Now
-                </span>
-              </Link>
-            </div>
-          </form>
+              <div className="my-4 flex items-center justify-center">
+                <SimpleButton
+                  btnText={
+                    <div className="flex items-center justify-center gap-2">
+                      <i className="fab fa-google"></i>
+                      <span>Continue with Google</span>
+                    </div>
+                  }
+                  type={"danger"}
+                  extraclasses={`w-full bg-rose-500`}
+                  onClick={handleGoogleLogin}
+                />
+              </div>
+              <div className="items-start justify-start flex flex-row mt-8">
+                <span>Forgot Password? &nbsp;</span>
+                {isResetLoading ? (
+                  <BarLoader color="#0000ff" width={137} />
+                ) : (
+                  <span
+                    className={`cursor-pointer ${theme.iconColor} ${theme.hoverText}`}
+                    onClick={handlePasswordReset}
+                  >
+                    Reset
+                  </span>
+                )}
+              </div>
+              <div className="items-start justify-start flex flex-row mt-8">
+                <span>Need an account? &nbsp;</span>
+                <Link href={"/signup"}>
+                  <span className={`${theme.iconColor} ${theme.hoverText}`}>
+                    Singup Now
+                  </span>
+                </Link>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
