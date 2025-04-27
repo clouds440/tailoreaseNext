@@ -8,6 +8,14 @@ import Link from "next/link";
 
 export default function Home() {
   const { theme, inputStyles, placeHolderStyles } = useContext(UserContext);
+  const year = new Date().getFullYear();
+
+  const socialLinks = {
+    facebook: "https://www.facebook.com/profile.php?id=61575302895431",
+    linkedin: "https://www.linkedin.com/company/107202971",
+    youtube: "https://youtube.com/@tailoreaseplatform?si=pXMDwaLdXmXtQkri",
+    twitter: "#", // No link given, so keeping it '#'
+  };
 
   return (
     <div className="h-full overflow-y-auto">
@@ -131,14 +139,17 @@ export default function Home() {
               Follow Us
             </h3>
             <div className="flex gap-4">
-              {["facebook", "twitter", "linkedin", "instagram", "youtube"].map(
+              {["facebook", "twitter", "linkedin", "youtube"].map(
                 (platform) => (
-                  <div
+                  <a
                     key={platform}
+                    href={socialLinks[platform]}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-800 transition duration-300"
                   >
                     <i className={`fab fa-${platform} text-xl`}></i>
-                  </div>
+                  </a>
                 )
               )}
             </div>
@@ -153,7 +164,6 @@ export default function Home() {
               {[
                 { href: "/about-us", text: "About Us" },
                 { href: "/contact-us", text: "Contact Us" },
-                { href: "/faq", text: "FAQ" },
               ].map(({ href, text }) => (
                 <li key={text}>
                   <Link
@@ -196,7 +206,7 @@ export default function Home() {
         <div
           className={`w-full text-center text-lg mt-10 ${theme.subTextColor}`}
         >
-          © 2024 TailorEase. All Rights Reserved.
+          © {year} TailorEase. All Rights Reserved.
         </div>
       </div>
     </div>

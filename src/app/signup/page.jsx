@@ -158,7 +158,7 @@ const SignUpForm = () => {
       sessionStorage.setItem("userData", JSON.stringify(userData));
       localStorage.setItem("userData", JSON.stringify(userData));
       setUserData(userData);
-      router.push("/");
+      router.push("/user");
     } catch (error) {
       let errorMessage = "An error occurred: " + ` ${error.message}`;
       let errorType = "danger";

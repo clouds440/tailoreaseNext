@@ -240,7 +240,7 @@ function AccountSettings() {
   };
 
   const handleDiscardChanges = () => {
-    router.push("/");
+    router.push("/user");
   };
 
   useEffect(() => {

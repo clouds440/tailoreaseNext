@@ -77,7 +77,7 @@ const GoogleLogin = () => {
         setPopUpMessageTrigger("true");
 
         // Redirect to home
-        router.push("/");
+        router.push("/user");
       } catch (err) {
         if (err.code === "auth/user-disabled") {
           setShowMessage({

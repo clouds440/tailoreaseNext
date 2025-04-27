@@ -23,6 +23,7 @@ const Navbar = () => {
     handleSetTheme,
     activeDashboard,
     updateActiveDashboard,
+    setUserData,
   } = useContext(UserContext);
 
   const [userFullName, setUserFullName] = useState(userData?.fullName || "");
@@ -78,6 +79,7 @@ const Navbar = () => {
         message: "Logged out!",
       });
       setPopUpMessageTrigger("true");
+      setUserData(null);
       router.replace("/login");
     } catch (error) {
       setShowMessage({
@@ -136,7 +138,7 @@ const Navbar = () => {
 
   const switchToUserDashboard = () => {
     updateActiveDashboard("user");
-    router.replace("/");
+    router.replace("/user");
     setDropdownOpen(false);
   };
 

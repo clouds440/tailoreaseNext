@@ -125,6 +125,7 @@ const OutfitCustomization = () => {
   const [buttonTexturePath, setbuttonTexturePath] = useState(
     "/models/buttons/button3.jpg"
   );
+  const [measurements, setMeasurements] = useState({});
 
   useEffect(() => {
     const getSharedOutfit = async () => {
@@ -144,6 +145,100 @@ const OutfitCustomization = () => {
       getSharedOutfit();
     }
   }, [shareId]);
+
+  // Fetch measurements from Firestore
+  useEffect(() => {
+    if (!userData?.uid || !userLoggedIn) return;
+    try {
+      const fetchData = async () => {
+        const docRef = doc(
+          db,
+          "settings",
+          userData.uid,
+          "user_settings",
+          "measurements"
+        );
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setMeasurements(docSnap.data());
+        }
+      };
+
+      fetchData();
+    } catch (error) {
+      console.log(error.message);
+    }
+  }, [setMeasurements, userData?.uid, userLoggedIn]);
+
+  useEffect(() => {
+    if (!userLoggedIn || shareId || !measurements) return;
+
+    const useInches =
+      localStorage.getItem("useInches." + userData?.uid) === "true";
+    const toInches = (valCm) => (useInches ? valCm : valCm * 0.393701);
+
+    // 1️⃣ all your measurement ranges (in inches)
+    const ranges = {
+      chest: [28, 50],
+      shoulder: [14, 24],
+      torso: [20, 36],
+      sleeve: [18, 28],
+      neck: [12, 20],
+      armhole: [12, 24],
+      cuff: [6, 12],
+      waist: [24, 48],
+      hips: [30, 50],
+      legs: [28, 44],
+      thigh: [18, 30],
+      legOpening: [10, 18],
+      arms: [6, 18], // matches “Arms”
+      armhole: [7, 14],
+      skirt: [20, 40], // matches “Skirt”
+    };
+
+    // 2️⃣ map each morph-target name → your measurement key
+    const morphToKey = {
+      Chest: "chest",
+      Waist: "waist",
+      Belly: "waist", // use waist for “Belly”
+      Length: (outfit) =>
+        // if it’s a pants outfit, map “Length” → leg length
+        outfit.toLowerCase().includes("pants") ? "legs" : "torso",
+      Legs: "legs",
+      Arms: "armhole",
+      Skirt: "hips",
+      Thigh: "thigh",
+      Shoulder: "shoulder",
+      Torso: "torso",
+      Sleeve: "sleeve",
+      Neck: "neck",
+      Armhole: "armhole",
+      Cuff: "cuff",
+      Hips: "hips",
+      LegOpening: "legOpening",
+    };
+
+    // 3️⃣ build initial morph-values
+    const initialMorphValues = {};
+    Object.entries(morphTargets).forEach(([outfit, targets]) => {
+      initialMorphValues[outfit] = targets.map((tgt) => {
+        // resolve measurement key
+        let key = morphToKey[tgt];
+        if (typeof key === "function") key = key(outfit);
+
+        const raw = measurements[key];
+        const range = ranges[key];
+        if (raw == null || !range) return 0;
+
+        const valInches = toInches(raw);
+        const [min, max] = range;
+        // clamp & normalize
+        return Math.min(1, Math.max(0, (valInches - min) / (max - min)));
+      });
+    });
+
+    setMorphValues(initialMorphValues);
+  }, [measurements, userLoggedIn, shareId, morphTargets, userData?.uid]);
 
   const { uploadImage } = useImageUpload();
 
