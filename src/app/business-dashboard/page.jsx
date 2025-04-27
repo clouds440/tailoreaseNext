@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { db } from "@/utils/firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import TailorAddProductPage from "../add-product/page";
 
 const BusinessDashboard = () => {
   const {
@@ -86,7 +85,7 @@ const BusinessDashboard = () => {
         className={`max-w-[99.5%] mx-auto items-center p-6 my-4 md:my-1 rounded-lg h-fit min-h-full select-none justify-center flex ${theme.mainTheme}`}
       >
         {/* Business account is approved and active. Dashboard content displayed here */}
-        <TailorAddProductPage />
+        {router.push("/business-dashboard")}
       </div>
     </div>
   ) : (

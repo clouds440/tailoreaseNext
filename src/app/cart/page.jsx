@@ -17,12 +17,26 @@ import {
 import Image from "next/image";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "@/components/SimpleButton";
-import { FaTrash, FaPlus, FaMinus, FaArrowLeft, FaWallet, FaReceipt, FaSpinner } from "react-icons/fa";
+import {
+  FaTrash,
+  FaPlus,
+  FaMinus,
+  FaArrowLeft,
+  FaWallet,
+  FaReceipt,
+  FaSpinner,
+} from "react-icons/fa";
 import { RiSecurePaymentFill } from "react-icons/ri";
 
 const CartPage = () => {
-  const { theme, userData, setShowMessage, setPopUpMessageTrigger, inputStyles, placeHolderStyles } =
-    useContext(UserContext);
+  const {
+    theme,
+    userData,
+    setShowMessage,
+    setPopUpMessageTrigger,
+    inputStyles,
+    placeHolderStyles,
+  } = useContext(UserContext);
   const router = useRouter();
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -66,12 +80,12 @@ const CartPage = () => {
         if (!querySnapshot.empty) {
           const cartDoc = querySnapshot.docs[0];
           setCart({ id: cartDoc.id, ...cartDoc.data() });
-          
+
           // Pre-fill checkout data if available
           if (cartDoc.data().deliveryAddress) {
-            setCheckoutData(prev => ({
+            setCheckoutData((prev) => ({
               ...prev,
-              ...cartDoc.data().deliveryAddress
+              ...cartDoc.data().deliveryAddress,
             }));
           }
         }
@@ -87,7 +101,7 @@ const CartPage = () => {
     };
 
     fetchCart();
-  }, [userData?.uid]);
+  }, [setPopUpMessageTrigger, setShowMessage, userData.uid]);
 
   // Update quantity in cart
   const updateQuantity = async (productId, newQuantity) => {
@@ -225,7 +239,9 @@ const CartPage = () => {
     if (missingFields.length > 0) {
       setShowMessage({
         type: "error",
-        message: `Please fill in all required fields: ${missingFields.join(", ")}`,
+        message: `Please fill in all required fields: ${missingFields.join(
+          ", "
+        )}`,
       });
       setPopUpMessageTrigger(true);
       return false;
@@ -285,7 +301,10 @@ const CartPage = () => {
         paymentMethod: paymentData.method,
         paymentDetails: {
           transactionId: paymentData.transactionId,
-          amount: cart.totalAmount >= 5000 ? cart.totalAmount : cart.totalAmount + 300,
+          amount:
+            cart.totalAmount >= 5000
+              ? cart.totalAmount
+              : cart.totalAmount + 300,
           timestamp: new Date().toISOString(),
         },
       });
@@ -308,7 +327,9 @@ const CartPage = () => {
 
   if (loading) {
     return (
-      <div className={`flex flex-col items-center justify-center h-screen ${theme.mainTheme}`}>
+      <div
+        className={`flex flex-col items-center justify-center h-screen ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -320,7 +341,7 @@ const CartPage = () => {
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="mx-auto rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"
           ></motion.div>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
@@ -335,7 +356,9 @@ const CartPage = () => {
 
   if (!userData?.uid) {
     return (
-      <div className={`flex flex-col items-center justify-center h-screen p-4 ${theme.mainTheme}`}>
+      <div
+        className={`flex flex-col items-center justify-center h-screen p-4 ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -367,14 +390,16 @@ const CartPage = () => {
 
   if (!cart || cart.products.length === 0) {
     return (
-      <div className={`flex flex-col items-center justify-center h-screen p-4 ${theme.mainTheme}`}>
+      <div
+        className={`flex flex-col items-center justify-center h-screen p-4 ${theme.mainTheme}`}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
           className="max-w-md text-center"
         >
-          <motion.div 
+          <motion.div
             animate={{ y: [-5, 5, -5] }}
             transition={{ duration: 4, repeat: Infinity }}
             className="relative w-40 h-40 mx-auto mb-6"
@@ -390,7 +415,7 @@ const CartPage = () => {
             Your Cart is Empty
           </h2>
           <p className={`mb-6 ${theme.colorText} opacity-80`}>
-            Looks like you haven't added any items to your cart yet. Start
+            Looks like you haven&apos;t added any items to your cart yet. Start
             shopping to add some!
           </p>
           <SimpleButton
@@ -404,13 +429,14 @@ const CartPage = () => {
     );
   }
 
-  const totalAmount = cart.totalAmount >= 5000 ? cart.totalAmount : cart.totalAmount + 300;
+  const totalAmount =
+    cart.totalAmount >= 5000 ? cart.totalAmount : cart.totalAmount + 300;
 
   return (
     <div className={`h-full overflow-auto ${theme.mainTheme} pb-20`}>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -474,7 +500,7 @@ const CartPage = () => {
                       className={`p-4 ${theme.colorBg} flex flex-col sm:flex-row`}
                     >
                       {/* Product Image */}
-                      <motion.div 
+                      <motion.div
                         whileHover={{ scale: 1.03 }}
                         className="relative w-full sm:w-24 h-24 mb-4 sm:mb-0 sm:mr-4 rounded-lg overflow-hidden"
                       >
@@ -561,7 +587,8 @@ const CartPage = () => {
 
                           {/* Price */}
                           <p className={`font-bold ${theme.colorText}`}>
-                            PKR {(product.price * product.quantity).toLocaleString(
+                            PKR{" "}
+                            {(product.price * product.quantity).toLocaleString(
                               "en-PK"
                             )}
                           </p>
@@ -580,14 +607,16 @@ const CartPage = () => {
               transition={{ delay: 0.2, duration: 0.4 }}
               className={`p-4 rounded-xl ${theme.colorBg} shadow-lg border ${theme.colorBorder}`}
             >
-              <h3 className={`font-semibold mb-2 ${theme.colorText} flex items-center`}>
+              <h3
+                className={`font-semibold mb-2 ${theme.colorText} flex items-center`}
+              >
                 <RiSecurePaymentFill className="mr-2 text-blue-500" />
                 Delivery Information
               </h3>
               <p className={`text-sm ${theme.colorText} opacity-80`}>
                 Your order will be ready in approximately{" "}
                 <span className="font-semibold">7-14 days</span>. Free shipping
-                on orders over PKR 5,000. You'll receive updates about your
+                on orders over PKR 5,000. You&apos;ll receive updates about your
                 order via email and SMS.
               </p>
             </motion.div>
@@ -605,21 +634,25 @@ const CartPage = () => {
                 className={`p-4 border-b ${theme.colorBorder} flex justify-between items-center`}
               >
                 <h2 className={`text-lg font-semibold ${theme.colorText}`}>
-                  {checkoutStep === "details" ? "Order Summary" : "Payment Details"}
+                  {checkoutStep === "details"
+                    ? "Order Summary"
+                    : "Payment Details"}
                 </h2>
                 <div className="flex items-center">
-                  <motion.div 
-                    animate={{ 
+                  <motion.div
+                    animate={{
                       scale: checkoutStep === "details" ? [1, 1.2, 1] : 1,
-                      backgroundColor: checkoutStep === "details" ? "#3B82F6" : "#9CA3AF"
+                      backgroundColor:
+                        checkoutStep === "details" ? "#3B82F6" : "#9CA3AF",
                     }}
                     transition={{ duration: 0.5 }}
                     className="w-2 h-2 rounded-full mx-1"
                   ></motion.div>
-                  <motion.div 
-                    animate={{ 
+                  <motion.div
+                    animate={{
                       scale: checkoutStep === "payment" ? [1, 1.2, 1] : 1,
-                      backgroundColor: checkoutStep === "payment" ? "#3B82F6" : "#9CA3AF"
+                      backgroundColor:
+                        checkoutStep === "payment" ? "#3B82F6" : "#9CA3AF",
                     }}
                     transition={{ duration: 0.5 }}
                     className="w-2 h-2 rounded-full mx-1"
@@ -654,17 +687,20 @@ const CartPage = () => {
                       </div>
                       {cart.totalAmount < 5000 && (
                         <div className={`text-sm ${theme.iconColor} mb-4`}>
-                          Add PKR {(5000 - cart.totalAmount).toLocaleString(
-                            "en-PK"
-                          )}{ " "}
+                          Add PKR{" "}
+                          {(5000 - cart.totalAmount).toLocaleString("en-PK")}{" "}
                           more to get free delivery!
                         </div>
                       )}
                       <div
                         className={`flex justify-between pt-4 mt-4 border-t ${theme.colorBorder}`}
                       >
-                        <span className={`font-bold ${theme.colorText}`}>Total</span>
-                        <span className={`font-bold text-lg ${theme.colorText}`}>
+                        <span className={`font-bold ${theme.colorText}`}>
+                          Total
+                        </span>
+                        <span
+                          className={`font-bold text-lg ${theme.colorText}`}
+                        >
                           PKR {totalAmount.toLocaleString("en-PK")}
                         </span>
                       </div>
@@ -691,7 +727,10 @@ const CartPage = () => {
                             placeholder=" "
                             required
                           />
-                          <label className={`${placeHolderStyles}`} htmlFor="name">
+                          <label
+                            className={`${placeHolderStyles}`}
+                            htmlFor="name"
+                          >
                             Full Name *
                           </label>
                         </div>
@@ -708,7 +747,10 @@ const CartPage = () => {
                               placeholder=" "
                               required
                             />
-                            <label className={`${placeHolderStyles}`} htmlFor="phone">
+                            <label
+                              className={`${placeHolderStyles}`}
+                              htmlFor="phone"
+                            >
                               Phone *
                             </label>
                           </div>
@@ -722,7 +764,10 @@ const CartPage = () => {
                               className={`${inputStyles}`}
                               placeholder=" "
                             />
-                            <label className={`${placeHolderStyles}`} htmlFor="email">
+                            <label
+                              className={`${placeHolderStyles}`}
+                              htmlFor="email"
+                            >
                               Email
                             </label>
                           </div>
@@ -739,7 +784,10 @@ const CartPage = () => {
                             placeholder=" "
                             required
                           />
-                          <label className={`${placeHolderStyles}`} htmlFor="streetAddress">
+                          <label
+                            className={`${placeHolderStyles}`}
+                            htmlFor="streetAddress"
+                          >
                             Street Address *
                           </label>
                         </div>
@@ -756,7 +804,10 @@ const CartPage = () => {
                               placeholder=" "
                               required
                             />
-                            <label className={`${placeHolderStyles}`} htmlFor="city">
+                            <label
+                              className={`${placeHolderStyles}`}
+                              htmlFor="city"
+                            >
                               City *
                             </label>
                           </div>
@@ -771,7 +822,10 @@ const CartPage = () => {
                               placeholder=" "
                               required
                             />
-                            <label className={`${placeHolderStyles}`} htmlFor="district">
+                            <label
+                              className={`${placeHolderStyles}`}
+                              htmlFor="district"
+                            >
                               District *
                             </label>
                           </div>
@@ -804,7 +858,10 @@ const CartPage = () => {
                                 Azad Jammu and Kashmir
                               </option>
                             </select>
-                            <label className={`${placeHolderStyles}`} htmlFor="province">
+                            <label
+                              className={`${placeHolderStyles}`}
+                              htmlFor="province"
+                            >
                               Province *
                             </label>
                           </div>
@@ -818,7 +875,10 @@ const CartPage = () => {
                               className={`${inputStyles}`}
                               placeholder=" "
                             />
-                            <label className={`${placeHolderStyles}`} htmlFor="postalCode">
+                            <label
+                              className={`${placeHolderStyles}`}
+                              htmlFor="postalCode"
+                            >
                               Postal Code
                             </label>
                           </div>
@@ -834,7 +894,10 @@ const CartPage = () => {
                             className={`${inputStyles} min-h-[60px] max-h-[120px]`}
                             placeholder=" "
                           ></textarea>
-                          <label className={`${placeHolderStyles}`} htmlFor="deliveryInstructions">
+                          <label
+                            className={`${placeHolderStyles}`}
+                            htmlFor="deliveryInstructions"
+                          >
                             Delivery Instructions
                           </label>
                         </div>
@@ -842,7 +905,10 @@ const CartPage = () => {
                     </div>
 
                     {/* Proceed to Payment Button */}
-                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                    >
                       <SimpleButton
                         btnText="Proceed to Payment"
                         type="primary"
@@ -863,7 +929,9 @@ const CartPage = () => {
                   >
                     <div className="mb-6">
                       <div className="flex justify-between mb-2">
-                        <span className={`${theme.colorText} opacity-80`}>Total Amount</span>
+                        <span className={`${theme.colorText} opacity-80`}>
+                          Total Amount
+                        </span>
                         <span className={`font-bold ${theme.colorText}`}>
                           PKR {totalAmount.toLocaleString("en-PK")}
                         </span>
@@ -878,7 +946,7 @@ const CartPage = () => {
                         Payment Method
                       </h3>
 
-                      <motion.div 
+                      <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
@@ -894,7 +962,10 @@ const CartPage = () => {
                             onChange={handlePaymentChange}
                             className="mr-2"
                           />
-                          <label htmlFor="easypaisa" className={`${theme.colorText} flex items-center`}>
+                          <label
+                            htmlFor="easypaisa"
+                            className={`${theme.colorText} flex items-center`}
+                          >
                             <Image
                               src="/images/payment/easypaisa.png"
                               alt="EasyPaisa"
@@ -905,22 +976,34 @@ const CartPage = () => {
                           </label>
                         </div>
 
-                        <motion.div 
+                        <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.3 }}
                           className={`p-4 rounded-lg ${theme.colorBg} border ${theme.colorBorder}`}
                         >
                           <p className={`text-sm ${theme.colorText} mb-3`}>
-                            Please send <span className="font-bold">PKR {totalAmount.toLocaleString("en-PK")}</span> to:
+                            Please send{" "}
+                            <span className="font-bold">
+                              PKR {totalAmount.toLocaleString("en-PK")}
+                            </span>{" "}
+                            to:
                           </p>
-                          
-                          <motion.div 
+
+                          <motion.div
                             whileHover={{ scale: 1.01 }}
                             className={`p-3 rounded-lg bg-blue-50 dark:bg-blue-900 mb-3`}
                           >
-                            <p className={`text-sm font-bold ${theme.colorText}`}>EasyPaisa Account:</p>
-                            <p className={`text-lg font-bold ${theme.colorText}`}>0348-9957248</p>
+                            <p
+                              className={`text-sm font-bold ${theme.colorText}`}
+                            >
+                              EasyPaisa Account:
+                            </p>
+                            <p
+                              className={`text-lg font-bold ${theme.colorText}`}
+                            >
+                              0348-9957248
+                            </p>
                           </motion.div>
 
                           <div className="relative mt-4">
@@ -934,11 +1017,17 @@ const CartPage = () => {
                               placeholder=" "
                               required
                             />
-                            <label className={`${placeHolderStyles}`} htmlFor="transactionId">
+                            <label
+                              className={`${placeHolderStyles}`}
+                              htmlFor="transactionId"
+                            >
                               Transaction ID *
                             </label>
-                            <p className={`text-xs mt-1 ${theme.colorText} opacity-70`}>
-                              You can find this in your EasyPaisa app after payment
+                            <p
+                              className={`text-xs mt-1 ${theme.colorText} opacity-70`}
+                            >
+                              You can find this in your EasyPaisa app after
+                              payment
                             </p>
                           </div>
                         </motion.div>
@@ -946,7 +1035,11 @@ const CartPage = () => {
                     </div>
 
                     <div className="flex gap-3">
-                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="flex-1">
+                      <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className="flex-1"
+                      >
                         <SimpleButton
                           btnText="Back"
                           type="secondary"
@@ -955,7 +1048,11 @@ const CartPage = () => {
                           extraClasses="py-3"
                         />
                       </motion.div>
-                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="flex-1">
+                      <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className="flex-1"
+                      >
                         <SimpleButton
                           btnText="Complete Payment"
                           type="primary"
