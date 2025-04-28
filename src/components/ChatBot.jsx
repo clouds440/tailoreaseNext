@@ -288,24 +288,24 @@ const ChatBot = () => {
         setIsTyping(true);
 
         const ordersCollection = collection(db, "OrdersManagement");
+
         const ordersQuery = query(
           ordersCollection,
-          where("userId", "==", userData?.uid)
+          where("userId", "==", userData?.uid),
+          where("orderStatus", "not-in", ["inCart"]) // Firestore likes "not-in" instead of "!=". Can also search for multiple values like ["inCart", "cancelled"]
         );
+
         const querySnapshot = await getDocs(ordersQuery);
 
         if (!querySnapshot.empty) {
-          const ordersDoc = querySnapshot.docs[0];
-          const data = ordersDoc.data();
-          const docId = ordersDoc.id;
-          const payload = {
-            orderData: data,
-            orderId: docId,
-          };
+          const orders = querySnapshot.docs.map((doc) => ({
+            orderData: doc.data(),
+            orderId: doc.id,
+          }));
 
-          handleSendMessage(JSON.stringify(payload));
+          handleSendMessage(JSON.stringify(orders)); // Sending ALL orders, not just the first one
         } else {
-          handleSendMessage("querySnapshot was empty, infrom the user");
+          handleSendMessage("querySnapshot was empty, inform the user");
         }
       } catch (error) {
         console.error("Error fetching orders:", error);
