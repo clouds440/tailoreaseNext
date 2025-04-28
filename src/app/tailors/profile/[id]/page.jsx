@@ -178,7 +178,16 @@ const TailorProfile = () => {
       setPopUpMessageTrigger(true);
       setRating(0);
       setUserReview("");
-      setFetchedReviews((prev) => ({ ...prev, userReview }));
+      setFetchedReviews((prev) => [
+        ...prev,
+        {
+          stars: rating, // whatever stars value you have
+          message: userReview,
+          user_id: userData.uid,
+          tailor_id: tailorData.id,
+          userName: userData.fullName,
+        },
+      ]);
     } catch (error) {
       console.error("Error submitting review:", error);
       setShowMessage({
