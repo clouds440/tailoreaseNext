@@ -75,14 +75,18 @@ const Tailors = () => {
       if (searchQuery) {
         tailors = tailors.filter(
           (tailor) =>
-            tailor.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            tailor.businessName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
             tailor.location?.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
 
       if (appliedFilters.length > 0) {
         tailors = tailors.filter((tailor) =>
-          appliedFilters.every((filter) => tailor.specialities?.includes(filter))
+          appliedFilters.every((filter) =>
+            tailor.specialities?.includes(filter)
+          )
         );
       }
 
@@ -125,7 +129,9 @@ const Tailors = () => {
           sortedTailors.sort((a, b) => b.numberOfReviews - a.numberOfReviews);
           break;
         case "Newest":
-          sortedTailors.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          sortedTailors.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
           break;
         case "Top Rated":
         default:
@@ -449,7 +455,7 @@ const Tailors = () => {
                         className={`text-sm mt-1 ${theme.colorText} opacity-80 flex items-center line-clamp-1`}
                       >
                         <i className="fas fa-map-marker-alt mr-2 text-xs"></i>
-                        {tailor.location || "Location not specified"}
+                        {tailor.businessAddress || "Location not specified"}
                       </p>
                       <div className="flex overflow-hidden items-center mt-2">
                         <div className="flex">
@@ -463,7 +469,8 @@ const Tailors = () => {
                         className={`mt-2 text-sm ${theme.colorText} flex items-center`}
                       >
                         <i className="fas fa-clock mr-2"></i>
-                        {tailor.openTime || "09:00"} - {tailor.closeTime || "18:00"}
+                        {tailor.openTime || "09:00"} -{" "}
+                        {tailor.closeTime || "18:00"}
                       </p>
                     </div>
                   </motion.div>
