@@ -151,10 +151,10 @@ const TailorProfile = () => {
       return;
     }
 
-    if (userReview.split(" ").length < 5) {
+    if (userReview.split(" ").length < 3) {
       setShowMessage({
         type: "info",
-        message: "Please write at least 5 words in the review",
+        message: "Please write at least 3 words in the review",
       });
       setPopUpMessageTrigger(true);
       return;
@@ -178,6 +178,7 @@ const TailorProfile = () => {
       setPopUpMessageTrigger(true);
       setRating(0);
       setUserReview("");
+      setFetchedReviews((prev) => ({ ...prev, userReview }));
     } catch (error) {
       console.error("Error submitting review:", error);
       setShowMessage({
