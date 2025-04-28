@@ -18,7 +18,7 @@ import { db } from "@/utils/firebaseConfig";
 import ShareLinkDialog from "@/components/ShareLinkDialog";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import ButtonSelector from "@/components/3d components/ButtonSelector";
-import NoticeBubble from "@/components/NoticeBubble";
+import FloatingInfoBubble from "@/components/FloatingInfoBubble";
 
 const outfitCategories = {
   jacket: { category: "torso", gender: "male" },
@@ -439,10 +439,11 @@ const OutfitCustomization = () => {
           isMobile ? "mb-1" : "h-full"
         } ${theme.mainTheme}`}
       >
-        <NoticeBubble
-          text="Outfits, colors, and fabrics may appear differently in real life"
+        <FloatingInfoBubble
+          text="Colors, and fabrics may appear differently in real life"
           type="warning"
           extraClasses="mb-4"
+          icon={<i className="fas fa-exclamation-circle"></i>}
         />
         {/* Morph sliders for each outfit */}
         {Object.keys(morphTargets).map((outfit) => (
@@ -469,6 +470,13 @@ const OutfitCustomization = () => {
                 />
               </div>
             ))}
+
+            <FloatingInfoBubble
+              text="Upload a picture of a fabric to apply as texture to the outfit"
+              type="info"
+              icon={<i className="fas fa-exclamation-circle"></i>}
+              extraClasses="mb-2"
+            />
 
             <div className="flex items-center justify-between mb-6">
               {/* Color Picker Button on the left */}
@@ -500,26 +508,23 @@ const OutfitCustomization = () => {
                   className="hidden" // Hide the default input element
                 />
               </div>
-              {outfit === "KameezShalwar" ||
-                (outfit === "FemaleGown" && (
-                  <div className="flex items-center">
-                    <label
-                      htmlFor={`file-shalwar-${outfit}`}
-                      className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.mainTheme} ${theme.hoverBg}`}
-                    >
-                      {shalwarTexure ? "Change Shalwar" : "Shalwar Texture"}
-                    </label>
-                    <input
-                      id={`file-shalwar-${outfit}`}
-                      type="file"
-                      accept=".jpg, .png"
-                      onChange={(e) =>
-                        handleTextureUpload(outfit, "shalwar", e)
-                      }
-                      className="hidden" // Hide the default input element
-                    />
-                  </div>
-                ))}
+              {["KameezShalwar", "FemaleGown"].includes(outfit) && (
+                <div className="flex items-center">
+                  <label
+                    htmlFor={`file-shalwar-${outfit}`}
+                    className={`px-4 py-2 rounded cursor-pointer hover:ring-2 ${theme.mainTheme} ${theme.hoverBg}`}
+                  >
+                    {texture[outfit] ? "Change Bottom" : "Bottom Texture"}
+                  </label>
+                  <input
+                    id={`file-shalwar-${outfit}`}
+                    type="file"
+                    accept=".jpg, .png"
+                    onChange={(e) => handleTextureUpload(outfit, "shalwar", e)}
+                    className="hidden" // Hide the default input element
+                  />
+                </div>
+              )}
             </div>
 
             {/* Color Picker */}

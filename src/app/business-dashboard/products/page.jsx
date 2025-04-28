@@ -24,7 +24,7 @@ const TailorProductDashboard = () => {
   const [predefinedProducts, setPredefinedProducts] = useState([]);
   const [tailorProducts, setTailorProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedTab, setSelectedTab] = useState("add"); 
+  const [selectedTab, setSelectedTab] = useState("add");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -140,27 +140,30 @@ const TailorProductDashboard = () => {
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
-    
+
     setSelectedFiles(files);
-    setImagesToCrop(files.map(file => URL.createObjectURL(file)));
+    setImagesToCrop(files.map((file) => URL.createObjectURL(file)));
     setCurrentImageIndex(0);
     setCropperModalOpen(true);
   };
 
-  const handleImageCropped = useCallback(async (croppedImageUrl) => {
-    setCroppedImages(prev => [...prev, croppedImageUrl]);
-    
-    if (currentImageIndex < imagesToCrop.length - 1) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    } else {
-      setCropperModalOpen(false);
-      setImagesToCrop([]);
-    }
-  }, [currentImageIndex, imagesToCrop.length]);
+  const handleImageCropped = useCallback(
+    async (croppedImageUrl) => {
+      setCroppedImages((prev) => [...prev, croppedImageUrl]);
+
+      if (currentImageIndex < imagesToCrop.length - 1) {
+        setCurrentImageIndex(currentImageIndex + 1);
+      } else {
+        setCropperModalOpen(false);
+        setImagesToCrop([]);
+      }
+    },
+    [currentImageIndex, imagesToCrop.length]
+  );
 
   const removeImage = (index) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    setCroppedImages(prev => prev.filter((_, i) => i !== index));
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setCroppedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const uploadImages = async () => {
@@ -248,7 +251,9 @@ const TailorProductDashboard = () => {
       if (viewMode === "custom") {
         uploadedImageUrls = await uploadImages();
         if (uploadedImageUrls.length === 0) {
-          throw new Error("Please upload at least one image for custom products");
+          throw new Error(
+            "Please upload at least one image for custom products"
+          );
         }
       }
 
@@ -285,7 +290,7 @@ const TailorProductDashboard = () => {
               gender: selectedProduct.gender,
               isPredefined: true,
             },
-        productId: uuidv4()
+        productId: uuidv4(),
       };
 
       await addDoc(collection(db, "tailorProducts"), productData);
@@ -626,7 +631,15 @@ const TailorProductDashboard = () => {
               btnText={"Add Product"}
               icon={<i className="fas fa-plus mr-2"></i>}
               extraclasses={`px-4 py-2 rounded-r-none`}
-              type={selectedTab === "add" ? `primary` : `default`}
+              type={
+                theme.themeName === "lunarGlow"
+                  ? selectedTab === "add"
+                    ? "primary"
+                    : "default"
+                  : selectedTab === "add"
+                  ? "default"
+                  : "primary"
+              }
               onClick={() => setSelectedTab("add")}
             />
 
@@ -634,7 +647,15 @@ const TailorProductDashboard = () => {
               btnText={"My Products"}
               icon={<i className="fas fa-list mr-2"></i>}
               extraclasses={`rounded-l-none`}
-              type={selectedTab === "add" ? `default` : `primary`}
+              type={
+                theme.themeName === "lunarGlow"
+                  ? selectedTab === "manage"
+                    ? "primary"
+                    : "default"
+                  : selectedTab === "manage"
+                  ? "default"
+                  : "primary"
+              }
               onClick={() => setSelectedTab("manage")}
             />
           </motion.div>
@@ -662,14 +683,30 @@ const TailorProductDashboard = () => {
                     <SimpleButton
                       btnText={"Predefined"}
                       extraclasses={`py-1 rounded-r-none text-sm`}
-                      type={viewMode === "predefined" ? `primary` : `default`}
+                      type={
+                        theme.themeName === "lunarGlow"
+                          ? viewMode === "predefined"
+                            ? "primary"
+                            : "default"
+                          : viewMode === "predefined"
+                          ? "default"
+                          : "primary"
+                      }
                       onClick={() => setViewMode("predefined")}
                     />
 
                     <SimpleButton
                       btnText={"Custom"}
                       extraclasses={`py-1 rounded-l-none text-sm`}
-                      type={viewMode === "predefined" ? `default` : `primary`}
+                      type={
+                        theme.themeName === "lunarGlow"
+                          ? viewMode === "custom"
+                            ? "primary"
+                            : "default"
+                          : viewMode === "custom"
+                          ? "default"
+                          : "primary"
+                      }
                       onClick={() => setViewMode("custom")}
                     />
                   </div>
@@ -1365,7 +1402,7 @@ const TailorProductDashboard = () => {
 
       {/* Image Cropper Modal */}
       <ImageCropper
-        aspectRatio={1/1}
+        aspectRatio={1 / 1}
         onCropComplete={handleImageCropped}
         showModal={cropperModalOpen}
         setShowModal={setCropperModalOpen}
