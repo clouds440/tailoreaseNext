@@ -136,14 +136,17 @@ const TailorProductDashboard = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
+    // Clear the input value to allow selecting same file again
+    e.target.value = "";
+
     setSelectedFiles(files);
     setImagesToCrop(files.map((file) => URL.createObjectURL(file)));
     setCurrentImageIndex(0);
+    setCroppedImages([]); // Clear previous cropped images
     setCropperModalOpen(true);
   };
 
@@ -152,7 +155,7 @@ const TailorProductDashboard = () => {
       setCroppedImages((prev) => [...prev, croppedImageUrl]);
 
       if (currentImageIndex < imagesToCrop.length - 1) {
-        setCurrentImageIndex(currentImageIndex + 1);
+        setCurrentImageIndex((prev) => prev + 1);
       } else {
         setCropperModalOpen(false);
         setImagesToCrop([]);
@@ -1405,11 +1408,21 @@ const TailorProductDashboard = () => {
         aspectRatio={1 / 1}
         onCropComplete={handleImageCropped}
         showModal={cropperModalOpen}
-        setShowModal={setCropperModalOpen}
+        setShowModal={(value) => {
+          if (!value) {
+            // When closing, reset all cropping state
+            setCropperModalOpen(false);
+            setImagesToCrop([]);
+            setCurrentImageIndex(0);
+            // But keep the selected files so user can try again
+          } else {
+            setCropperModalOpen(value);
+          }
+        }}
         imageSrc={imagesToCrop[currentImageIndex]}
         modalTitle="TailorEase Image Cropper"
         instructionText="Adjust your product image to fit within the square crop area. 
-        This will be used as your product thumbnail and display image."
+  This will be used as your product thumbnail and display image."
       />
 
       {/* Dialog Box */}
