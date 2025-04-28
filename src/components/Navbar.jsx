@@ -273,7 +273,7 @@ const Navbar = () => {
     {
       path: "/tailors",
       icon: <i className="fas fa-scissors" />,
-      label: "Tailors",
+      label: "All Tailors",
     },
     {
       path: "/contact-us",
@@ -302,7 +302,7 @@ const Navbar = () => {
     {
       path: "/tailors",
       icon: <i className="fas fa-scissors" />,
-      label: "Tailors",
+      label: "All Tailors",
     },
     {
       path: "/contact-us",

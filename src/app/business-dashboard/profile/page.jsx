@@ -341,6 +341,31 @@ const TailorBusinessProfile = () => {
     );
   }
 
+  if (tailorData.status === "suspended") {
+    return (
+      <div
+        className={`flex items-center justify-center h-screen ${theme.mainTheme}`}
+      >
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <div className={`text-5xl mb-4 ${theme.iconColor}`}>
+            <i className="fas fa-user-secret"></i>
+          </div>
+          <h1 className="text-2xl font-bold mb-4">
+            Your business account has been suspended.
+          </h1>
+          <p className="mb-6">
+            Please contact support if you believe this is an error
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`h-full overflow-y-auto ${theme.mainTheme} py-8 px-4 sm:px-6 lg:px-8`}

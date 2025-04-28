@@ -7,6 +7,7 @@ import Image from "next/image";
 const TailorApplicationForm = ({ onNext }) => {
   const [formData, setFormData] = useState({
     businessName: "",
+    countryCode: "+92",
     businessPhone: "",
     businessAddress: "",
     description: "",
@@ -48,6 +49,15 @@ const TailorApplicationForm = ({ onNext }) => {
       setShowMessage({
         type: "warning",
         message: "Business phone number is required",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+
+    if (formData.businessPhone.startsWith("0")) {
+      setShowMessage({
+        type: "warning",
+        message: "Please remove prefix (0) from phone number",
       });
       setPopUpMessageTrigger(true);
       return;
@@ -109,18 +119,36 @@ const TailorApplicationForm = ({ onNext }) => {
               </label>
             </div>
             <div className="relative mb-4">
-              <input
-                type="tel"
-                id="businessPhone"
-                name="businessPhone"
-                value={formData.businessPhone}
-                onChange={handleChange}
-                className={`${inputStyles}`}
-                placeholder=" "
-              />
-              <label className={`${placeHolderStyles}`} htmlFor="businessPhone">
-                Business Phone
-              </label>
+              <div className="flex">
+                <select
+                  id="countryCode"
+                  name="countryCode"
+                  value={formData.countryCode}
+                  onChange={handleChange}
+                  className={`border-b-2 bg-transparent p-2 ${theme.colorText} ${theme.colorBorder} focus:border-blue-600 outline-none`}
+                >
+                  <option value="+92">🇵🇰 +92</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+61">🇦🇺 +61</option>
+                  {/* Add more countries if you want */}
+                </select>
+                <input
+                  type="tel"
+                  id="businessPhone"
+                  name="businessPhone"
+                  value={formData.businessPhone}
+                  onChange={handleChange}
+                  className={`ml-3 ${inputStyles}`}
+                  placeholder=" "
+                />
+                <label
+                  className={`ml-24 ${placeHolderStyles}`}
+                  htmlFor="businessPhone"
+                >
+                  Business Phone (WhatsApp)
+                </label>
+              </div>
             </div>
             <div className="relative mb-4">
               <input

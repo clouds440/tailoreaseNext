@@ -151,10 +151,10 @@ const TailorProfile = () => {
       return;
     }
 
-    if (userReview.split(" ").length < 5) {
+    if (userReview.split(" ").length < 3) {
       setShowMessage({
         type: "info",
-        message: "Please write at least 5 words in the review",
+        message: "Please write at least 3 words in the review",
       });
       setPopUpMessageTrigger(true);
       return;
@@ -178,6 +178,7 @@ const TailorProfile = () => {
       setPopUpMessageTrigger(true);
       setRating(0);
       setUserReview("");
+      setFetchedReviews((prev) => ({ ...prev, userReview }));
     } catch (error) {
       console.error("Error submitting review:", error);
       setShowMessage({
@@ -188,6 +189,19 @@ const TailorProfile = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleClickContact = () => {
+    const message =
+      `Hi, I'm interested in your services from TailorEase.` +
+      (userData?.uid
+        ? ` Here is my profile link on the TailorEase Platform: https://tailorease.vercel.app/user?share=${userData.uid}`
+        : "");
+
+    const url = `https://wa.me/${
+      tailorData.countryCode + tailorData.businessPhone
+    }?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
   };
 
   if (isLoading) {
@@ -245,6 +259,19 @@ const TailorProfile = () => {
             <p className={`text-lg `}>
               Address: {tailorData.businessAddress || "Not provided"}
             </p>
+            <div>
+              <p>
+                Contact:{" "}
+                <span
+                  onClick={handleClickContact}
+                  className={`cursor-pointer ${theme.hoverText}`}
+                >
+                  {" "}
+                  <i className="fab fa-whatsapp text-green-700"></i>{" "}
+                  {tailorData.countryCode}-{tailorData.businessPhone}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
 
@@ -257,7 +284,7 @@ const TailorProfile = () => {
           </p>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 select-none">
           <p className={`text-xl mb-2 pb-1 font-semibold `}>Specialties</p>
           <div className="flex flex-wrap gap-2">
             {tailorData.specialities?.length > 0 ? (
@@ -305,7 +332,7 @@ const TailorProfile = () => {
                     className={`relative w-full mt-8 border p-6 rounded-lg shadow-md ${theme.mainTheme}`}
                   >
                     <div
-                      className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center w-16 h-16 rounded-full overflow-hidden ${theme.mainTheme}`}
+                      className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center w-16 h-16 rounded-full overflow-hidden bg-opacity-100 ${theme.colorBg}`}
                     >
                       <i
                         className={`fas fa-user ${theme.colorText} text-3xl`}
