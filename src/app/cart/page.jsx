@@ -297,7 +297,7 @@ const CartPage = () => {
     try {
       const cartRef = doc(db, "OrdersManagement", cart.id);
       await updateDoc(cartRef, {
-        orderStatus: "paid",
+        orderStatus: "paymentVerificationPending",
         paymentMethod: paymentData.method,
         paymentDetails: {
           transactionId: paymentData.transactionId,

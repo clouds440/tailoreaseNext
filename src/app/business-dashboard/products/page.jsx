@@ -23,7 +23,7 @@ const TailorProductDashboard = () => {
   const [predefinedProducts, setPredefinedProducts] = useState([]);
   const [tailorProducts, setTailorProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedTab, setSelectedTab] = useState("add"); // 'add' or 'manage'
+  const [selectedTab, setSelectedTab] = useState("add"); 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
