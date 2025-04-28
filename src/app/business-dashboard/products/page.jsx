@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import Image from "next/image";
 import { db, storage } from "@/utils/firebaseConfig";
 import {
@@ -18,6 +18,7 @@ import SimpleButton from "@/components/SimpleButton";
 import UserContext from "@/utils/UserContext";
 import DialogBox from "@/components/DialogBox";
 import { v4 as uuidv4 } from "uuid";
+import ImageCropper from "@/components/ImageCropper";
 
 const TailorProductDashboard = () => {
   const [predefinedProducts, setPredefinedProducts] = useState([]);
@@ -36,12 +37,15 @@ const TailorProductDashboard = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [customProductImages, setCustomProductImages] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [viewMode, setViewMode] = useState("predefined"); // 'predefined' or 'custom'
+  const [viewMode, setViewMode] = useState("predefined");
   const fileInputRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [cropperModalOpen, setCropperModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imagesToCrop, setImagesToCrop] = useState([]);
+  const [croppedImages, setCroppedImages] = useState([]);
 
   const {
     theme,
@@ -136,26 +140,43 @@ const TailorProductDashboard = () => {
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
-    setSelectedFiles(files);
     
-    // Create preview URLs for selected files
-    const previewUrls = files.map(file => URL.createObjectURL(file));
-    setCustomProductImages(previewUrls);
+    setSelectedFiles(files);
+    setImagesToCrop(files.map(file => URL.createObjectURL(file)));
+    setCurrentImageIndex(0);
+    setCropperModalOpen(true);
+  };
+
+  const handleImageCropped = useCallback(async (croppedImageUrl) => {
+    setCroppedImages(prev => [...prev, croppedImageUrl]);
+    
+    if (currentImageIndex < imagesToCrop.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1);
+    } else {
+      setCropperModalOpen(false);
+      setImagesToCrop([]);
+    }
+  }, [currentImageIndex, imagesToCrop.length]);
+
+  const removeImage = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setCroppedImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const uploadImages = async () => {
-    if (selectedFiles.length === 0) return [];
+    if (croppedImages.length === 0) return [];
 
     try {
       setIsUploading(true);
       setUploadProgress(0);
 
-      const uploadPromises = selectedFiles.map(async (file) => {
-        const reader = new FileReader();
-        const base64Image = await new Promise((resolve, reject) => {
+      const uploadPromises = croppedImages.map(async (imageUrl) => {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const base64Image = await new Promise((resolve) => {
+          const reader = new FileReader();
           reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
+          reader.readAsDataURL(blob);
         });
 
         const fileName = `product-${Date.now()}-${Math.random()
@@ -163,7 +184,7 @@ const TailorProductDashboard = () => {
           .substring(2, 9)}.jpg`;
         const targetPath = "images/products";
 
-        const response = await fetch("/api/imageUpload", {
+        const uploadResponse = await fetch("/api/imageUpload", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -175,12 +196,12 @@ const TailorProductDashboard = () => {
           }),
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
+        if (!uploadResponse.ok) {
+          const errorText = await uploadResponse.text();
           throw new Error(`Image upload failed: ${errorText}`);
         }
 
-        const { url } = await response.json();
+        const { url } = await uploadResponse.json();
         return "/" + url;
       });
 
@@ -193,11 +214,6 @@ const TailorProductDashboard = () => {
       setIsUploading(false);
       setUploadProgress(0);
     }
-  };
-
-  const removeImage = (index) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    setCustomProductImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -228,7 +244,6 @@ const TailorProductDashboard = () => {
         throw new Error("Please enter a valid price");
       }
 
-      // Upload images only when submitting for custom products
       let uploadedImageUrls = [];
       if (viewMode === "custom") {
         uploadedImageUrls = await uploadImages();
@@ -248,7 +263,7 @@ const TailorProductDashboard = () => {
             ? `${formData.name} custom product`
             : `${selectedProduct.name} stitching service`),
         isActive: formData.isActive,
-        has3DTryOn: !isCustom, // Always true for predefined products
+        has3DTryOn: !isCustom,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         isCustom,
@@ -270,12 +285,11 @@ const TailorProductDashboard = () => {
               gender: selectedProduct.gender,
               isPredefined: true,
             },
-            productId: uuidv4()
+        productId: uuidv4()
       };
 
       await addDoc(collection(db, "tailorProducts"), productData);
 
-      // Refresh tailor products
       const tailorQuery = query(
         collection(db, "tailorProducts"),
         where("tailorId", "==", userData.bId)
@@ -291,7 +305,6 @@ const TailorProductDashboard = () => {
         `Product ${isCustom ? "created" : "added"} successfully!`
       );
 
-      // Reset form
       if (isCustom) {
         setFormData({
           name: "",
@@ -303,7 +316,7 @@ const TailorProductDashboard = () => {
           isActive: true,
           gender: "unisex",
         });
-        setCustomProductImages([]);
+        setCroppedImages([]);
         setSelectedFiles([]);
       } else {
         setSelectedProduct(null);
@@ -801,7 +814,7 @@ const TailorProductDashboard = () => {
                             onChange={handleFileSelect}
                             className="hidden"
                             multiple
-                            accept=".jpg, .png"
+                            accept=".jpg, .jpeg, .png"
                           />
                           <i
                             className={`fas fa-cloud-upload-alt text-3xl mb-2 ${theme.iconColor}`}
@@ -813,10 +826,10 @@ const TailorProductDashboard = () => {
                         </div>
 
                         {/* Image Previews */}
-                        {customProductImages.length > 0 && (
+                        {croppedImages.length > 0 && (
                           <div className="mt-4">
                             <div className="flex flex-wrap gap-2">
-                              {customProductImages.map((img, index) => (
+                              {croppedImages.map((img, index) => (
                                 <motion.div
                                   key={index}
                                   className="relative group"
@@ -847,7 +860,7 @@ const TailorProductDashboard = () => {
                               ))}
                             </div>
                             <p className="text-xs mt-1">
-                              {customProductImages.length} image(s) selected
+                              {croppedImages.length} image(s) selected
                             </p>
                           </div>
                         )}
@@ -893,9 +906,9 @@ const TailorProductDashboard = () => {
                             style={{ objectFit: "cover" }}
                             className="transition-transform duration-300 hover:scale-105"
                           />
-                        ) : customProductImages.length > 0 ? (
+                        ) : croppedImages.length > 0 ? (
                           <Image
-                            src={customProductImages[0]}
+                            src={croppedImages[0]}
                             alt={formData.name || "Custom product"}
                             width={300}
                             height={300}
@@ -1114,7 +1127,7 @@ const TailorProductDashboard = () => {
                               (viewMode === "custom" &&
                                 (!formData.name ||
                                   !formData.category ||
-                                  customProductImages.length === 0))
+                                  croppedImages.length === 0))
                             }
                           />
                         </motion.div>
@@ -1349,6 +1362,18 @@ const TailorProductDashboard = () => {
           </motion.div>
         )}
       </motion.div>
+
+      {/* Image Cropper Modal */}
+      <ImageCropper
+        aspectRatio={1/1}
+        onCropComplete={handleImageCropped}
+        showModal={cropperModalOpen}
+        setShowModal={setCropperModalOpen}
+        imageSrc={imagesToCrop[currentImageIndex]}
+        modalTitle="TailorEase Image Cropper"
+        instructionText="Adjust your product image to fit within the square crop area. 
+        This will be used as your product thumbnail and display image."
+      />
 
       {/* Dialog Box */}
       <AnimatePresence>
