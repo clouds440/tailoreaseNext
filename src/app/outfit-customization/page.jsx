@@ -18,6 +18,7 @@ import { db } from "@/utils/firebaseConfig";
 import ShareLinkDialog from "@/components/ShareLinkDialog";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import ButtonSelector from "@/components/3d components/ButtonSelector";
+import NoticeBubble from "@/components/NoticeBubble";
 
 const outfitCategories = {
   jacket: { category: "torso", gender: "male" },
@@ -402,7 +403,7 @@ const OutfitCustomization = () => {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1024);
     };
 
     checkScreenSize();
@@ -412,21 +413,22 @@ const OutfitCustomization = () => {
 
   return (
     <div
-      className={`max-w-[99.5%] mx-auto flex flex-col md:flex-row items-center p-6 my-4 md:my-1 rounded-lg h-full overflow-y-auto select-none justify-center ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto flex flex-col lg:flex-row items-center p-6 my-4 md:my-1 rounded-lg h-full overflow-y-auto overflow-x-hidden select-none justify-center ${theme.mainTheme}`}
     >
       {/* Customization panel (Left Side) */}
       <Resizable
+        key={isMobile ? "mobile" : "desktop"} // force remount on mobile/desktop swap
         defaultSize={
           isMobile
-            ? { width: "100%", height }
+            ? { width: "100%", height: `${height}` }
             : { width: `${width}%`, height: "full" }
         }
-        minWidth={isMobile ? "100%" : "28%"}
-        maxWidth={isMobile ? "100%" : "40%"}
+        minWidth={isMobile ? "100%" : "40%"}
+        maxWidth={isMobile ? "100%" : "50%"}
         minHeight={isMobile ? "30vh" : "full"}
         maxHeight={isMobile ? "30vh" : "full"}
         enable={!isMobile && { right: true }}
-        onResizeStop={(d) => {
+        onResizeStop={(e, direction, ref, d) => {
           if (isMobile) {
             setHeight(`${parseFloat(height) + d.height}px`);
           } else {
@@ -437,6 +439,11 @@ const OutfitCustomization = () => {
           isMobile ? "mb-1" : "h-full"
         } ${theme.mainTheme}`}
       >
+        <NoticeBubble
+          text="Outfits, colors, and fabrics may appear differently in real life"
+          type="warning"
+          extraClasses="mb-4"
+        />
         {/* Morph sliders for each outfit */}
         {Object.keys(morphTargets).map((outfit) => (
           <div key={outfit} className="mb-4 border-b pb-4">
