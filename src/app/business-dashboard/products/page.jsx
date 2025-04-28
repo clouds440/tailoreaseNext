@@ -24,7 +24,7 @@ const TailorProductDashboard = () => {
   const [predefinedProducts, setPredefinedProducts] = useState([]);
   const [tailorProducts, setTailorProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedTab, setSelectedTab] = useState("add"); 
+  const [selectedTab, setSelectedTab] = useState("add");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -136,31 +136,37 @@ const TailorProductDashboard = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
-    
+
+    // Clear the input value to allow selecting same file again
+    e.target.value = "";
+
     setSelectedFiles(files);
-    setImagesToCrop(files.map(file => URL.createObjectURL(file)));
+    setImagesToCrop(files.map((file) => URL.createObjectURL(file)));
     setCurrentImageIndex(0);
+    setCroppedImages([]); // Clear previous cropped images
     setCropperModalOpen(true);
   };
 
-  const handleImageCropped = useCallback(async (croppedImageUrl) => {
-    setCroppedImages(prev => [...prev, croppedImageUrl]);
-    
-    if (currentImageIndex < imagesToCrop.length - 1) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    } else {
-      setCropperModalOpen(false);
-      setImagesToCrop([]);
-    }
-  }, [currentImageIndex, imagesToCrop.length]);
+  const handleImageCropped = useCallback(
+    async (croppedImageUrl) => {
+      setCroppedImages((prev) => [...prev, croppedImageUrl]);
+
+      if (currentImageIndex < imagesToCrop.length - 1) {
+        setCurrentImageIndex((prev) => prev + 1);
+      } else {
+        setCropperModalOpen(false);
+        setImagesToCrop([]);
+      }
+    },
+    [currentImageIndex, imagesToCrop.length]
+  );
 
   const removeImage = (index) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    setCroppedImages(prev => prev.filter((_, i) => i !== index));
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setCroppedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const uploadImages = async () => {
@@ -248,7 +254,9 @@ const TailorProductDashboard = () => {
       if (viewMode === "custom") {
         uploadedImageUrls = await uploadImages();
         if (uploadedImageUrls.length === 0) {
-          throw new Error("Please upload at least one image for custom products");
+          throw new Error(
+            "Please upload at least one image for custom products"
+          );
         }
       }
 
@@ -285,7 +293,7 @@ const TailorProductDashboard = () => {
               gender: selectedProduct.gender,
               isPredefined: true,
             },
-        productId: uuidv4()
+        productId: uuidv4(),
       };
 
       await addDoc(collection(db, "tailorProducts"), productData);
@@ -1365,14 +1373,24 @@ const TailorProductDashboard = () => {
 
       {/* Image Cropper Modal */}
       <ImageCropper
-        aspectRatio={1/1}
+        aspectRatio={1 / 1}
         onCropComplete={handleImageCropped}
         showModal={cropperModalOpen}
-        setShowModal={setCropperModalOpen}
+        setShowModal={(value) => {
+          if (!value) {
+            // When closing, reset all cropping state
+            setCropperModalOpen(false);
+            setImagesToCrop([]);
+            setCurrentImageIndex(0);
+            // But keep the selected files so user can try again
+          } else {
+            setCropperModalOpen(value);
+          }
+        }}
         imageSrc={imagesToCrop[currentImageIndex]}
         modalTitle="TailorEase Image Cropper"
         instructionText="Adjust your product image to fit within the square crop area. 
-        This will be used as your product thumbnail and display image."
+  This will be used as your product thumbnail and display image."
       />
 
       {/* Dialog Box */}

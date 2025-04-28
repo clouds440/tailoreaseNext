@@ -76,7 +76,7 @@ const ImageCropper = ({
     setZoom(1);
     setRotation(0);
     setCroppedAreaPixels(null);
-    setShowModal(false);
+    setShowModal(false); // This will trigger the parent's handler
   }, [setShowModal]);
 
   const handleCropComplete = useCallback(async () => {
