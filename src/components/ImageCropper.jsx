@@ -147,9 +147,9 @@ const ImageCropper = ({
                 </label>
                 <input
                   type="range"
-                  min={1}
+                  min={0.1}
                   max={3}
-                  step={0.1}
+                  step={0.01}
                   value={zoom}
                   onChange={(e) => setZoom(Number(e.target.value))}
                   className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${theme.colorPrimaryBg}`}
