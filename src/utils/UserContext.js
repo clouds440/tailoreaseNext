@@ -30,6 +30,7 @@ export const UserProvider = ({ children }) => {
       colorBg: "bg-slate-700 backdrop-blur-xl bg-opacity-90",
       hoverBg: "hover:bg-indigo-300 hover:bg-opacity-30",
       hoverShadow: "hover:shadow-md hover:shadow-amber-300",
+      subTextColor: "text-gray-300",
     },
     lunarGlow: {
       themeName: "lunarGlow",
