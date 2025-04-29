@@ -81,9 +81,9 @@ function AccountSettings() {
       setIsLoading(true);
       // Check if the new value is different
       if (
-        (field === "fullName" && newValue === userData.fullName) ||
-        (field === "phone" && newValue === userData.phone) ||
-        (field === "age" && newValue === userData.age)
+        (field === "fullName" && newValue === userData?.fullName) ||
+        (field === "phone" && newValue === userData?.phone) ||
+        (field === "age" && newValue === userData?.age)
       ) {
         setModalInfo({ isOpen: false, field: "", value: "" });
         return;
@@ -122,7 +122,7 @@ function AccountSettings() {
       // Query Firestore to find the document with the matching UID
       const userQuery = query(
         collection(db, "users"),
-        where("uid", "==", userData.uid)
+        where("uid", "==", userData?.uid)
       );
       const querySnapshot = await getDocs(userQuery);
 
@@ -284,7 +284,7 @@ function AccountSettings() {
                 className={`flex  cursor-pointer ${theme.hoverText}`}
                 onClick={() => handleFieldClick("fullName")}
               >
-                {userData.fullName}
+                {userData?.fullName}
                 <EditIcon
                   color={`${theme.iconColor}`}
                   extraClasses={"ml-3 mt-1"}
@@ -306,7 +306,7 @@ function AccountSettings() {
                   });
                 }}
               >
-                {userData.email}
+                {userData?.email}
               </span>
             </div>
             <div
@@ -317,8 +317,8 @@ function AccountSettings() {
                 className={`flex  cursor-pointer ${theme.hoverText}`}
                 onClick={() => handleFieldClick("gender")}
               >
-                {userData.gender ? (
-                  userData.gender
+                {userData?.gender ? (
+                  userData?.gender
                 ) : (
                   <span
                     className={`italic ${theme.colorText} ${theme.hoverText}`}
@@ -340,8 +340,8 @@ function AccountSettings() {
                 className={`flex  cursor-pointer ${theme.hoverText}`}
                 onClick={() => handleFieldClick("age")}
               >
-                {userData.age ? (
-                  userData.age
+                {userData?.age ? (
+                  userData?.age
                 ) : (
                   <span
                     className={`italic ${theme.colorText} ${theme.hoverText}`}
@@ -363,8 +363,8 @@ function AccountSettings() {
                 className={`flex  cursor-pointer ${theme.hoverText}`}
                 onClick={() => handleFieldClick("phone")}
               >
-                {userData.phone !== "" ? (
-                  userData.phone
+                {userData?.phone !== "" ? (
+                  userData?.phone
                 ) : (
                   <span
                     className={`italic ${theme.colorText} ${theme.hoverText}`}

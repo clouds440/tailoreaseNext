@@ -79,8 +79,10 @@ const Navbar = () => {
         message: "Logged out!",
       });
       setPopUpMessageTrigger("true");
-      setUserData(null);
       router.replace("/login");
+      setTimeout(() => {
+        setUserData(null);
+      }, 3000);
     } catch (error) {
       setShowMessage({
         type: "danger",
@@ -110,7 +112,7 @@ const Navbar = () => {
 
   useEffect(() => {
     if (userData?.fullName) {
-      setUserFullName(userData.fullName);
+      setUserFullName(userData?.fullName);
     }
   }, [userData]);
 
@@ -383,7 +385,7 @@ const Navbar = () => {
               />
               {userLoggedIn ? (
                 <div className="py-1 mt-3 text-center mx-3 sm:mx-5 md:mx-0 select-none">
-                  <span>{userFullName}</span>
+                  <span>{userFullName && userFullName}</span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
