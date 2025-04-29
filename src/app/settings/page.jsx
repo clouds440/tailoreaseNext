@@ -109,10 +109,10 @@ function AccountSettings() {
 
       if (field === "age") {
         const ageValue = newValue;
-        if (!ageValue || isNaN(ageValue) || +ageValue < 7 || +ageValue > 100) {
+        if (!ageValue || isNaN(ageValue) || +ageValue < 10 || +ageValue > 100) {
           setShowMessage({
             type: "info",
-            message: "Enter a valid age between 7 and 100 with no spaces",
+            message: "Enter a valid age between 10 and 100 with no spaces",
           });
           setPopUpMessageTrigger("true");
           return;

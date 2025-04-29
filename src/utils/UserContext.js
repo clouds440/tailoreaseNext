@@ -30,6 +30,7 @@ export const UserProvider = ({ children }) => {
       colorBg: "bg-slate-700 backdrop-blur-xl bg-opacity-90",
       hoverBg: "hover:bg-indigo-300 hover:bg-opacity-30",
       hoverShadow: "hover:shadow-md hover:shadow-amber-300",
+      subTextColor: "text-gray-300",
     },
     lunarGlow: {
       themeName: "lunarGlow",
@@ -42,6 +43,7 @@ export const UserProvider = ({ children }) => {
       colorBg: "bg-gray-300 backdrop-blur-xl bg-opacity-85",
       hoverBg: "hover:bg-gray-500 hover:bg-opacity-80",
       hoverShadow: "hover:shadow-md hover:shadow-gray-800",
+      subTextColor: "text-gray-600",
     },
     neonPunk: {
       themeName: "neonPunk",
@@ -49,11 +51,12 @@ export const UserProvider = ({ children }) => {
       bgImage: "url(/background_images/backgroundRedPurple.jpg)",
       colorText: "text-yellow-400",
       colorBorder: "border-pink-600",
-      iconColor: "text-yellow-400",
+      iconColor: "text-yellow-500",
       hoverText: "hover:text-rose-600",
       colorBg: "bg-sky-800 backdrop-blur-xl bg-opacity-70",
       hoverBg: "hover:bg-rose-400 hover:bg-opacity-50",
       hoverShadow: "hover:shadow-md hover:shadow-violet-500",
+      subTextColor: "text-orange-300",
     },
   };
 
