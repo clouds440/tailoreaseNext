@@ -36,17 +36,14 @@ const BecomeTailor = () => {
   const router = useRouter();
 
   const [hasBusinessAccount, setHasBusinessAccount] = useState(null);
-  const [redirecting, setRedirecting] = useState(false);
-
-  useEffect(() => {
-    if (!userLoggedIn) {
-      router.push("/signup");
-      return; // Exit if the user is not logged in or `uid` is not available
-    }
-  }, [router, userLoggedIn]);
 
   useEffect(() => {
     const checkBusinessAccount = async () => {
+      if (!userLoggedIn) {
+        router.push("/signup");
+        return; // Exit if the user is not logged in or `uid` is not available
+      }
+
       try {
         // Query to find a tailor document with ownerId matching the user UID
         const userQuery = query(
@@ -78,7 +75,6 @@ const BecomeTailor = () => {
             approved: approved || false, // Use `false` as a default if `approved` is undefined
             exists: true,
           });
-          setRedirecting(true);
         } else {
           // No tailor document found for this ownerId
           setHasBusinessAccount({
@@ -92,7 +88,7 @@ const BecomeTailor = () => {
     };
 
     checkBusinessAccount();
-  }, [userData]);
+  }, [userData, userLoggedIn, router]);
 
   const stepNames = ["Business Info", "Additional Info", "Submitting"];
 
@@ -228,15 +224,14 @@ const BecomeTailor = () => {
     }
   };
 
-  // 3) render
-  if (!redirecting) {
+  if (hasBusinessAccount === null) {
     return (
       <div
         className={`max-w-[99.5%] mx-auto my-4 md:my-1 flex justify-center items-center rounded-lg h-full ${theme.mainTheme}`}
       >
-        <ClipLoader size={50} color="#fff" />
+        <ClipLoader size={60} color="#ffffff" />
       </div>
-    );
+    ); // Loading indicator while checking
   }
 
   return hasBusinessAccount.exists ? (
