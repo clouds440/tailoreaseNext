@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/utils/firebaseConfig";
 import { MenuIcon } from "../../public/icons/svgIcons";
+import CompleteProfileModal from "./CompleteProfileModal";
 
 const Navbar = () => {
   const {
@@ -30,6 +31,7 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [isVerifiedTailor, setIsVerifiedTailor] = useState(false);
+  const [profileComplete, setProfileComplete] = useState(true);
   const [windowWidth, setWindowWidth] = useState(undefined);
   const [windowHeight, setWindowHeight] = useState(undefined);
 
@@ -115,6 +117,16 @@ const Navbar = () => {
       setUserFullName(userData?.fullName);
     }
   }, [userData]);
+
+  useEffect(() => {
+    if (userLoggedIn) {
+      if (!userData?.phone || !userData?.age || !userData?.gender) {
+        setTimeout(() => {
+          setProfileComplete(false);
+        }, 3000);
+      }
+    }
+  }, [userData, userLoggedIn]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -504,6 +516,11 @@ const Navbar = () => {
         }
         type="info"
         buttons={dialogButtons}
+      />
+      <CompleteProfileModal
+        isVisible={!profileComplete}
+        userData={userData}
+        onClose={() => setProfileComplete(true)}
       />
     </div>
   );
