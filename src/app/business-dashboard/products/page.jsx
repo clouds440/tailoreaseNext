@@ -136,24 +136,53 @@ const TailorProductDashboard = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+  
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
-
+  
     // Clear the input value to allow selecting same file again
     e.target.value = "";
-
-    setSelectedFiles(files);
-    setImagesToCrop(files.map((file) => URL.createObjectURL(file)));
+  
+    // Create URLs for new files
+    const newImageUrls = files.map((file) => URL.createObjectURL(file));
+  
+    // Filter out any duplicates (same file name and size)
+    const uniqueNewFiles = files.filter((newFile, index) => {
+      return !selectedFiles.some(
+        (existingFile) =>
+          existingFile.name === newFile.name && existingFile.size === newFile.size
+      );
+    });
+  
+    const uniqueNewImageUrls = newImageUrls.filter((_, index) => {
+      return !selectedFiles.some(
+        (existingFile) =>
+          existingFile.name === files[index].name && 
+          existingFile.size === files[index].size
+      );
+    });
+  
+    if (uniqueNewFiles.length === 0) {
+      // All selected files are duplicates - replace them
+      setSelectedFiles(files);
+      setImagesToCrop(newImageUrls);
+      setCurrentImageIndex(0);
+      setCropperModalOpen(true);
+      return;
+    }
+  
+    // Add new files to existing selection
+    setSelectedFiles((prev) => [...prev, ...uniqueNewFiles]);
+    setImagesToCrop(uniqueNewImageUrls);
     setCurrentImageIndex(0);
-    setCroppedImages([]); // Clear previous cropped images
     setCropperModalOpen(true);
   };
-
+  
   const handleImageCropped = useCallback(
     async (croppedImageUrl) => {
       setCroppedImages((prev) => [...prev, croppedImageUrl]);
-
+  
       if (currentImageIndex < imagesToCrop.length - 1) {
         setCurrentImageIndex((prev) => prev + 1);
       } else {
@@ -607,6 +636,27 @@ const TailorProductDashboard = () => {
     <div
       className={`h-full overflow-y-auto ${theme.mainTheme} ${theme.colorText} py-8 px-4 sm:px-6 lg:px-8`}
     >
+      {/* Image Cropper Modal */}
+      <ImageCropper
+        aspectRatio={1 / 1}
+        onCropComplete={handleImageCropped}
+        showModal={cropperModalOpen}
+        setShowModal={(value) => {
+          if (!value) {
+            // When closing, reset all cropping state
+            setCropperModalOpen(false);
+            setImagesToCrop([]);
+            setCurrentImageIndex(0);
+            // But keep the selected files so user can try again
+          } else {
+            setCropperModalOpen(value);
+          }
+        }}
+        imageSrc={imagesToCrop[currentImageIndex]}
+        modalTitle="TailorEase Image Cropper"
+        instructionText="Adjust your product image to fit within the square crop area. 
+  This will be used as your product thumbnail and display image."
+      />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -1402,28 +1452,6 @@ const TailorProductDashboard = () => {
           </motion.div>
         )}
       </motion.div>
-
-      {/* Image Cropper Modal */}
-      <ImageCropper
-        aspectRatio={1 / 1}
-        onCropComplete={handleImageCropped}
-        showModal={cropperModalOpen}
-        setShowModal={(value) => {
-          if (!value) {
-            // When closing, reset all cropping state
-            setCropperModalOpen(false);
-            setImagesToCrop([]);
-            setCurrentImageIndex(0);
-            // But keep the selected files so user can try again
-          } else {
-            setCropperModalOpen(value);
-          }
-        }}
-        imageSrc={imagesToCrop[currentImageIndex]}
-        modalTitle="TailorEase Image Cropper"
-        instructionText="Adjust your product image to fit within the square crop area. 
-  This will be used as your product thumbnail and display image."
-      />
 
       {/* Dialog Box */}
       <AnimatePresence>
