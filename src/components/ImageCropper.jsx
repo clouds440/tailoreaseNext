@@ -4,6 +4,7 @@ import Cropper from "react-easy-crop";
 import { motion } from "framer-motion";
 import { UserContext } from "@/utils/UserContext";
 import SimpleButton from "./SimpleButton";
+import DialogBox from "./DialogBox";
 
 // Load image
 const createImage = (url) =>
@@ -89,114 +90,88 @@ const ImageCropper = ({
     }
   }, [croppedAreaPixels, imageSrc, rotation, onCropComplete, handleClose]);
 
-  if (!showModal) return null;
+  const cropperBody = (
+    <div className="flex flex-col h-full">
+      {/* Cropper Preview */}
+      <div className="p-5 flex-1 overflow-hidden">
+        <div className="relative h-48 w-full rounded-lg overflow-hidden mb-4">
+          <Cropper
+            image={imageSrc}
+            crop={crop}
+            zoom={zoom}
+            rotation={rotation}
+            aspect={aspectRatio}
+            onCropChange={setCrop}
+            onZoomChange={setZoom}
+            onRotationChange={setRotation}
+            onCropComplete={onCropCompleteCallback}
+            cropShape="rect"
+            showGrid={false}
+          />
+        </div>
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-lg overflow-hidden">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.2 }}
-        className={`relative w-full max-w-md rounded-2xl shadow-2xl ${theme.colorBg} border ${theme.colorBorder}`}
-        style={{ maxHeight: "90vh" }}
-      >
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="p-5 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold flex items-center">
-                <i className={`fas fa-crop-alt mr-3 ${theme.iconColor}`}></i>
-                {modalTitle}
-              </h2>
-              <button
-                onClick={handleClose}
-                className={`p-1 rounded-full ${theme.colorText} hover:${theme.colorBgHover}`}
-              >
-                <i className="fas fa-times text-lg"></i>
-              </button>
-            </div>
-            <p className={`mt-1 text-sm ${theme.colorText} opacity-80`}>
-              {instructionText}
-            </p>
+        {/* Controls - Both sliders in one row */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={`block mb-1 text-sm ${theme.colorText} font-medium`}>
+              Zoom: {zoom.toFixed(1)}x
+            </label>
+            <input
+              type="range"
+              min={0.1}
+              max={3}
+              step={0.01}
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${theme.colorPrimaryBg}`}
+            />
           </div>
 
-          {/* Cropper Preview */}
-          <div className="p-5 flex-1 overflow-hidden">
-            <div className="relative h-48 w-full rounded-lg overflow-hidden mb-4">
-              <Cropper
-                image={imageSrc}
-                crop={crop}
-                zoom={zoom}
-                rotation={rotation}
-                aspect={aspectRatio}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onRotationChange={setRotation}
-                onCropComplete={onCropCompleteCallback}
-                cropShape="rect"
-                showGrid={false}
-              />
-            </div>
-
-            {/* Controls - Both sliders in one row */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={`block mb-1 text-sm ${theme.colorText} font-medium`}>
-                  Zoom: {zoom.toFixed(1)}x
-                </label>
-                <input
-                  type="range"
-                  min={0.1}
-                  max={3}
-                  step={0.01}
-                  value={zoom}
-                  onChange={(e) => setZoom(Number(e.target.value))}
-                  className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${theme.colorPrimaryBg}`}
-                />
-              </div>
-
-              <div>
-                <label className={`block mb-1 text-sm ${theme.colorText} font-medium`}>
-                  Rotation: {rotation}°
-                </label>
-                <input
-                  type="range"
-                  min={0}
-                  max={360}
-                  step={1}
-                  value={rotation}
-                  onChange={(e) => setRotation(Number(e.target.value))}
-                  className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${theme.colorPrimaryBg}`}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex justify-end space-x-3">
-              <SimpleButton
-                btnText="Cancel"
-                type="default"
-                onClick={handleClose}
-                extraclasses="px-4 py-1.5 text-sm"
-              />
-              <SimpleButton
-                btnText={
-                  <>
-                    <i className="fas fa-crop mr-2"></i> Crop
-                  </>
-                }
-                type="primary"
-                onClick={handleCropComplete}
-                extraclasses="px-4 py-1.5 text-sm"
-              />
-            </div>
+          <div>
+            <label className={`block mb-1 text-sm ${theme.colorText} font-medium`}>
+              Rotation: {rotation}°
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={360}
+              step={1}
+              value={rotation}
+              onChange={(e) => setRotation(Number(e.target.value))}
+              className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${theme.colorPrimaryBg}`}
+            />
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
+  );
+
+  const buttons = [
+    {
+      label: "Cancel",
+      onClick: handleClose,
+      type: "default"
+    },
+    {
+      label: (
+        <>
+          <i className="fas fa-crop mr-2"></i> Crop
+        </>
+      ),
+      onClick: handleCropComplete,
+      type: "primary"
+    }
+  ];
+
+  return (
+    <DialogBox
+      showDialog={showModal}
+      setShowDialog={setShowModal}
+      title={modalTitle}
+      body={cropperBody}
+      type="info"
+      buttons={buttons}
+    />
   );
 };
 

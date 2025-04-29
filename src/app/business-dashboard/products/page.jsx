@@ -638,7 +638,7 @@ const TailorProductDashboard = () => {
     >
       {/* Image Cropper Modal */}
       <ImageCropper
-        aspectRatio={1 / 1}
+        aspectRatio={1/1}
         onCropComplete={handleImageCropped}
         showModal={cropperModalOpen}
         setShowModal={(value) => {

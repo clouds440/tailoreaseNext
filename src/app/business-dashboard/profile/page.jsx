@@ -1,7 +1,6 @@
 "use client";
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import Image from "next/image";
-import useImageUpload from "@/app/hooks/useImageUpload";
 import { db } from "@/utils/firebaseConfig";
 import {
   doc,
@@ -18,6 +17,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SimpleButton from "@/components/SimpleButton";
 import UserContext from "@/utils/UserContext";
 import DialogBox from "@/components/DialogBox";
+import ImageCropper from "@/components/ImageCropper";
 
 const FIXED_SPECIALTIES = [
   "Men Specialist",
@@ -37,6 +37,8 @@ const TailorBusinessProfile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  const [cropperModalOpen, setCropperModalOpen] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState(null);
   const {
     theme,
     userLoggedIn,
@@ -65,7 +67,24 @@ const TailorBusinessProfile = () => {
     businessAddress: "",
     specialities: [],
   });
-  const { uploadImage } = useImageUpload();
+
+  const handleImageCropped = useCallback((croppedImageUrl) => {
+    setPreviewImage(croppedImageUrl);
+    setCropperModalOpen(false);
+  }, []);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageToCrop(reader.result);
+        setCropperModalOpen(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     const fetchTailorData = async () => {
@@ -143,18 +162,6 @@ const TailorBusinessProfile = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const toggleSpeciality = (speciality) => {
     setFormData((prev) => {
       const isSelected = prev.specialities.includes(speciality);
@@ -192,23 +199,53 @@ const TailorBusinessProfile = () => {
       }
 
       let imageUrl = formData.businessPictureUrl;
-      if (selectedFile) {
-        const { url, error } = await uploadImage(
-          selectedFile,
-          formData.businessPictureUrl,
-          "images/profile/business"
-        );
+      if (selectedFile && previewImage) {
+        setIsUploading(true);
+        try {
+          // Convert cropped image to blob
+          const response = await fetch(previewImage);
+          const blob = await response.blob();
+          const base64Image = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(",")[1]);
+            reader.readAsDataURL(blob);
+          });
 
-        if (error) {
+          const fileName = `profile-${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}.jpg`;
+          const targetPath = "images/profile/business";
+
+          const uploadResponse = await fetch("/api/imageUpload", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              imageData: base64Image,
+              fileName,
+              targetPath,
+            }),
+          });
+
+          if (!uploadResponse.ok) {
+            const errorText = await uploadResponse.text();
+            throw new Error(`Image upload failed: ${errorText}`);
+          }
+
+          const { url } = await uploadResponse.json();
+          imageUrl = "/" + url;
+        } catch (error) {
+          console.error("Error uploading image:", error);
           setShowMessage({
             message: "Image upload failed",
             type: "danger",
           });
           setPopUpMessageTrigger(true);
           return;
+        } finally {
+          setIsUploading(false);
         }
-
-        imageUrl = url; // update with the new uploaded URL
       }
 
       const updatedData = {
@@ -370,6 +407,17 @@ const TailorBusinessProfile = () => {
     <div
       className={`h-full overflow-y-auto ${theme.mainTheme} py-8 px-4 sm:px-6 lg:px-8`}
     >
+      {/* Image Cropper Modal */}
+      <ImageCropper
+        aspectRatio={3 / 2}
+        onCropComplete={handleImageCropped}
+        showModal={cropperModalOpen}
+        setShowModal={setCropperModalOpen}
+        imageSrc={imageToCrop}
+        modalTitle="Profile Image Cropper"
+        instructionText="Adjust your profile image to fit within the 3:2 ratio crop area. This will be used as your business profile picture."
+      />
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -427,7 +475,7 @@ const TailorBusinessProfile = () => {
                 >
                   <div className="relative group">
                     <motion.div
-                      className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white shadow-lg relative"
+                      className="w-60 h-40 md:w-72 md:h-48 rounded-lg overflow-hidden border-4 border-white shadow-lg relative"
                       whileHover={{ scale: 1.03 }}
                       transition={{
                         type: "spring",
@@ -439,8 +487,8 @@ const TailorBusinessProfile = () => {
                         <Image
                           src={previewImage}
                           alt="Business Preview"
-                          width={300} // adjust as needed
-                          height={500} // adjust as needed
+                          width={300}
+                          height={200}
                           style={{ objectFit: "cover" }}
                           className="transition-all duration-300 group-hover:opacity-90"
                         />
@@ -470,7 +518,7 @@ const TailorBusinessProfile = () => {
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full"
+                        className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg"
                       >
                         <ClipLoader size={30} color="#ffffff" />
                       </motion.div>
@@ -735,14 +783,14 @@ const TailorBusinessProfile = () => {
                     initial={{ rotate: 0, scale: 0.9 }}
                     animate={{ rotate: 0, scale: 1 }}
                     transition={{ type: "spring", stiffness: 300 }}
-                    className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white shadow-lg relative"
+                    className="w-60 h-40 md:w-72 md:h-48 rounded-lg overflow-hidden border-4 border-white shadow-lg relative"
                   >
                     {tailorData.businessPictureUrl ? (
                       <Image
                         src={tailorData.businessPictureUrl}
                         alt={tailorData.businessName}
-                        width={300} // adjust as needed
-                        height={300} // adjust as needed
+                        width={300}
+                        height={200}
                         style={{ objectFit: "cover" }}
                       />
                     ) : (
@@ -751,7 +799,7 @@ const TailorBusinessProfile = () => {
                       </div>
                     )}
                   </motion.div>
-                  <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 flex items-center justify-center transition-opacity duration-300">
+                  <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 flex items-center justify-center transition-opacity duration-300">
                     <i className="fas fa-eye text-white text-2xl"></i>
                   </div>
                 </motion.div>
