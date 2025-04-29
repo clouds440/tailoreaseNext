@@ -28,6 +28,7 @@ const SignUpForm = () => {
     password: "",
     gender: "",
     age: "",
+    countryCode: "+92",
     phone: "",
   });
 
@@ -124,6 +125,14 @@ const SignUpForm = () => {
       setPopUpMessageTrigger("true");
       return;
     }
+    if (formData.phone.startsWith("0")) {
+      setShowMessage({
+        type: "warning",
+        message: "Please remove prefix (0) from phone number",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -140,6 +149,7 @@ const SignUpForm = () => {
         email: formData.email,
         age: formData.age,
         gender: formData.gender,
+        countryCode: formData.countryCode,
         phone: formData.phone,
       });
       setShowMessage({
@@ -277,18 +287,36 @@ const SignUpForm = () => {
                 </label>
               </div>
               <div className="relative mb-4">
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className={`${inputStyles}`}
-                  placeholder=" "
-                />
-                <label className={`${placeHolderStyles}`} htmlFor="phone">
-                  Phone <span className="text-xs">(Optional)</span>
-                </label>
+                <div className="flex">
+                  <select
+                    id="countryCode"
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={handleChange}
+                    className={`border-b-2 bg-transparent p-2 ${theme.colorText} ${theme.colorBorder} focus:border-blue-600 outline-none`}
+                  >
+                    <option value="+92">🇵🇰 +92</option>
+                    <option value="+1">🇺🇸 +1</option>
+                    <option value="+44">🇬🇧 +44</option>
+                    <option value="+61">🇦🇺 +61</option>
+                    {/* Add more countries if you want */}
+                  </select>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className={`ml-3 ${inputStyles}`}
+                    placeholder=" "
+                  />
+                  <label
+                    className={`ml-24 ${placeHolderStyles}`}
+                    htmlFor="phone"
+                  >
+                    Phone Number
+                  </label>
+                </div>
               </div>
               <SimpleButton
                 btnText={isLoading ? <LoadingSpinner size={24} /> : "Sign Up"}

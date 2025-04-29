@@ -14,12 +14,17 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
     useContext(UserContext);
   const [showDialog, setShowDialog] = useState(false);
   const [shareType, setShareType] = useState("tailor"); // or 'user'
-  const [accountNumber, setAccountNumber] = useState("");
+
+  // New separate states for country code and phone number
+  const [countryCode, setCountryCode] = useState("+92");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [allowEdit, setAllowEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleShare = async () => {
-    if (!accountNumber.trim()) {
+    // Basic validation: ensure phone number is provided
+    const cleanedPhone = phoneNumber.trim().replace(/\D/g, "");
+    if (!cleanedPhone) {
       setShowMessage({
         message: "Please enter a valid phone number",
         type: "warning",
@@ -34,15 +39,18 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
       const phoneField = shareType === "tailor" ? "businessPhone" : "phone";
       const notifType = shareType === "tailor" ? "business" : "user";
 
-      const colRef = collection(db, collectionName);
-      const snapshot = await getDocs(colRef);
+      const snapshot = await getDocs(collection(db, collectionName));
       const matches = snapshot.docs
         .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((item) => item[phoneField] === accountNumber);
+        .filter(
+          (item) =>
+            item["countryCode"] === countryCode &&
+            item[phoneField] === cleanedPhone
+        );
 
       if (matches.length === 0) {
         setShowMessage({
-          message: `No ${shareType} found with this phone number.`,
+          message: `No ${shareType} found with this phone number. Make sure you don't use prefix (0)`,
           type: "warning",
         });
         setPopUpMessageTrigger(true);
@@ -52,7 +60,7 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
       const target = matches[0];
       // send notification
       const recipientId = shareType === "tailor" ? target.ownerId : target.uid;
-      sendNotification(
+      await sendNotification(
         recipientId,
         notifType,
         `${sender.fullName} shared their ${subject} with you!`,
@@ -62,8 +70,7 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
       // only for tailor: save connection
       if (shareType === "tailor" && allowEdit) {
         const relId = `${target.id}_${sender.uid}`;
-        const relRef = doc(db, "userTailorConnections", relId);
-        await setDoc(relRef, {
+        await setDoc(doc(db, "userTailorConnections", relId), {
           tailorId: target.id,
           userId: sender.uid,
           timestamp: new Date(),
@@ -71,7 +78,7 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
       }
 
       setShowMessage({
-        message: subject + " shared successfully!",
+        message: `${subject} shared successfully!`,
         type: "success",
       });
       setPopUpMessageTrigger(true);
@@ -100,8 +107,8 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
     shareType === "tailor" ? "Tailor Phone Number" : "User Phone Number";
   const promptText =
     shareType === "tailor"
-      ? "Please enter the account number (phone) of the business account:"
-      : "Please enter the phone number of the user account:";
+      ? "Select business country code and enter phone number:"
+      : "Select user country code and enter phone number:";
 
   return (
     <>
@@ -144,17 +151,35 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
                 </div>
 
                 <h2 className="mb-2">{promptText}</h2>
-                <input
-                  type="text"
-                  className={inputStyles}
-                  placeholder={placeholder}
-                  value={accountNumber}
-                  onChange={(e) => setAccountNumber(e.target.value)}
-                />
+                <div className="flex items-center space-x-3 mb-4">
+                  <select
+                    id="countryCode"
+                    name="countryCode"
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    className={`${inputStyles} bg-transparent w-28`}
+                  >
+                    <option value="+92">🇵🇰 +92</option>
+                    <option value="+1">🇺🇸 +1</option>
+                    <option value="+44">🇬🇧 +44</option>
+                    <option value="+61">🇦🇺 +61</option>
+                    {/* Add more as needed */}
+                  </select>
+
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className={`${inputStyles} flex-1`}
+                    placeholder={placeholder}
+                  />
+                </div>
 
                 {shareType === "tailor" && subject !== "Custom Outfit" && (
                   <>
-                    <label className="inline-flex items-center mt-4 space-x-2 cursor-pointer">
+                    <label className="flex items-center mt-2 space-x-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={allowEdit}
@@ -165,7 +190,7 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
                         Allow Measurements Editing
                       </span>
                     </label>
-                    <span className="flex text-xs">
+                    <span className="text-xs">
                       This will also add the tailor to My Tailors
                     </span>
                   </>
@@ -196,7 +221,7 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
                 </div>
               </div>
             )}
-            buttons={[]} // actions moved into body
+            buttons={[]}
           />
         )}
       </AnimatePresence>
