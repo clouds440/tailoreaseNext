@@ -175,7 +175,7 @@ const BecomeTailor = () => {
 
       // 5. Update bId in local storage
       let UpdatedUserData = JSON.parse(localStorage.getItem("userData")) || {};
-      userData.bId = bId;
+      UpdatedUserData.bId = bId;
       localStorage.setItem("userData", JSON.stringify(UpdatedUserData));
       sessionStorage.setItem("userData", JSON.stringify(UpdatedUserData));
 
