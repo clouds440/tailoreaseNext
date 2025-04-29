@@ -48,7 +48,7 @@ export const UserProvider = ({ children }) => {
       mainTheme: "neon-punk",
       bgImage: "url(/background_images/backgroundRedPurple.jpg)",
       colorText: "text-yellow-400",
-      colorBorder: "border-pink-500",
+      colorBorder: "border-pink-600",
       iconColor: "text-yellow-400",
       hoverText: "hover:text-rose-600",
       colorBg: "bg-sky-800 backdrop-blur-xl bg-opacity-70",

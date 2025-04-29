@@ -44,9 +44,14 @@ const NotificationPanel = () => {
       });
       // Sort notifications by createdAt (newest first)
       allNotifications.sort((a, b) => {
+        // Unread ones first
+        if (a.read !== b.read) {
+          return a.read ? 1 : -1;
+        }
+        // If both are same in read status, sort by createdAt
         const timeA = a.createdAt ? a.createdAt.seconds : 0;
         const timeB = b.createdAt ? b.createdAt.seconds : 0;
-        return timeB - timeA;
+        return timeB - timeA; // Newest first
       });
       setNotifications(allNotifications);
     } catch (error) {
