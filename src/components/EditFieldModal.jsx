@@ -144,6 +144,9 @@ function EditFieldModal({
                       <option value="Female" className={`${theme.colorBg}`}>
                         Female
                       </option>
+                      <option value="Other" className={`${theme.colorBg}`}>
+                        Other
+                      </option>
                     </select>
                   ) : (
                     <input

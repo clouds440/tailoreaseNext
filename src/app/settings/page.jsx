@@ -364,7 +364,7 @@ function AccountSettings() {
                 onClick={() => handleFieldClick("phone")}
               >
                 {userData?.phone !== "" ? (
-                  userData?.phone
+                  userData.countryCode + "-" + userData.phone
                 ) : (
                   <span
                     className={`italic ${theme.colorText} ${theme.hoverText}`}
@@ -441,13 +441,7 @@ function AccountSettings() {
                 />
                 <SimpleButton
                   onClick={handleSavePreferences}
-                  btnText={
-                    isLoading ? (
-                      <LoadingSpinner size={24} extraClasses={"mx-[38px]"} />
-                    ) : (
-                      "Save Prefererences"
-                    )
-                  }
+                  btnText={"Save Prefererences"}
                   type={"primary"}
                   extraclasses={"w-auto px-6"}
                   disabled={isLoading}

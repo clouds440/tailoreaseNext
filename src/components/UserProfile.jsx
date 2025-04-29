@@ -39,7 +39,9 @@ const UserProfile = ({ userData, uid }) => {
             <>
               <p className="text-lg font-semibold">{displayUser.fullName}</p>
               <p className="text-sm">{displayUser.email}</p>
-              <p className="text-sm">{displayUser.phone}</p>
+              <p className="text-sm">
+                {displayUser.countryCode}-{displayUser.phone}
+              </p>
             </>
           ) : (
             <div className="mt-4">

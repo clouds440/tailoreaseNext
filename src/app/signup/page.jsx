@@ -34,9 +34,9 @@ const SignUpForm = () => {
 
   const genders = [
     { value: "", label: "Gender" },
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
-    { value: "other", label: "Other" },
+    { value: "Male", label: "Male" },
+    { value: "Female", label: "Female" },
+    { value: "Other", label: "Other" },
   ];
 
   const [isLoading, setIsLoading] = useState(false);
@@ -163,7 +163,10 @@ const SignUpForm = () => {
         uid: user.uid,
         fullName: formData.fullName,
         email: formData.email,
+        age: formData.age,
+        gender: formData.gender,
         phone: formData.phone,
+        countryCode: formData.countryCode,
       };
       sessionStorage.setItem("userData", JSON.stringify(userData));
       localStorage.setItem("userData", JSON.stringify(userData));
