@@ -14,6 +14,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import SimpleButton from "./SimpleButton";
 import deleteNotification from "@/utils/deleteNotification";
+import { ClipLoader } from "react-spinners";
 
 const NotificationPanel = () => {
   const { theme, userData, userLoggedIn } = useContext(UserContext);
@@ -24,34 +25,38 @@ const NotificationPanel = () => {
   // activeTab will be either "user" or "business"
   const [activeTab, setActiveTab] = useState("user");
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch all notifications (both read and unread)
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const notificationsRef = collection(
-          db,
-          "notifications",
-          userData.uid,
-          "userNotifications"
-        );
-        const querySnapshot = await getDocs(notificationsRef);
-        const allNotifications = [];
-        querySnapshot.forEach((doc) => {
-          allNotifications.push({ id: doc.id, ...doc.data() });
-        });
-        // Sort notifications by createdAt (newest first)
-        allNotifications.sort((a, b) => {
-          const timeA = a.createdAt ? a.createdAt.seconds : 0;
-          const timeB = b.createdAt ? b.createdAt.seconds : 0;
-          return timeB - timeA;
-        });
-        setNotifications(allNotifications);
-      } catch (error) {
-        console.error("Error fetching notifications:", error);
-      }
-    };
+  const fetchNotifications = async () => {
+    try {
+      setIsLoading(true);
+      const notificationsRef = collection(
+        db,
+        "notifications",
+        userData.uid,
+        "userNotifications"
+      );
+      const querySnapshot = await getDocs(notificationsRef);
+      const allNotifications = [];
+      querySnapshot.forEach((doc) => {
+        allNotifications.push({ id: doc.id, ...doc.data() });
+      });
+      // Sort notifications by createdAt (newest first)
+      allNotifications.sort((a, b) => {
+        const timeA = a.createdAt ? a.createdAt.seconds : 0;
+        const timeB = b.createdAt ? b.createdAt.seconds : 0;
+        return timeB - timeA;
+      });
+      setNotifications(allNotifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (userData?.uid) {
       fetchNotifications();
     }
@@ -223,9 +228,13 @@ const NotificationPanel = () => {
             >
               <div className="flex items-center space-x-2">
                 <i className={`fas fa-bell text-2xl ${theme.iconColor}`}></i>
-                <h3 className={`text-lg font-bold ${theme.colorText}`}>
+                <h3 className={`text-lg font-bold pr-2 ${theme.colorText}`}>
                   Notifications
                 </h3>
+                <i
+                  className="fas fa-sync cursor-pointer ml-2 hover:text-blue-700"
+                  onClick={fetchNotifications}
+                ></i>
               </div>
               <i
                 className="fas fa-times cursor-pointer text-xl hover:text-red-500"
@@ -296,9 +305,15 @@ const NotificationPanel = () => {
             {/* Notification List */}
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
               {notificationsToDisplay.length === 0 ? (
-                <p className={`${theme.colorText} text-sm text-center`}>
-                  No notifications
-                </p>
+                !isLoading ? (
+                  <p className={`${theme.colorText} text-sm text-center`}>
+                    No notifications
+                  </p>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-center">
+                    <ClipLoader color="white" />
+                  </div>
+                )
               ) : (
                 notificationsToDisplay.map((notif) => (
                   <div
