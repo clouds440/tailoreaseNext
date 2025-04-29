@@ -1,16 +1,33 @@
 "use client";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { db } from "@/utils/firebaseConfig";
-import { collection, getDocs, query, where, updateDoc, doc, addDoc } from "firebase/firestore";
-import { FaLock, FaUser, FaPlus, FaCheck, FaTimes, FaShoppingBag, FaMoneyBillWave } from "react-icons/fa";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+  doc,
+  addDoc,
+} from "firebase/firestore";
+import {
+  FaLock,
+  FaUser,
+  FaPlus,
+  FaCheck,
+  FaTimes,
+  FaShoppingBag,
+  FaMoneyBillWave,
+} from "react-icons/fa";
 import { ClipLoader } from "react-spinners";
 import Image from "next/image";
 import UserContext from "@/utils/UserContext";
+import ImageCropper from "@/components/ImageCropper";
 
 const AdminDashboard = () => {
   const { theme, inputStyles, placeHolderStyles } = useContext(UserContext);
-  
+
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
@@ -21,7 +38,7 @@ const AdminDashboard = () => {
   // Admin credentials (hardcoded)
   const ADMIN_CREDENTIALS = {
     username: "admin",
-    password: "123123"
+    password: "123123",
   };
 
   // Product management state
@@ -33,13 +50,24 @@ const AdminDashboard = () => {
     gender: "Unisex",
     has3DTryOn: false,
     isActive: true,
-    imageUrl: ""
+    imageUrl: "",
   });
   const [isUploading, setIsUploading] = useState(false);
+
+  // Image cropper state
+  const [cropperModalOpen, setCropperModalOpen] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Order management state
   const [pendingOrders, setPendingOrders] = useState([]);
   const [activeTab, setActiveTab] = useState("orders");
+
+  // Handle image cropped
+  const handleImageCropped = useCallback((croppedImageUrl) => {
+    setNewProduct((prev) => ({ ...prev, imageUrl: croppedImageUrl }));
+    setCropperModalOpen(false);
+  }, []);
 
   // Handle login
   const handleLogin = (e) => {
@@ -48,9 +76,12 @@ const AdminDashboard = () => {
     setAuthError("");
 
     setTimeout(() => {
-      if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+      if (
+        username === ADMIN_CREDENTIALS.username &&
+        password === ADMIN_CREDENTIALS.password
+      ) {
         setIsAuthenticated(true);
-        localStorage.setItem('adminAuthenticated', 'true');
+        localStorage.setItem("adminAuthenticated", "true");
       } else {
         setAuthError("Invalid username or password");
       }
@@ -60,8 +91,8 @@ const AdminDashboard = () => {
 
   // Check auth status on load
   useEffect(() => {
-    const authStatus = localStorage.getItem('adminAuthenticated');
-    if (authStatus === 'true') {
+    const authStatus = localStorage.getItem("adminAuthenticated");
+    if (authStatus === "true") {
       setIsAuthenticated(true);
     }
   }, []);
@@ -74,9 +105,9 @@ const AdminDashboard = () => {
         where("orderStatus", "==", "paymentVerificationPending")
       );
       const querySnapshot = await getDocs(q);
-      const orders = querySnapshot.docs.map(doc => ({
+      const orders = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setPendingOrders(orders);
     } catch (error) {
@@ -88,9 +119,9 @@ const AdminDashboard = () => {
   const fetchProducts = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "predefinedProducts"));
-      const productsData = querySnapshot.docs.map(doc => ({
+      const productsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setProducts(productsData);
     } catch (error) {
@@ -103,8 +134,9 @@ const AdminDashboard = () => {
     try {
       const orderRef = doc(db, "OrdersManagement", orderId);
       await updateDoc(orderRef, {
-        orderStatus: action === "approve" ? "paymentVerified" : "paymentRejected",
-        updatedAt: new Date().toISOString()
+        orderStatus:
+          action === "approve" ? "paymentVerified" : "paymentRejected",
+        updatedAt: new Date().toISOString(),
       });
       fetchPendingOrders();
     } catch (error) {
@@ -123,7 +155,7 @@ const AdminDashboard = () => {
         reader.readAsDataURL(file);
       });
 
-      const fileExtension = file.name.split('.').pop();
+      const fileExtension = file.name.split(".").pop();
       const fileName = `product-${Date.now()}.${fileExtension}`;
       const targetPath = "images/products";
 
@@ -158,10 +190,15 @@ const AdminDashboard = () => {
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     try {
-      const imageUrl = await handleImageUpload(file);
-      setNewProduct(prev => ({ ...prev, imageUrl }));
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageToCrop(reader.result);
+        setCropperModalOpen(true);
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
       console.error("Error handling file upload:", error);
     }
@@ -177,7 +214,7 @@ const AdminDashboard = () => {
 
       const productData = {
         ...newProduct,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
       await addDoc(collection(db, "predefinedProducts"), productData);
       setNewProduct({
@@ -187,7 +224,7 @@ const AdminDashboard = () => {
         gender: "Unisex",
         has3DTryOn: false,
         isActive: true,
-        imageUrl: ""
+        imageUrl: "",
       });
       fetchProducts();
     } catch (error) {
@@ -207,7 +244,7 @@ const AdminDashboard = () => {
   // Login form if not authenticated
   if (!isAuthenticated) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -219,13 +256,13 @@ const AdminDashboard = () => {
           transition={{ delay: 0.2, type: "spring" }}
           className={`w-full max-w-md ${theme.mainTheme} rounded-xl shadow-2xl overflow-hidden`}
         >
-          <motion.div 
+          <motion.div
             className={`p-6 text-center ${theme.colorPrimaryBg}`}
             initial={{ y: -50 }}
             animate={{ y: 0 }}
             transition={{ type: "spring", stiffness: 100 }}
           >
-            <motion.h1 
+            <motion.h1
               className="text-2xl font-bold text-white"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -233,7 +270,7 @@ const AdminDashboard = () => {
             >
               Admin Dashboard
             </motion.h1>
-            <motion.p 
+            <motion.p
               className="opacity-90 text-white"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -242,9 +279,9 @@ const AdminDashboard = () => {
               Please sign in to continue
             </motion.p>
           </motion.div>
-          
-          <motion.form 
-            onSubmit={handleLogin} 
+
+          <motion.form
+            onSubmit={handleLogin}
             className="p-6 space-y-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -263,11 +300,9 @@ const AdminDashboard = () => {
                   placeholder=" "
                   required
                 />
-                <label className={`${placeHolderStyles}`}>
-                  Username
-                </label>
+                <label className={`${placeHolderStyles}`}>Username</label>
               </div>
-              
+
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaLock className={theme.iconColor} />
@@ -280,17 +315,15 @@ const AdminDashboard = () => {
                   placeholder=" "
                   required
                 />
-                <label className={`${placeHolderStyles}`}>
-                  Password
-                </label>
+                <label className={`${placeHolderStyles}`}>Password</label>
               </div>
             </div>
-            
+
             <AnimatePresence>
               {authError && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
+                  animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
@@ -300,7 +333,7 @@ const AdminDashboard = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-            
+
             <motion.button
               type="submit"
               disabled={isLoading}
@@ -324,19 +357,32 @@ const AdminDashboard = () => {
   // Admin dashboard
   return (
     <div className={`h-full overflow-auto ${theme.mainTheme}`}>
+      {/* Image Cropper Modal */}
+      <ImageCropper
+        aspectRatio={1 / 1}
+        onCropComplete={handleImageCropped}
+        showModal={cropperModalOpen}
+        setShowModal={setCropperModalOpen}
+        imageSrc={imageToCrop}
+        modalTitle="Product Image Cropper"
+        instructionText="Adjust your product image to fit within the square crop area. This will be used as your product thumbnail."
+      />
+
       {/* Header */}
-      <motion.header 
+      <motion.header
         className="shadow-sm"
         initial={{ y: -20 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.3 }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className={`text-2xl font-bold ${theme.colorText}`}>Admin Dashboard</h1>
+          <h1 className={`text-2xl font-bold ${theme.colorText}`}>
+            Admin Dashboard
+          </h1>
           <motion.button
             onClick={() => {
               setIsAuthenticated(false);
-              localStorage.removeItem('adminAuthenticated');
+              localStorage.removeItem("adminAuthenticated");
             }}
             className={`px-4 py-2 rounded-lg ${theme.colorBgSecondary} ${theme.colorText} hover:bg-red-500 hover:text-white transition`}
             whileHover={{ scale: 1.05 }}
@@ -355,7 +401,11 @@ const AdminDashboard = () => {
             onClick={() => setActiveTab("orders")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`px-4 py-2 font-medium text-sm flex items-center ${activeTab === "orders" ? `${theme.colorText} border-b-2 border-blue-500` : `${theme.colorText} opacity-70 hover:opacity-100`}`}
+            className={`px-4 py-2 font-medium text-sm flex items-center ${
+              activeTab === "orders"
+                ? `${theme.colorText} border-b-2 border-blue-500`
+                : `${theme.colorText} opacity-70 hover:opacity-100`
+            }`}
           >
             <FaMoneyBillWave className="mr-2" />
             Pending Orders
@@ -364,7 +414,11 @@ const AdminDashboard = () => {
             onClick={() => setActiveTab("products")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`px-4 py-2 font-medium text-sm flex items-center ${activeTab === "products" ? `${theme.colorText} border-b-2 border-blue-500` : `${theme.colorText} opacity-70 hover:opacity-100`}`}
+            className={`px-4 py-2 font-medium text-sm flex items-center ${
+              activeTab === "products"
+                ? `${theme.colorText} border-b-2 border-blue-500`
+                : `${theme.colorText} opacity-70 hover:opacity-100`
+            }`}
           >
             <FaShoppingBag className="mr-2" />
             Product Management
@@ -378,18 +432,22 @@ const AdminDashboard = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <h2 className={`text-xl font-semibold mb-4 ${theme.colorText}`}>Payment Verification Pending</h2>
-            
+            <h2 className={`text-xl font-semibold mb-4 ${theme.colorText}`}>
+              Payment Verification Pending
+            </h2>
+
             {pendingOrders.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className={`rounded-lg shadow p-6 text-center ${theme.colorBg}`}
               >
-                <p className={`${theme.colorText}`}>No orders pending verification</p>
+                <p className={`${theme.colorText}`}>
+                  No orders pending verification
+                </p>
               </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -406,19 +464,35 @@ const AdminDashboard = () => {
                     <div className="p-6">
                       <div className="space-y-4">
                         <div>
-                          <p className={`text-sm ${theme.colorText} opacity-80`}>Transaction ID</p>
-                          <p className={`font-medium ${theme.colorText}`}>{order.paymentDetails?.transactionId || "N/A"}</p>
+                          <p
+                            className={`text-sm ${theme.colorText} opacity-80`}
+                          >
+                            Transaction ID
+                          </p>
+                          <p className={`font-medium ${theme.colorText}`}>
+                            {order.paymentDetails?.transactionId || "N/A"}
+                          </p>
                         </div>
-                        
+
                         <div>
-                          <p className={`text-sm ${theme.colorText} opacity-80`}>Amount</p>
-                          <p className={`font-medium text-lg ${theme.colorText}`}>${order.totalAmount?.toFixed(2) || "0.00"}</p>
+                          <p
+                            className={`text-sm ${theme.colorText} opacity-80`}
+                          >
+                            Amount
+                          </p>
+                          <p
+                            className={`font-medium text-lg ${theme.colorText}`}
+                          >
+                            ${order.totalAmount?.toFixed(2) || "0.00"}
+                          </p>
                         </div>
                       </div>
-                      
+
                       <div className="mt-6 flex space-x-3">
                         <motion.button
-                          onClick={() => handleOrderVerification(order.id, "approve")}
+                          onClick={() =>
+                            handleOrderVerification(order.id, "approve")
+                          }
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
                           className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center justify-center"
@@ -427,7 +501,9 @@ const AdminDashboard = () => {
                           Approve
                         </motion.button>
                         <motion.button
-                          onClick={() => handleOrderVerification(order.id, "reject")}
+                          onClick={() =>
+                            handleOrderVerification(order.id, "reject")
+                          }
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
                           className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex items-center justify-center"
@@ -459,14 +535,20 @@ const AdminDashboard = () => {
               animate={{ x: 0 }}
               transition={{ type: "spring" }}
             >
-              <div className={`rounded-xl shadow overflow-hidden ${theme.colorBg}`}>
+              <div
+                className={`rounded-xl shadow overflow-hidden ${theme.colorBg}`}
+              >
                 <div className="p-6">
-                  <h2 className={`text-xl font-semibold mb-4 ${theme.colorText}`}>Products</h2>
-                  
+                  <h2
+                    className={`text-xl font-semibold mb-4 ${theme.colorText}`}
+                  >
+                    Products
+                  </h2>
+
                   {products.length === 0 ? (
                     <p className={`${theme.colorText}`}>No products found</p>
                   ) : (
-                    <motion.div 
+                    <motion.div
                       className="space-y-4"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -480,7 +562,7 @@ const AdminDashboard = () => {
                           transition={{ delay: index * 0.05 }}
                           className={`flex items-center p-4 rounded-lg ${theme.colorBgSecondary} hover:${theme.colorBgHover}`}
                         >
-                          <motion.div 
+                          <motion.div
                             className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-gray-100"
                             whileHover={{ scale: 1.05 }}
                           >
@@ -494,12 +576,20 @@ const AdminDashboard = () => {
                               />
                             )}
                           </motion.div>
-                          
+
                           <div className="ml-4 flex-1">
-                            <h3 className={`font-medium ${theme.colorText}`}>{product.name}</h3>
-                            <p className={`text-sm ${theme.colorText} opacity-80`}>{product.category}</p>
+                            <h3 className={`font-medium ${theme.colorText}`}>
+                              {product.name}
+                            </h3>
+                            <p
+                              className={`text-sm ${theme.colorText} opacity-80`}
+                            >
+                              {product.category}
+                            </p>
                             <div className="flex items-center mt-1 space-x-2">
-                              <span className={`text-xs px-2 py-1 rounded-full ${theme.colorBgTertiary}`}>
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full ${theme.colorBgTertiary}`}
+                              >
                                 {product.gender}
                               </span>
                               {product.has3DTryOn && (
@@ -525,27 +615,33 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </motion.div>
-            
+
             {/* Add Product Form */}
             <motion.div
               initial={{ x: 20 }}
               animate={{ x: 0 }}
               transition={{ type: "spring" }}
             >
-              <div className={`rounded-xl shadow overflow-hidden ${theme.colorBg}`}>
+              <div
+                className={`rounded-xl shadow overflow-hidden ${theme.colorBg}`}
+              >
                 <div className="p-6">
-                  <h2 className={`text-xl font-semibold mb-4 flex items-center ${theme.colorText}`}>
+                  <h2
+                    className={`text-xl font-semibold mb-4 flex items-center ${theme.colorText}`}
+                  >
                     <FaPlus className="mr-2" />
                     Add New Product
                   </h2>
-                  
+
                   <form onSubmit={handleProductSubmit} className="space-y-4">
                     <div className="relative">
                       <input
                         type="text"
                         name="name"
                         value={newProduct.name}
-                        onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                        onChange={(e) =>
+                          setNewProduct({ ...newProduct, name: e.target.value })
+                        }
                         className={`${inputStyles}`}
                         placeholder=" "
                         required
@@ -554,28 +650,36 @@ const AdminDashboard = () => {
                         Product Name
                       </label>
                     </div>
-                    
+
                     <div className="relative">
                       <input
                         type="text"
                         name="category"
                         value={newProduct.category}
-                        onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            category: e.target.value,
+                          })
+                        }
                         className={`${inputStyles}`}
                         placeholder=" "
                         required
                       />
-                      <label className={`${placeHolderStyles}`}>
-                        Category
-                      </label>
+                      <label className={`${placeHolderStyles}`}>Category</label>
                     </div>
-                    
+
                     <div className="relative">
                       <input
                         type="text"
                         name="material"
                         value={newProduct.material}
-                        onChange={(e) => setNewProduct({...newProduct, material: e.target.value})}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            material: e.target.value,
+                          })
+                        }
                         className={`${inputStyles}`}
                         placeholder=" "
                       />
@@ -583,7 +687,7 @@ const AdminDashboard = () => {
                         Material (optional)
                       </label>
                     </div>
-                    
+
                     <div className="relative">
                       <label className={`block mb-2 ${theme.colorText}`}>
                         Gender
@@ -591,7 +695,12 @@ const AdminDashboard = () => {
                       <select
                         name="gender"
                         value={newProduct.gender}
-                        onChange={(e) => setNewProduct({...newProduct, gender: e.target.value})}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            gender: e.target.value,
+                          })
+                        }
                         className={`${inputStyles}`}
                       >
                         <option value="Male">Male</option>
@@ -600,7 +709,7 @@ const AdminDashboard = () => {
                         <option value="Unisex">Unisex</option>
                       </select>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center">
                         <input
@@ -608,47 +717,67 @@ const AdminDashboard = () => {
                           id="has3DTryOn"
                           name="has3DTryOn"
                           checked={newProduct.has3DTryOn}
-                          onChange={(e) => setNewProduct({...newProduct, has3DTryOn: e.target.checked})}
+                          onChange={(e) =>
+                            setNewProduct({
+                              ...newProduct,
+                              has3DTryOn: e.target.checked,
+                            })
+                          }
                           className={`h-4 w-4 ${theme.colorBorder} rounded`}
                         />
-                        <label htmlFor="has3DTryOn" className={`ml-2 block text-sm ${theme.colorText}`}>
+                        <label
+                          htmlFor="has3DTryOn"
+                          className={`ml-2 block text-sm ${theme.colorText}`}
+                        >
                           3D Try-On
                         </label>
                       </div>
-                      
+
                       <div className="flex items-center">
                         <input
                           type="checkbox"
                           id="isActive"
                           name="isActive"
                           checked={newProduct.isActive}
-                          onChange={(e) => setNewProduct({...newProduct, isActive: e.target.checked})}
+                          onChange={(e) =>
+                            setNewProduct({
+                              ...newProduct,
+                              isActive: e.target.checked,
+                            })
+                          }
                           className={`h-4 w-4 ${theme.colorBorder} rounded`}
                         />
-                        <label htmlFor="isActive" className={`ml-2 block text-sm ${theme.colorText}`}>
+                        <label
+                          htmlFor="isActive"
+                          className={`ml-2 block text-sm ${theme.colorText}`}
+                        >
                           Active
                         </label>
                       </div>
                     </div>
-                    
+
                     <div>
                       <label className={`block mb-2 ${theme.colorText}`}>
                         Product Image
                       </label>
                       {newProduct.imageUrl ? (
                         <div className="relative">
-                          <div className="w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
+                          {/* Updated preview container with 1:1 aspect ratio */}
+                          <div className="w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
                             <Image
                               src={newProduct.imageUrl}
                               alt="Product preview"
                               width={300}
                               height={300}
                               className="object-cover w-full h-full"
+                              style={{ objectFit: "cover" }}
                             />
                           </div>
                           <motion.button
                             type="button"
-                            onClick={() => setNewProduct({...newProduct, imageUrl: ""})}
+                            onClick={() =>
+                              setNewProduct({ ...newProduct, imageUrl: "" })
+                            }
                             className={`absolute top-2 right-2 p-1 rounded-full ${theme.colorBgSecondary} ${theme.colorText} hover:bg-red-500 hover:text-white`}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -658,23 +787,43 @@ const AdminDashboard = () => {
                         </div>
                       ) : (
                         <div className="flex items-center justify-center w-full">
-                          <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer ${theme.colorBgSecondary} hover:${theme.colorBgHover}`}>
+                          <label
+                            className={`flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed rounded-lg cursor-pointer ${theme.colorBgSecondary} hover:${theme.colorBgHover}`}
+                          >
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                               {isUploading ? (
                                 <ClipLoader size={24} color={theme.iconColor} />
                               ) : (
                                 <>
-                                  <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                  <svg
+                                    className="w-8 h-8 mb-4 text-gray-500"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 20 16"
+                                  >
+                                    <path
+                                      stroke="currentColor"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                                    />
                                   </svg>
-                                  <p className={`mb-2 text-sm ${theme.colorText}`}><span className="font-semibold">Click to upload</span></p>
+                                  <p
+                                    className={`mb-2 text-sm ${theme.colorText}`}
+                                  >
+                                    <span className="font-semibold">
+                                      Click to upload
+                                    </span>
+                                  </p>
                                 </>
                               )}
                             </div>
-                            <input 
-                              id="dropzone-file" 
-                              type="file" 
-                              className="hidden" 
+                            <input
+                              id="dropzone-file"
+                              type="file"
+                              className="hidden"
                               onChange={handleFileChange}
                               accept="image/*"
                               disabled={isUploading}
@@ -683,7 +832,7 @@ const AdminDashboard = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     <motion.button
                       type="submit"
                       disabled={!newProduct.imageUrl || isUploading}
@@ -692,7 +841,11 @@ const AdminDashboard = () => {
                       className={`w-full py-2 px-4 rounded-lg ${theme.colorPrimaryBg} text-white font-medium flex items-center justify-center disabled:opacity-50`}
                     >
                       {isUploading ? (
-                        <ClipLoader size={20} color="#ffffff" className="mr-2" />
+                        <ClipLoader
+                          size={20}
+                          color="#ffffff"
+                          className="mr-2"
+                        />
                       ) : (
                         <FaPlus className="mr-2" />
                       )}
