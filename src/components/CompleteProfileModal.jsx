@@ -161,7 +161,7 @@ export default function CompleteProfileModal({ isVisible, userData, onClose }) {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="fixed inset-0 flex h-screen items-center justify-center"
+          className="fixed inset-0 flex h-screen items-center justify-center z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -169,7 +169,7 @@ export default function CompleteProfileModal({ isVisible, userData, onClose }) {
         >
           <div className="bg-black bg-opacity-50 fixed inset-0"></div>
 
-          <div className="w-[90%] max-w-[90%] md:w-[50%] fixed flex items-center justify-center md:translate-x-24">
+          <div className="w-[90%] max-w-[90%] md:w-[50%] fixed flex items-center justify-center md:translate-x-24 z-50">
             <motion.div
               className={`rounded-xl shadow-lg w-[90%] lg:w-[75%] z-50 ${theme.mainTheme}`}
               initial={{ scale: 0.7 }}
