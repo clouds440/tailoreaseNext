@@ -71,7 +71,7 @@ function PopupMessage() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className={`flex w-auto fixed top-5 right-1 px-5 py-1 rounded-lg z-50 font-sans`}
+          className={`flex w-auto fixed top-5 right-1 px-5 py-1 rounded-lg z-[9999] font-sans`}
           initial={{ x: "100%" }}
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
