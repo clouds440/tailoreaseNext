@@ -163,7 +163,7 @@ const TailorSpecialitiesForm = ({
         <div className="w-full p-6 md:w-1/2 h-auto flex flex-col items-center md:items-start">
           {/* Image Dropzone Section */}
           <div
-            className="flex items-center justify-center w-full h-64 mb-2 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-700"
+            className="flex items-center justify-center w-full h-96 mb-2 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-700"
             onDragOver={handleDragOver}
             onDrop={handleDrop}
           >
