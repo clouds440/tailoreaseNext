@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState, useEffect, useCallback } from "react";
+import { useContext, useState, useEffect } from "react";
 import TailorApplicationForm from "@/components/TailorApplicationForm";
 import TailorSpecialitiesForm from "@/components/TailorSpecialitiesForm";
 import ProgressBar from "@/components/ProgressBar";
@@ -20,7 +20,6 @@ import {
 } from "firebase/firestore";
 import { sendEmailVerification } from "firebase/auth";
 import SimpleButton from "@/components/SimpleButton";
-import ImageCropper from "@/components/ImageCropper";
 
 const BecomeTailor = () => {
   const [step, setStep] = useState(1);
@@ -36,21 +35,17 @@ const BecomeTailor = () => {
   const [disableResendButton, setDisableResendButton] = useState(false);
   const router = useRouter();
 
-  // Image cropper state
-  const [cropperModalOpen, setCropperModalOpen] = useState(false);
-  const [imageToCrop, setImageToCrop] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-
   const [hasBusinessAccount, setHasBusinessAccount] = useState(null);
 
   useEffect(() => {
     const checkBusinessAccount = async () => {
       if (!userLoggedIn) {
         router.push("/signup");
-        return;
+        return; // Exit if the user is not logged in or `uid` is not available
       }
 
       try {
+        // Query to find a tailor document with ownerId matching the user UID
         const userQuery = query(
           collection(db, "tailors"),
           where("ownerId", "==", userData.uid)
@@ -58,6 +53,7 @@ const BecomeTailor = () => {
         const querySnapshot = await getDocs(userQuery);
 
         if (!querySnapshot.empty) {
+          // Get the first matching tailor document
           const tailorDoc = querySnapshot.docs[0];
           const { approved } = tailorDoc.data();
 
@@ -65,6 +61,7 @@ const BecomeTailor = () => {
           const tailorRef = doc(db, "tailors", tailorDocId);
 
           if (!approved && auth.currentUser.emailVerified) {
+            // If not approved and email is verified, update `approved` to true
             await updateDoc(tailorRef, { approved: true });
             setHasBusinessAccount({
               approved: true,
@@ -73,11 +70,13 @@ const BecomeTailor = () => {
             return;
           }
 
+          // Update state with `approved` value and existence flag
           setHasBusinessAccount({
-            approved: approved || false,
+            approved: approved || false, // Use `false` as a default if `approved` is undefined
             exists: true,
           });
         } else {
+          // No tailor document found for this ownerId
           setHasBusinessAccount({
             approved: false,
             exists: false,
@@ -93,35 +92,42 @@ const BecomeTailor = () => {
 
   const stepNames = ["Business Info", "Additional Info", "Submitting"];
 
+  // Handle next step: collect form data and move to step 2
   const handleNext = (data) => {
-    setFormData({ ...formData, ...data });
+    setFormData({ ...formData, ...data }); // Combine form data
     setTimeout(() => {
-      setStep(step + 1);
-    }, 300);
+      setStep(step + 1); // Move to the next step
+    }, 300); // Delay to allow animation time
   };
 
+  // Handle back to step 1
   const handleBack = () => {
-    setStep(1);
+    setStep(1); // Go back to step 1
   };
 
+  // Final submit: combine data and handle form submission
   const handleSubmit = async (finalData) => {
     const combinedData = { ...formData, ...finalData };
+
+    // Extract `businessPicture` from `combinedData` to avoid storing it directly in Firestore
     const { businessPicture, ...dataWithoutPicture } = combinedData;
 
     setIsLoading(true);
     try {
+      // 1. Upload the image to a local directory in the project at "./images/profile/business"
       let businessPictureUrl = "";
       if (businessPicture) {
-        const fileName = `business-${Date.now()}.jpg`;
-        const targetPath = "images/profile/business";
+        const fileName = `business-${Date.now()}.jpg`; // Unique file name
+        const targetPath = "images/profile/business"; // Dynamic storage path
 
+        // Fetch API call to the reusable route.js route
         const response = await fetch("/api/imageUpload", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            imageData: businessPicture,
+            imageData: businessPicture, // Base64 encoded image
             fileName,
             targetPath,
           }),
@@ -133,9 +139,10 @@ const BecomeTailor = () => {
         }
 
         const { url } = await response.json();
-        businessPictureUrl = "/" + url;
+        businessPictureUrl = "/" + url; // Public URL of the uploaded image
       }
 
+      // 2. Add business details to the "tailors" collection in Firestore
       const tailorsRef = collection(db, "tailors");
       const tailorDocRef = await addDoc(tailorsRef, {
         ...dataWithoutPicture,
@@ -147,8 +154,10 @@ const BecomeTailor = () => {
         total_rating: 0,
       });
 
+      // Get the newly created document ID
       const bId = tailorDocRef.id;
 
+      // 3. Update the user document with the new business ID (bId)
       const userQuery = query(
         collection(db, "users"),
         where("uid", "==", userData.uid)
@@ -161,8 +170,10 @@ const BecomeTailor = () => {
         bId: bId,
       });
 
+      // 4. Send a verification email to the user
       await sendEmailVerification(auth.currentUser);
 
+      // 5. Update bId in local storage
       let UpdatedUserData = JSON.parse(localStorage.getItem("userData")) || {};
       UpdatedUserData.bId = bId;
       localStorage.setItem("userData", JSON.stringify(UpdatedUserData));
@@ -220,7 +231,7 @@ const BecomeTailor = () => {
       >
         <ClipLoader size={60} color="#ffffff" />
       </div>
-    );
+    ); // Loading indicator while checking
   }
 
   return hasBusinessAccount.exists ? (
@@ -308,25 +319,8 @@ const BecomeTailor = () => {
           onNext={handleNext}
           onSubmit={handleSubmit}
           isLoading={isLoading}
-          setCropperModalOpen={setCropperModalOpen}
-          setImageToCrop={setImageToCrop}
-          setSelectedFile={setSelectedFile}
         />
       </div>
-
-      {/* Image Cropper Modal */}
-      <ImageCropper
-        aspectRatio={3 / 2}
-        onCropComplete={(croppedImage) => {
-          setFormData(prev => ({ ...prev, businessPicture: croppedImage }));
-          setCropperModalOpen(false);
-        }}
-        showModal={cropperModalOpen}
-        setShowModal={setCropperModalOpen}
-        imageSrc={imageToCrop}
-        modalTitle="Business Banner Cropper"
-        instructionText="Adjust your business banner image to fit within the 3:2 ratio crop area. This will be used as your business profile banner."
-      />
     </div>
   );
 };

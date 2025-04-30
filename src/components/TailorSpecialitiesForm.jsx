@@ -11,9 +11,6 @@ const TailorSpecialitiesForm = ({
   onBack,
   onSubmit,
   isLoading,
-  setCropperModalOpen,
-  setImageToCrop,
-  setSelectedFile,
 }) => {
   const [specialitiesData, setSpecialitiesData] = useState({
     specialities: [],
@@ -34,6 +31,7 @@ const TailorSpecialitiesForm = ({
   const handleChange = async (e) => {
     const { name, value, files } = e.target;
 
+    // Validate file type
     if (name === "businessPicture" && files[0]) {
       const file = files[0];
       const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
@@ -47,22 +45,22 @@ const TailorSpecialitiesForm = ({
       }
 
       try {
-        setSelectedFile(file);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImageToCrop(reader.result);
-          setCropperModalOpen(true);
-        };
-        reader.readAsDataURL(file);
+        // Convert file to Base64
+        const base64 = await convertToBase64(file);
+
+        // Update state with the Base64 image
+        setSpecialitiesData({ ...specialitiesData, [name]: base64 });
+        setPreviewImage(URL.createObjectURL(file));
       } catch (error) {
-        console.error("Error processing image:", error);
+        console.error("Error converting file to Base64:", error);
         setShowMessage({
           type: "error",
           message: "Failed to process the image. Please try again.",
         });
         setPopUpMessageTrigger(true);
       }
-      return;
+
+      return; // Prevent further execution for this case
     }
 
     if (name === "specialities") {
@@ -78,10 +76,21 @@ const TailorSpecialitiesForm = ({
     }
   };
 
+  // Helper function to convert a file to a Base64 string
+  function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result); // Base64 string
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file); // Read file as Base64
+    });
+  }
+
   const handleFinalSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.businessPicture) {
+    // Validate profile picture
+    if (!specialitiesData.businessPicture) {
       setShowMessage({
         type: "warning",
         message: "Business profile picture is required",
@@ -90,6 +99,7 @@ const TailorSpecialitiesForm = ({
       return;
     }
 
+    // Validate opening and closing times
     if (!specialitiesData.openTime || !specialitiesData.closeTime) {
       setShowMessage({
         type: "warning",
@@ -99,6 +109,7 @@ const TailorSpecialitiesForm = ({
       return;
     }
 
+    // Validate experience
     if (specialitiesData.experience < 0 || specialitiesData.experience > 100) {
       setShowMessage({
         type: "warning",
@@ -108,6 +119,7 @@ const TailorSpecialitiesForm = ({
       return;
     }
 
+    // Validate that at least one speciality is selected
     if (
       !specialitiesData.specialities ||
       !Object.values(specialitiesData.specialities).some(Boolean)
@@ -121,7 +133,11 @@ const TailorSpecialitiesForm = ({
     }
 
     onNext(onNext);
+
+    // Combine form data and specialities data
     const combinedData = { ...formData, ...specialitiesData };
+
+    // Call the parent component's submit handler
     onSubmit(combinedData);
   };
 
@@ -133,13 +149,8 @@ const TailorSpecialitiesForm = ({
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageToCrop(reader.result);
-        setCropperModalOpen(true);
-      };
-      reader.readAsDataURL(file);
+      setSpecialitiesData({ ...specialitiesData, businessPicture: file });
+      setPreviewImage(URL.createObjectURL(file));
     }
   };
 
@@ -152,7 +163,7 @@ const TailorSpecialitiesForm = ({
         <div className="w-full p-6 md:w-1/2 h-auto flex flex-col items-center md:items-start">
           {/* Image Dropzone Section */}
           <div
-            className="flex items-center justify-center w-full aspect-[3/2] mb-2 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-700"
+            className="flex items-center justify-center w-full h-64 mb-2 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-700"
             onDragOver={handleDragOver}
             onDrop={handleDrop}
           >
@@ -160,17 +171,14 @@ const TailorSpecialitiesForm = ({
               htmlFor="businessPicture"
               className="flex flex-col items-center justify-center w-full h-full"
             >
-              {formData.businessPicture ? (
-                <div className="relative w-full h-full">
-                  <Image
-                    src={formData.businessPicture}
-                    alt="Preview"
-                    className="w-full h-full object-cover rounded-lg cursor-pointer"
-                    width={600}
-                    height={400}
-                    style={{ objectFit: 'cover' }}
-                  />
-                </div>
+              {previewImage ? (
+                <Image
+                  src={previewImage}
+                  alt="Preview"
+                  className="w-full h-full object-cover rounded-lg cursor-pointer"
+                  width={300}
+                  height={256}
+                />
               ) : (
                 <div className="flex flex-col items-center justify-center pt-5 pb-6 cursor-pointer">
                   <svg
@@ -192,7 +200,7 @@ const TailorSpecialitiesForm = ({
                     drag and drop
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    PNG or JPG (3:2 aspect ratio recommended)
+                    PNG or JPG (MAX. 800x400px)
                   </p>
                 </div>
               )}
