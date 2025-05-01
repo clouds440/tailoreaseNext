@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import UserContext from "@/utils/UserContext";
+import { motion } from "framer-motion";
 
 function SimpleButton({
   onClick,
@@ -52,7 +53,10 @@ function SimpleButton({
   };
 
   return (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95, opacity: 0.85 }}
+      transition={{ duration: 0.01 }}
       type={type === "primary-submit" ? "submit" : "button"}
       className={`${baseStyles} ${getButtonStyle()} ${
         disabled ? disabledStyles : ""
@@ -62,7 +66,7 @@ function SimpleButton({
     >
       {icon && <span className="mr-2">{icon}</span>}
       {btnText}
-    </button>
+    </motion.button>
   );
 }
 

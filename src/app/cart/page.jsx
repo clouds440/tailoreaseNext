@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { db } from "@/utils/firebaseConfig";
 import {
   doc,
-  getDoc,
   collection,
   query,
   where,

@@ -301,7 +301,7 @@ const Market = () => {
   const handleAddToCart = () => {
     if (!userData?.uid) {
       setShowMessage({
-        type: "error",
+        type: "info",
         message: "Please login to add items to cart",
       });
       setPopUpMessageTrigger(true);
