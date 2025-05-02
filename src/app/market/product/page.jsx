@@ -177,7 +177,7 @@ const ProductPage = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`bg-${theme.colorBg} rounded-lg shadow-lg overflow-hidden`}
+          className={`${theme.colorBg} ${theme.hoverShadow} rounded-lg shadow-lg overflow-hidden`}
         >
           <div className="grid lg:grid-cols-2 gap-6">
             {/* IMAGE CAROUSEL */}
@@ -304,7 +304,7 @@ const ProductPage = () => {
                 />
                 <ShareLinkDialog
                   shareLink={window.location.toString()}
-                  sender={userData ? userData : {fullName: "Someone"}}
+                  sender={userData ? userData : { fullName: "Someone" }}
                   subject={"Product"}
                 />
                 <SimpleButton
@@ -317,8 +317,12 @@ const ProductPage = () => {
             </div>
           </div>
         </motion.div>
+
         {relatedProducts && (
-          <div className="mt-10 pt-9">
+          <div className="mt-10 pt-12">
+            <div>
+              <span className="font-bold text-xl">Related Products</span>
+            </div>
             <ContentSlider content={relatedProducts} />
           </div>
         )}

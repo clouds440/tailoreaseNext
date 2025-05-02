@@ -20,7 +20,9 @@ const RelatedSlider = ({ content }) => {
   };
 
   return (
-    <div className="relative mt-12">
+    <div
+      className={`relative mt-4 p-3 rounded-md ${theme.colorBg} ${theme.hoverShadow}`}
+    >
       {/* Left arrow */}
       <button
         onClick={() => scroll("prev")}

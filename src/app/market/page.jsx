@@ -75,7 +75,11 @@ const Market = () => {
       // Process each product to get tailor details
       const productsData = await Promise.all(
         productsSnapshot.docs.map(async (Doc) => {
-          const productData = Doc.data();
+          const productData = {
+            id: Doc.id,
+            ...Doc.data(),
+          };
+          console.log(productData);
 
           // Get tailor's business name
           let tailorName = "Unknown Tailor";
@@ -685,7 +689,7 @@ const Market = () => {
               >
                 {/* Close Button */}
                 <button
-                  className={`absolute top-4 right-4 z-10 p-2 rounded-full ${theme.colorBgSecondary} ${theme.colorText} hover:bg-red-500 hover:text-white transition-colors`}
+                  className={`absolute top-4 right-4 z-10 py-2 px-4 rounded-full ${theme.colorBgSecondary} ${theme.colorText} hover:bg-red-500 hover:text-white transition-colors`}
                   onClick={() => setQuickViewOpen(false)}
                 >
                   <i className="fas fa-times"></i>
@@ -859,6 +863,14 @@ const Market = () => {
                       type="primary"
                       fullWidth
                       onClick={handleAddToCart}
+                    />
+                    <SimpleButton
+                      btnText={"View Product"}
+                      type={"default"}
+                      icon={<i className="fas fa-eye"></i>}
+                      onClick={() => {
+                        router.push(`/market/product?id=${selectedProduct.id}`);
+                      }}
                     />
 
                     {selectedProduct.has3DTryOn && (
