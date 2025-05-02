@@ -204,7 +204,7 @@ const AboutUs = () => {
             <i className="fas fa-users text-4xl text-purple-500 mb-4"></i>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Meet Our Team</h2>
             <p className="text-lg max-w-2xl mx-auto">
-              The brilliant minds behind TailorEase's success
+              The brilliant minds behind TailorEase&apos;s success
             </p>
           </div>
 
@@ -234,7 +234,7 @@ const AboutUs = () => {
                 <div className="p-6">
                   {member.quote && (
                     <blockquote className="italic text-gray-600 dark:text-gray-300 mb-4">
-                      "{member.quote}"
+                      &quot;{member.quote}&quot;
                     </blockquote>
                   )}
                   <div className="flex items-center mt-4">

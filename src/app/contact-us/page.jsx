@@ -128,7 +128,7 @@ const ContactUs = () => {
               transition={{ delay: 0.3 }}
               className={`${theme.colorText} mb-8 text-lg leading-relaxed`}
             >
-              Have questions or need assistance? Fill out the form, and we'll get
+              Have questions or need assistance? Fill out the form, and we&apos;ll get
               back to you as soon as possible. You can also reach us via email or
               phone for immediate support.
             </motion.p>
