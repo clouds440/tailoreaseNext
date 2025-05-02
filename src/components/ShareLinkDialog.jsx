@@ -8,10 +8,16 @@ import UserContext from "@/utils/UserContext";
 import { collection, getDocs, setDoc, doc } from "firebase/firestore";
 import { db } from "@/utils/firebaseConfig";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { FaShareAlt } from "react-icons/fa";
 
 const ShareLinkDialog = ({ sender, shareLink, subject }) => {
-  const { inputStyles, setShowMessage, setPopUpMessageTrigger } =
-    useContext(UserContext);
+  const {
+    theme,
+    inputStyles,
+    setShowMessage,
+    setPopUpMessageTrigger,
+    placeHolderStyles,
+  } = useContext(UserContext);
   const [showDialog, setShowDialog] = useState(false);
   const [shareType, setShareType] = useState("tailor"); // or 'user'
 
@@ -63,7 +69,9 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
       await sendNotification(
         recipientId,
         notifType,
-        `${sender.fullName} shared their ${subject} with you!`,
+        `${sender.fullName} shared ${
+          subject === "Product" ? "a" : "their"
+        } ${subject} with you!`,
         shareLink
       );
 
@@ -114,7 +122,7 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
     <>
       <SimpleButton
         btnText={`Share ${subject}`}
-        icon={<i className="fas fa-share" />}
+        icon={<FaShareAlt />}
         onClick={() => setShowDialog(true)}
       />
 
@@ -151,33 +159,48 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
                 </div>
 
                 <h2 className="mb-2">{promptText}</h2>
-                <div className="flex items-center space-x-3 mb-4">
-                  <select
-                    id="countryCode"
-                    name="countryCode"
-                    value={countryCode}
-                    onChange={(e) => setCountryCode(e.target.value)}
-                    className={`${inputStyles} bg-transparent w-28`}
-                  >
-                    <option value="+92">🇵🇰 +92</option>
-                    <option value="+1">🇺🇸 +1</option>
-                    <option value="+44">🇬🇧 +44</option>
-                    <option value="+61">🇦🇺 +61</option>
-                    {/* Add more as needed */}
-                  </select>
-
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className={`${inputStyles} flex-1`}
-                    placeholder={placeholder}
-                  />
+                <div className="relative mb-4">
+                  <div className="flex">
+                    <select
+                      id="countryCode"
+                      name="countryCode"
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className={`border-b-2 bg-transparent p-2 ${theme.colorText} ${theme.colorBorder} focus:border-blue-600 outline-none`}
+                    >
+                      <option value="+92" className={theme.colorBg}>
+                        🇵🇰 +92
+                      </option>
+                      <option className={theme.colorBg} value="+1">
+                        🇺🇸 +1
+                      </option>
+                      <option className={theme.colorBg} value="+44">
+                        🇬🇧 +44
+                      </option>
+                      <option className={theme.colorBg} value="+61">
+                        🇦🇺 +61
+                      </option>
+                      {/* Add more countries if you want */}
+                    </select>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className={`ml-3 ${inputStyles}`}
+                      placeholder=" "
+                    />
+                    <label
+                      className={`ml-24 ${placeHolderStyles}`}
+                      htmlFor="phone"
+                    >
+                      {placeholder}
+                    </label>
+                  </div>
                 </div>
 
-                {shareType === "tailor" && subject !== "Custom Outfit" && (
+                {shareType === "tailor" && subject === "Profile" && (
                   <>
                     <label className="flex items-center mt-2 space-x-2 cursor-pointer">
                       <input

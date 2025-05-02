@@ -1,13 +1,20 @@
 "use client";
 import { useEffect, useState, useContext } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  getDocs,
+  where,
+  limit,
+  collection,
+  query,
+} from "firebase/firestore";
 import { db } from "@/utils/firebaseConfig";
 import UserContext from "@/utils/UserContext";
 import {
   FaBolt,
   FaCartPlus,
-  FaShareAlt,
   FaHeart,
   FaPalette,
   FaMars,
@@ -19,8 +26,8 @@ import {
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import SimpleButton from "@/components/SimpleButton";
-import { formatDistanceToNow } from "date-fns";
-import { ClipLoader } from "react-spinners";
+import ContentSlider from "@/components/ContentSlider";
+import ShareLinkDialog from "@/components/ShareLinkDialog";
 
 const ProductPage = () => {
   const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
@@ -29,6 +36,7 @@ const ProductPage = () => {
   const params = useSearchParams();
   const id = params.get("id");
   const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [currentImg, setCurrentImg] = useState(0);
@@ -48,6 +56,36 @@ const ProductPage = () => {
       setLoading(false);
     })();
   }, [id, router]);
+
+  useEffect(() => {
+    if (!product) return; // wait for product
+
+    const fetchRelated = async () => {
+      const ref = collection(db, "tailorProducts");
+      const q = query(
+        ref,
+        where(
+          "baseProductData.category",
+          "==",
+          product.baseProductData.category
+        ),
+        where("price", ">=", product.price * 0.8),
+        where("price", "<=", product.price * 1.2),
+        limit(20)
+      );
+
+      const snap = await getDocs(q);
+      const related = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((p) => p.id !== product.id)
+        .sort((a, b) => (b.coPurchaseCount || 0) - (a.coPurchaseCount || 0))
+        .slice(0, 8);
+
+      setRelatedProducts(related);
+    };
+
+    fetchRelated();
+  }, [product]);
 
   const handleAddToCart = () => {
     if (!userData?.uid) {
@@ -158,6 +196,7 @@ const ProductPage = () => {
                     alt={product.baseProductData.name}
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                     priority
                   />
                 </motion.div>
@@ -263,11 +302,10 @@ const ProductPage = () => {
                   type="accent"
                   icon={<FaCartPlus />}
                 />
-                <SimpleButton
-                  onClick={() => {}}
-                  btnText="Share"
-                  type="default"
-                  icon={<FaShareAlt />}
+                <ShareLinkDialog
+                  shareLink={window.location.toString()}
+                  sender={userData ? userData : {fullName: "Someone"}}
+                  subject={"Product"}
                 />
                 <SimpleButton
                   onClick={() => {}}
@@ -279,6 +317,11 @@ const ProductPage = () => {
             </div>
           </div>
         </motion.div>
+        {relatedProducts && (
+          <div className="mt-10 pt-9">
+            <ContentSlider content={relatedProducts} />
+          </div>
+        )}
       </div>
     </div>
   );
