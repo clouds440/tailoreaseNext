@@ -79,7 +79,6 @@ const Market = () => {
             id: Doc.id,
             ...Doc.data(),
           };
-          console.log(productData);
 
           // Get tailor's business name
           let tailorName = "Unknown Tailor";
@@ -295,8 +294,10 @@ const Market = () => {
     setQuickViewOpen(true);
   };
 
-  const handleCustomizeClick = () => {
+  const handleCustomizeClick = (product) => {
     if (!selectedProduct) return;
+    // Before navigating
+    sessionStorage.setItem("product", JSON.stringify(product));
     const category =
       selectedProduct.baseProductData?.category?.toLowerCase() || "shirt";
     router.push(`/outfit-customization?outfit=${category}`);
@@ -854,17 +855,6 @@ const Market = () => {
 
                   <div className="flex flex-col gap-3">
                     <SimpleButton
-                      btnText={
-                        <>
-                          <i className="fas fa-shopping-cart mr-2"></i>
-                          Add to Cart
-                        </>
-                      }
-                      type="primary"
-                      fullWidth
-                      onClick={handleAddToCart}
-                    />
-                    <SimpleButton
                       btnText={"View Product"}
                       type={"default"}
                       icon={<i className="fas fa-eye"></i>}
@@ -878,14 +868,27 @@ const Market = () => {
                         btnText={
                           <>
                             <i className="fas fa-magic mr-2"></i>
-                            Customize Now
+                            Try-On In 3D
                           </>
                         }
-                        type="secondary"
+                        type="default"
                         fullWidth
-                        onClick={handleCustomizeClick}
+                        onClick={() => {
+                          handleCustomizeClick(selectedProduct);
+                        }}
                       />
                     )}
+                    <SimpleButton
+                      btnText={
+                        <>
+                          <i className="fas fa-shopping-cart mr-2"></i>
+                          Add to Cart
+                        </>
+                      }
+                      type="accent"
+                      fullWidth
+                      onClick={handleAddToCart}
+                    />
 
                     <SimpleButton
                       btnText={
@@ -894,7 +897,7 @@ const Market = () => {
                           Buy Now
                         </>
                       }
-                      type="primary-outline"
+                      type="primary"
                       fullWidth
                       onClick={handleBuyNow}
                     />

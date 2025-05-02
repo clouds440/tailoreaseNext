@@ -19,6 +19,7 @@ import ShareLinkDialog from "@/components/ShareLinkDialog";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import ButtonSelector from "@/components/3d components/ButtonSelector";
 import FloatingInfoBubble from "@/components/FloatingInfoBubble";
+import AddToCart from "@/components/AddToCart";
 
 const outfitCategories = {
   jacket: { category: "torso", gender: "male" },
@@ -44,7 +45,13 @@ const hasButtonsTypes = [
 ];
 
 const OutfitCustomization = () => {
-  const { theme, userData, userLoggedIn } = useContext(UserContext);
+  const {
+    theme,
+    userData,
+    userLoggedIn,
+    setShowMessage,
+    setPopUpMessageTrigger,
+  } = useContext(UserContext);
   const [selectedGender, setSelectedGender] = useState(null);
   const searchParams = useSearchParams();
   const [shareLink, setShareLink] = useState(() => {
@@ -55,6 +62,8 @@ const OutfitCustomization = () => {
 
   const [linkGenerated, setLinkGenerated] = useState(false);
   const [generatingLink, setGeneratingLink] = useState(false);
+  const [showAddToCart, setShowAddToCart] = useState(false);
+  const [product, setProduct] = useState(null);
 
   // Get outfit(s) from URL and convert them into an array
   const outfitTypes = searchParams.get("outfit")?.split(",") || [];
@@ -128,6 +137,7 @@ const OutfitCustomization = () => {
     "/models/buttons/button3.jpg"
   );
   const [measurements, setMeasurements] = useState({});
+  const [showActionButtons, setShowActionButtons] = useState(false);
 
   useEffect(() => {
     const getSharedOutfit = async () => {
@@ -241,6 +251,13 @@ const OutfitCustomization = () => {
 
     setMorphValues(initialMorphValues);
   }, [measurements, userLoggedIn, shareId, morphTargets, userData?.uid]);
+
+  useEffect(() => {
+    setProduct(JSON.parse(sessionStorage.getItem("product")));
+    if (product) {
+      setShowActionButtons(true);
+    }
+  }, [product]);
 
   const { uploadImage } = useImageUpload();
 
@@ -410,6 +427,34 @@ const OutfitCustomization = () => {
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  const handleBuyNow = () => {
+    if (!userLoggedIn) {
+      setShowMessage({
+        type: "danger",
+        message: "Please log in to buy now.",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+    setShowMessage({
+      type: "info",
+      message: "We're adding Buy Now functionality later. Stay tuned!",
+    });
+    setPopUpMessageTrigger(true);
+  };
+
+  const handleAddToCart = () => {
+    if (!userLoggedIn) {
+      setShowMessage({
+        type: "info",
+        message: "Please login to add items to cart",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+    setShowAddToCart(true);
+  };
 
   return (
     <div
@@ -586,8 +631,8 @@ const OutfitCustomization = () => {
           />
         </div>
         {userLoggedIn && (
-          <div className="block mt-5 space-y-3">
-            {!linkGenerated && (
+          <div className="flex flex-col mt-5 space-y-3">
+            {!linkGenerated ? (
               <div className="space-y-2">
                 <span>Generate customized outfit sharing link</span>
                 <SimpleButton
@@ -601,22 +646,50 @@ const OutfitCustomization = () => {
                       "Generate"
                     )
                   }
-                  type={"default"}
+                  type="default"
                   onClick={uploadCustomization}
                   disabled={generatingLink}
                 />
               </div>
-            )}
-            {linkGenerated && (
+            ) : (
               <div className="space-y-2">
                 <span>
                   Link Generated{" "}
-                  <i className="fas fa-check ml-3 font-bold text-lg text-green-500"></i>
+                  <i className="fas fa-check ml-3 font-bold text-lg text-green-500" />
                 </span>
                 <ShareLinkDialog
                   sender={userData}
                   shareLink={shareLink}
-                  subject={"Custom Outfit"}
+                  subject="Custom Outfit"
+                />
+              </div>
+            )}
+            {showActionButtons && (
+              <div className="flex space-x-2">
+                <SimpleButton
+                  btnText={
+                    <>
+                      <i className="fas fa-shopping-cart mr-2" />
+                      Add to Cart
+                    </>
+                  }
+                  type="accent"
+                  onClick={async () => {
+                    if (!linkGenerated) {
+                      await uploadCustomization();
+                    }
+                    handleAddToCart();
+                  }}
+                />
+                <SimpleButton
+                  btnText={
+                    <>
+                      <i className="fas fa-bolt mr-2" />
+                      Buy Now
+                    </>
+                  }
+                  type="primary"
+                  onClick={handleBuyNow}
                 />
               </div>
             )}
@@ -644,6 +717,14 @@ const OutfitCustomization = () => {
           collarVisible={collarVisible}
         />
       </div>
+      {showAddToCart && product && (
+        <AddToCart
+          product={{ ...product, customizedOutfitLink: shareLink }}
+          onClose={() => setShowAddToCart(false)}
+          theme={theme}
+          userId={userData?.uid}
+        />
+      )}
     </div>
   );
 };

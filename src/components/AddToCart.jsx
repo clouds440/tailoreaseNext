@@ -15,8 +15,6 @@ import {
 } from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import UserContext from "@/utils/UserContext";
-import { useContext } from "react";
 import {
   FaShoppingCart,
   FaCheck,
@@ -36,7 +34,6 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
   const [quantity, setQuantity] = useState(1);
   const [totalItemsInCart, setTotalItemsInCart] = useState(0);
   const router = useRouter();
-  const { setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
 
   const didInit = useRef(false);
 
