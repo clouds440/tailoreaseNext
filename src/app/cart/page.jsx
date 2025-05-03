@@ -310,10 +310,10 @@ const CartPage = () => {
 
       setShowMessage({
         type: "success",
-        message: "Payment successful! Your order is being processed.",
+        message: "Order placed! - Payment under verification.",
       });
       setPopUpMessageTrigger(true);
-      router.push("/orders");
+      router.push("/user?tab=orders");
     } catch (error) {
       console.error("Error completing payment:", error);
       setShowMessage({

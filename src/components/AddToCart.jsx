@@ -23,7 +23,7 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 
-const AddToCart = ({ product, onClose, theme, userId }) => {
+const AddToCart = ({ product, onClose, theme, userId, customizedProductLink }) => {
   const [animationStage, setAnimationStage] = useState(1);
   const [cartExists, setCartExists] = useState(false);
   const [currentTailorId, setCurrentTailorId] = useState(null);
@@ -54,9 +54,7 @@ const AddToCart = ({ product, onClose, theme, userId }) => {
         product.isCustom && product.images?.length > 0
           ? product.images[0]
           : product.baseProductData?.imageUrl || "/images/default-product.png",
-      customizedProductLink: product.isCustom
-        ? sessionStorage.getItem("customProductUrl") || ""
-        : "",
+      customizedProductLink: customizedProductLink || "", 
       tailorId: product.tailorId || "",
       tailorName: product.tailor || "Unknown Tailor",
     };

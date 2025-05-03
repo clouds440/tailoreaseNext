@@ -723,11 +723,11 @@ const OutfitCustomization = () => {
             ...product,
             products: {
               ...product.products,
-              customizedProductLink: shareLink,
             },
           }}
           onClose={() => setShowAddToCart(false)}
           theme={theme}
+          customizedProductLink={shareLink}
           userId={userData?.uid}
         />
       )}

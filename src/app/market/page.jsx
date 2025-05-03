@@ -312,6 +312,13 @@ const Market = () => {
       setPopUpMessageTrigger(true);
       return;
     }
+    
+    const productWithEmptyLink = {
+      ...selectedProduct,
+      customizedProductLink: "" 
+    };
+    
+    setSelectedProduct(productWithEmptyLink);
     setShowAddToCart(true);
   };
 
@@ -927,6 +934,7 @@ const Market = () => {
           product={selectedProduct}
           onClose={() => setShowAddToCart(false)}
           theme={theme}
+          customizedProductLink={""}
           userId={userData?.uid}
         />
       )}
