@@ -719,7 +719,13 @@ const OutfitCustomization = () => {
       </div>
       {showAddToCart && product && (
         <AddToCart
-          product={{ ...product, customizedOutfitLink: shareLink }}
+          product={{
+            ...product,
+            products: {
+              ...product.products,
+              customizedProductLink: shareLink,
+            },
+          }}
           onClose={() => setShowAddToCart(false)}
           theme={theme}
           userId={userData?.uid}
