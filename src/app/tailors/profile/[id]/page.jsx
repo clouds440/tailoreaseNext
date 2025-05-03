@@ -10,6 +10,7 @@ import {
   query,
   where,
   getDocs,
+  limit,
 } from "firebase/firestore";
 
 import { ClipLoader } from "react-spinners";
@@ -19,6 +20,7 @@ import UserContext from "@/utils/UserContext";
 import Link from "next/link";
 import UpdateTailorRating from "@/components/UpdateTailorRating";
 import DialogBox from "@/components/DialogBox";
+import { motion } from "framer-motion";
 
 const TailorProfile = () => {
   const [tailorData, setTailorData] = useState(null);
@@ -43,6 +45,9 @@ const TailorProfile = () => {
     message: "",
   });
   const [fetchedReviews, setFetchedReviews] = useState([]);
+  const [orderStats, setOrderStats] = useState(null);
+  const [topProducts, setTopProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   const [showDialog, setShowDialog] = useState(false);
   const [dialogBoxInfo, setDialogBoxInfo] = useState({
@@ -62,7 +67,8 @@ const TailorProfile = () => {
         const docSnap = await getDoc(tailorDocRef);
 
         if (docSnap.exists()) {
-          setTailorData(docSnap.data());
+          const data = docSnap.data();
+          setTailorData(data);
 
           // Fetch reviews related to this tailor
           const reviewsRef = collection(db, "tailor_reviews");
@@ -97,6 +103,96 @@ const TailorProfile = () => {
           await Promise.all(userPromises);
 
           setFetchedReviews(reviewsData);
+
+          // Fetch order statistics and top products
+          const fetchOrderData = async () => {
+            const ordersQuery = query(
+              collection(db, "OrdersManagement"),
+              where("tailorId", "==", id)
+            );
+            const ordersSnapshot = await getDocs(ordersQuery);
+            
+            let inQueue = 0;
+            let active = 0;
+            let successful = 0;
+            let cancelled = 0;
+            const productCounts = {};
+
+            ordersSnapshot.forEach((doc) => {
+              const order = doc.data();
+              switch (order.orderStatus) {
+                case "paymentVerificationPending":
+                  inQueue++;
+                  break;
+                case "startedStichting":
+                  active++;
+                  break;
+                case "delivered":
+                  successful++;
+                  // Count products for delivered orders
+                  if (order.products && Array.isArray(order.products)) {
+                    order.products.forEach(product => {
+                      if (product.productId) {
+                        productCounts[product.productId] = 
+                          (productCounts[product.productId] || 0) + 1;
+                      }
+                    });
+                  }
+                  break;
+                case "cancelled":
+                  cancelled++;
+                  break;
+              }
+            });
+
+            setOrderStats({
+              inQueue,
+              active,
+              successful,
+              cancelled
+            });
+
+            // Get top 3 product IDs by count
+            const sortedProductIds = Object.entries(productCounts)
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 3)
+              .map(item => item[0]);
+
+            // Fetch product details for top products
+            if (sortedProductIds.length > 0) {
+              const productsQuery = query(
+                collection(db, "tailorProducts"),
+                where("__name__", "in", sortedProductIds)
+              );
+              const productsSnapshot = await getDocs(productsQuery);
+              const productsData = productsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+              }));
+              // Sort the products to match the order of sortedProductIds
+              const sortedProducts = sortedProductIds.map(id => 
+                productsData.find(p => p.id === id)
+              ).filter(Boolean);
+              setTopProducts(sortedProducts);
+            } else {
+              // If no delivered products, get any 3 active products from this tailor
+              const fallbackQuery = query(
+                collection(db, "tailorProducts"),
+                where("tailorId", "==", id),
+                where("isActive", "==", true),
+                limit(3)
+              );
+              const fallbackSnapshot = await getDocs(fallbackQuery);
+              const fallbackData = fallbackSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+              }));
+              setTopProducts(fallbackData);
+            }
+            setLoadingProducts(false);
+          };
+
+          fetchOrderData();
         } else {
           setShowMessage({
             type: "info",
@@ -181,7 +277,7 @@ const TailorProfile = () => {
       setFetchedReviews((prev) => [
         ...prev,
         {
-          stars: rating, // whatever stars value you have
+          stars: rating,
           message: userReview,
           user_id: userData.uid,
           tailor_id: tailorData.id,
@@ -242,11 +338,11 @@ const TailorProfile = () => {
               "/images/profile/business/default.png"
             }
             alt={tailorData.businessName || "Business Name"}
-            width={256} // 16rem = 256px
+            width={256}
             height={256}
             className={`object-cover rounded-lg lg:rounded-xl shadow-md max-h-40 border ${theme.colorBorder}`}
             placeholder="blur"
-            blurDataURL="/images/profile/business/default.png" // For fallback blur effect
+            blurDataURL="/images/profile/business/default.png"
           />
           <div className="flex w-full flex-col mt-4 sm:mt-0">
             <div className="flex w-full justify-between items-center mb-6">
@@ -283,6 +379,122 @@ const TailorProfile = () => {
             </div>
           </div>
         </div>
+
+        {/* Order Statistics Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+        >
+          <div className={`p-4 rounded-lg shadow-md ${theme.colorBgSecondary} flex flex-col items-center`}>
+            <div className="flex items-center mb-2">
+              <i className="fas fa-clock text-blue-500 text-xl mr-2"></i>
+              <span className="text-lg font-semibold">Orders In Queue</span>
+            </div>
+            <span className="text-3xl font-bold">
+              {orderStats?.inQueue || 0}
+            </span>
+          </div>
+          
+          <div className={`p-4 rounded-lg shadow-md ${theme.colorBgSecondary} flex flex-col items-center`}>
+            <div className="flex items-center mb-2">
+              <i className="fas fa-tools text-yellow-500 text-xl mr-2"></i>
+              <span className="text-lg font-semibold">Active Orders</span>
+            </div>
+            <span className="text-3xl font-bold">
+              {orderStats?.active || 0}
+            </span>
+          </div>
+          
+          <div className={`p-4 rounded-lg shadow-md ${theme.colorBgSecondary} flex flex-col items-center`}>
+            <div className="flex items-center mb-2">
+              <i className="fas fa-check-circle text-green-500 text-xl mr-2"></i>
+              <span className="text-lg font-semibold">Successful Orders</span>
+            </div>
+            <span className="text-3xl font-bold">
+              {orderStats?.successful || 0}
+            </span>
+          </div>
+          
+          <div className={`p-4 rounded-lg shadow-md ${theme.colorBgSecondary} flex flex-col items-center`}>
+            <div className="flex items-center mb-2">
+              <i className="fas fa-times-circle text-red-500 text-xl mr-2"></i>
+              <span className="text-lg font-semibold">Cancelled Orders</span>
+            </div>
+            <span className="text-3xl font-bold">
+              {orderStats?.cancelled || 0}
+            </span>
+          </div>
+        </motion.div>
+
+        {/* Top Selling Products Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mb-8"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h2 className={`text-2xl font-bold ${theme.colorText}`}>
+              {topProducts.length > 0 ? "Top Selling Products" : "Featured Products"}
+            </h2>
+            <Link href={`/market?tailor=${id}`}>
+              <button className={`px-4 py-2 rounded-lg ${theme.hoverBg} ${theme.colorText} flex items-center`}>
+                <i className="fas fa-eye mr-2"></i>
+                See All Products
+              </button>
+            </Link>
+          </div>
+
+          {loadingProducts ? (
+            <div className="flex justify-center items-center h-40">
+              <ClipLoader size={40} color="#ffffff" />
+            </div>
+          ) : topProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {topProducts.map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className={`rounded-lg overflow-hidden border ${theme.colorBorder} ${theme.hoverShadow} cursor-pointer`}
+                  onClick={() => router.push(`/market/product?id=${product.id}`)}
+                >
+                  <div className="relative h-48 w-full">
+                    <Image
+                      src={
+                        product.baseProductData?.imageUrl ||
+                        "/images/default-product.png"
+                      }
+                      alt={product.baseProductData?.name || "Product"}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                    />
+                  </div>
+                  <div className={`p-4 ${theme.colorBg}`}>
+                    <h3 className={`font-semibold ${theme.colorText}`}>
+                      {product.baseProductData?.name || "Unnamed Product"}
+                    </h3>
+                    <p className={`text-sm mt-1 ${theme.colorText} opacity-80`}>
+                      {product.baseProductData?.category || "Uncategorized"}
+                    </p>
+                    <p className={`mt-2 font-bold ${theme.colorText}`}>
+                      PKR {product.price?.toLocaleString("en-PK") || "0"}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className={`p-8 text-center rounded-lg ${theme.colorBgSecondary}`}>
+              <i className={`fas fa-tshirt text-4xl mb-4 ${theme.colorText} opacity-50`}></i>
+              <p className={`${theme.colorText}`}>No products available yet</p>
+            </div>
+          )}
+        </motion.div>
 
         <div className="mb-6">
           <p className={`text-xl mb-2 border-b-[1px] pb-1 font-semibold `}>
