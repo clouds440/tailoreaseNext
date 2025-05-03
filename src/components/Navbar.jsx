@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect, useRef, act } from "react";
 import Logo from "./Logo";
 import SimpleButton from "./SimpleButton";
 import { auth } from "@/utils/firebaseConfig";
@@ -34,10 +34,18 @@ const Navbar = () => {
   const [profileComplete, setProfileComplete] = useState(true);
   const [windowWidth, setWindowWidth] = useState(undefined);
   const [windowHeight, setWindowHeight] = useState(undefined);
+  const [selectedTab, setSelectedTab] = useState(null);
 
   const dropdownRef = useRef(null);
   const router = useRouter();
 
+  useEffect(() => {
+    if (activeDashboard === "user") {
+      setSelectedTab("Dashboard");
+    } else {
+      setSelectedTab("Profile");
+    }
+  }, [activeDashboard]);
   // Check if user is a verified tailor
   useEffect(() => {
     const checkTailorStatus = async () => {
@@ -221,6 +229,7 @@ const Navbar = () => {
       icon: <i className="fas fa-sign-in-alt fa-fw" />,
       onClick: () => {
         router.replace("/login");
+        setSelectedTab("Login");
         setDropdownOpen(false);
       },
     },
@@ -232,12 +241,16 @@ const Navbar = () => {
     {
       text: "Logout",
       icon: <i className="fas fa-sign-out-alt fa-fw text-red-700" />,
-      onClick: handleLogout,
+      onClick: () => {
+        handleLogout();
+        setSelectedTab("Login");
+      },
     },
     {
       text: "Settings",
       icon: <i className="fas fa-cog fa-fw" />,
       onClick: () => {
+        setSelectedTab("Settings");
         router.replace("/settings");
         setDropdownOpen(false);
       },
@@ -261,6 +274,7 @@ const Navbar = () => {
       text: "Settings",
       icon: <i className="fas fa-cog fa-fw" />,
       onClick: () => {
+        setSelectedTab("Settings");
         router.replace("/settings");
         setDropdownOpen(false);
       },
@@ -394,6 +408,9 @@ const Navbar = () => {
             >
               <Logo
                 classes={`md:my-5 my-1 max-w-16 md:max-w-full items-center justify-center`}
+                onClick={() => {
+                  setSelectedTab(null);
+                }}
               />
               {userLoggedIn ? (
                 <div className="py-1 mt-3 text-center mx-3 sm:mx-5 md:mx-0 select-none">
@@ -420,8 +437,13 @@ const Navbar = () => {
                 {navItems.map((item, index) => (
                   <li
                     key={index}
-                    onClick={() => router.replace(item.path)}
-                    className={linkStyles}
+                    onClick={() => {
+                      router.replace(item.path);
+                      setSelectedTab(item.label);
+                    }}
+                    className={`${linkStyles} ${
+                      selectedTab === item.label ? theme.colorBg : ""
+                    }`}
                   >
                     <span className="text-lg mr-2">{item.icon}</span>
                     <span className={"hidden md:inline-block"}>
@@ -487,7 +509,7 @@ const Navbar = () => {
                   onClick={option.onClick}
                   className={`justify-between ${linkStyles} ${
                     theme?.colorText || ""
-                  }`}
+                  } ${selectedTab === option.text ? theme.colorBg : ""}`}
                 >
                   <span className="text-lg mr-2">{option.icon}</span>
                   <span>{option.text}</span>

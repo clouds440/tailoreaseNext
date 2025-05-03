@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 
-const Logo = ({ classes }) => {
+const Logo = ({ onClick, classes }) => {
   return (
-    <div className={`flex select-none ${classes}`}>
+    <div className={`flex select-none ${classes}`} onClick={onClick}>
       <Link href={"/"}>
         <span className="flex">
           <Image
