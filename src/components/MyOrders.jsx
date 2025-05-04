@@ -29,43 +29,37 @@ const MyOrders = () => {
       icon: "hourglass-half",
       color: "bg-yellow-500",
       description: "We're verifying your payment details",
-    },
-    paymentVerified: {
+  },
+  paymentVerified: {
       title: "Payment Verified",
       icon: "check-circle",
       color: "bg-green-500",
       description: "Your payment has been confirmed",
-    },
-    paymentRejected: {
-      title: "Payment Rejected",
-      icon: "times-circle",
-      color: "bg-red-500",
-      description: "Payment verification failed",
-    },
-    startedStichting: {
+  },
+  startedStichting: {
       title: "Stitching Started",
       icon: "cut",
       color: "bg-blue-500",
       description: "Tailor has started working on your order",
-    },
-    onDelivery: {
+  },
+  onDelivery: {
       title: "On Delivery",
       icon: "truck",
       color: "bg-purple-500",
       description: "Your order is on its way",
-    },
-    delivered: {
+  },
+  delivered: {
       title: "Delivered",
       icon: "box-open",
       color: "bg-green-600",
       description: "Order has been delivered",
-    },
-    cancelled: {
+  },
+  cancelled: {
       title: "Cancelled",
       icon: "ban",
       color: "bg-gray-500",
       description: "Order was cancelled",
-    },
+  }
   };
 
   // Status progression for the timeline
