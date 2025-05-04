@@ -357,7 +357,7 @@ const Navbar = () => {
       label: "Products",
     },
     {
-      path: "/orders",
+      path: "/business-dashboard/orders",
       icon: <i className="fas fa-clipboard-list" />,
       label: "Orders",
     },
