@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useContext } from "react";
-import { db, auth } from "@/utils/firebaseConfig";
+import { db } from "@/utils/firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import UserContext from "@/utils/UserContext";
 import { ClipLoader } from "react-spinners";

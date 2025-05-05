@@ -6,6 +6,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import UserContext from "@/utils/UserContext";
 import BodyMeasurements from "@/components/BodyMeasurements";
 import UserProfile from "@/components/UserProfile";
+import { db } from "@/utils/firebaseConfig";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 // Lazy-loaded views for dashboard tabs
 const MyOrders = lazy(() => import("@/components/MyOrders"));
@@ -28,6 +30,7 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isNavOpen, setIsNavOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [editAuthShareMode, setEditAuthShareMode] = useState(false);
 
   // If not in shared mode, ensure the user is logged in; if not, redirect to login page.
   useEffect(() => {
@@ -52,6 +55,30 @@ const UserDashboard = () => {
       router.replace(`/user?tab=${activeTab}`);
     }
   }, [activeTab, router, isSharedMode]);
+
+  useEffect(() => {
+    const fetchEditMeasurementsAuth = async () => {
+      try {
+        const q = query(
+          collection(db, "userTailorConnections"),
+          where("tailorId", "==", userData.bId),
+          where("userId", "==", sharedId)
+        );
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          setEditAuthShareMode(true);
+        } else {
+          console.log("No matching document found.");
+        }
+      } catch (error) {
+        console.error("Error fetching connection:", error);
+      }
+    };
+
+    if (isSharedMode && userData?.bId) {
+      fetchEditMeasurementsAuth();
+    }
+  }, [isSharedMode, userData?.bId, sharedId]);
 
   // Render content based on active tab in dashboard mode
   const renderContent = () => {
@@ -88,8 +115,7 @@ const UserDashboard = () => {
           className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
         >
           <UserProfile uid={sharedId} />
-          {/* Here, the autorization will be provided when the user has added the viewer (tailor) in "My tailors" (uses database) */}
-          <BodyMeasurements uid={sharedId} />
+          <BodyMeasurements uid={sharedId} authorization={editAuthShareMode} />
         </div>
       </div>
     );
