@@ -419,7 +419,10 @@ const Navbar = () => {
               ) : (
                 <div className="flex items-center justify-center">
                   <SimpleButton
-                    onClick={() => router.replace("/login")}
+                    onClick={() => {
+                      router.replace("/login");
+                      setSelectedTab("Login");
+                    }}
                     btnText={"Log In"}
                     type={"simple"}
                     extraclasses="w-full mx-2"

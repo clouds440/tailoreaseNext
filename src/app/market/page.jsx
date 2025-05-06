@@ -298,8 +298,23 @@ const Market = () => {
     if (!selectedProduct) return;
     // Before navigating
     sessionStorage.setItem("product", JSON.stringify(product));
-    const category =
-      selectedProduct.baseProductData?.category?.toLowerCase() || "shirt";
+    const formatCategory = (str = "") => {
+      const words = str.trim().split(/\s+/);
+      if (words.length === 1) {
+        return words[0].toLowerCase();
+      }
+      return words
+        .map((word, index) =>
+          index === 0
+            ? word.toLowerCase()
+            : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join("");
+    };
+
+    const category = formatCategory(
+      selectedProduct.baseProductData?.category || "shirt"
+    );
     router.push(`/outfit-customization?outfit=${category}`);
   };
 
@@ -312,12 +327,12 @@ const Market = () => {
       setPopUpMessageTrigger(true);
       return;
     }
-    
+
     const productWithEmptyLink = {
       ...selectedProduct,
-      customizedProductLink: "" 
+      customizedProductLink: "",
     };
-    
+
     setSelectedProduct(productWithEmptyLink);
     setShowAddToCart(true);
   };

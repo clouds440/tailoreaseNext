@@ -253,11 +253,12 @@ const OutfitCustomization = () => {
   }, [measurements, userLoggedIn, shareId, morphTargets, userData?.uid]);
 
   useEffect(() => {
-    setProduct(JSON.parse(sessionStorage.getItem("product")));
-    if (product) {
+    const p = JSON.parse(sessionStorage.getItem("product"));
+    if (p) {
+      setProduct(p);
       setShowActionButtons(true);
     }
-  }, [product]);
+  }, []);
 
   const { uploadImage } = useImageUpload();
 
