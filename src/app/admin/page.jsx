@@ -26,7 +26,13 @@ import UserContext from "@/utils/UserContext";
 import ImageCropper from "@/components/ImageCropper";
 
 const AdminDashboard = () => {
-  const { theme, inputStyles, placeHolderStyles, setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
+  const {
+    theme,
+    inputStyles,
+    placeHolderStyles,
+    setShowMessage,
+    setPopUpMessageTrigger,
+  } = useContext(UserContext);
 
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -165,7 +171,7 @@ const AdminDashboard = () => {
       }
 
       const orderRef = doc(db, "OrdersManagement", orderId);
-      
+
       if (action === "approve") {
         // First create the user-tailor connection
         const connectionCreated = await createUserTailorConnection(
@@ -184,7 +190,10 @@ const AdminDashboard = () => {
           updatedAt: new Date().toISOString(),
         });
 
-        showAlert("success", "Payment verified and user-tailor connection created");
+        showAlert(
+          "success",
+          "Payment verified and user-tailor connection created"
+        );
       } else {
         await updateDoc(orderRef, {
           orderStatus: "paymentRejected",
@@ -358,7 +367,7 @@ const AdminDashboard = () => {
                   placeholder=" "
                   required
                 />
-                <label className={`${placeHolderStyles}`}>Username</label>
+                <label className={`${placeHolderStyles} ml-9`}>Username</label>
               </div>
 
               <div className="relative">
@@ -373,7 +382,7 @@ const AdminDashboard = () => {
                   placeholder=" "
                   required
                 />
-                <label className={`${placeHolderStyles}`}>Password</label>
+                <label className={`${placeHolderStyles} ml-9`}>Password</label>
               </div>
             </div>
 
