@@ -54,6 +54,18 @@ const TailorApplicationForm = ({ onNext }) => {
       return;
     }
 
+    if (
+      formData.businessPhone.length < 7 ||
+      formData.businessPhone.length > 10
+    ) {
+      setShowMessage({
+        type: "warning",
+        message: "Please enter a valid business phone number",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+
     if (formData.businessPhone.startsWith("0")) {
       setShowMessage({
         type: "warning",
