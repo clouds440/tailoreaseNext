@@ -28,6 +28,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import SimpleButton from "@/components/SimpleButton";
 import ContentSlider from "@/components/ContentSlider";
 import ShareLinkDialog from "@/components/ShareLinkDialog";
+import Footer from "@/components/Footer";
 
 const ProductPage = () => {
   const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
@@ -101,6 +102,8 @@ const ProductPage = () => {
   const inc = () => setQuantity((q) => Math.min(10, q + 1));
   const dec = () => setQuantity((q) => Math.max(1, q - 1));
 
+  console.log(relatedProducts);
+
   if (loading)
     return (
       <div
@@ -171,7 +174,7 @@ const ProductPage = () => {
   return (
     <div className="h-full overflow-y-auto">
       <div
-        className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-t-lg select-none ${theme.mainTheme}`}
       >
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -318,7 +321,7 @@ const ProductPage = () => {
           </div>
         </motion.div>
 
-        {relatedProducts && (
+        {relatedProducts && relatedProducts.length > 0 && (
           <div className="mt-10 pt-12">
             <div>
               <span className="font-bold text-xl">Related Products</span>
@@ -327,6 +330,7 @@ const ProductPage = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

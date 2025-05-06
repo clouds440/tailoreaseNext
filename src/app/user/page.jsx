@@ -8,6 +8,7 @@ import BodyMeasurements from "@/components/BodyMeasurements";
 import UserProfile from "@/components/UserProfile";
 import { db } from "@/utils/firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import Footer from "@/components/Footer";
 
 // Lazy-loaded views for dashboard tabs
 const MyOrders = lazy(() => import("@/components/MyOrders"));
@@ -125,7 +126,7 @@ const UserDashboard = () => {
   return (
     <div className="h-full overflow-y-auto">
       <div
-        className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto min-h-screen p-6 rounded-lg select-none ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto min-h-screen p-6 rounded-t-lg select-none ${theme.mainTheme}`}
       >
         {/* Top Navbar */}
         <div
@@ -204,6 +205,7 @@ const UserDashboard = () => {
           </Suspense>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

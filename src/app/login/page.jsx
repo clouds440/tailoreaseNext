@@ -11,6 +11,7 @@ import UserContext from "@/utils/UserContext";
 import { BarLoader } from "react-spinners";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import Footer from "@/components/Footer";
 
 const LoginForm = () => {
   const {
@@ -144,9 +145,9 @@ const LoginForm = () => {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-lg select-none">
+      <div className="max-w-[99.5%] mx-auto flex items-center justify-center w-auto rounded-t-lg select-none">
         <div
-          className={`p-6 h-full rounded-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
+          className={`p-6 h-full rounded-t-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
         >
           <div className="w-full md:w-1/2 h-auto flex justify-center md:justify-start">
             <Image
@@ -237,6 +238,7 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

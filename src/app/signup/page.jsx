@@ -10,6 +10,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import Image from "next/image";
 import OptionSelector from "@/components/OptionSelector";
+import Footer from "@/components/Footer";
 
 const SignUpForm = () => {
   const {
@@ -203,9 +204,9 @@ const SignUpForm = () => {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="max-w-[99.5%] min-h-[97%] mx-auto flex items-center justify-center w-auto p-6 rounded-lg select-none">
+      <div className="max-w-[99.5%] mx-auto flex items-center justify-center w-auto rounded-t-lg select-none">
         <div
-          className={`p-6 min-h-full rounded-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
+          className={`p-6 min-h-full rounded-t-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
         >
           <div className="w-full md:w-1/2 h-auto flex justify-center md:justify-start">
             <Image
@@ -352,6 +353,7 @@ const SignUpForm = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

@@ -20,6 +20,7 @@ import {
 } from "firebase/firestore";
 import { sendEmailVerification } from "firebase/auth";
 import SimpleButton from "@/components/SimpleButton";
+import Footer from "@/components/Footer";
 
 const BecomeTailor = () => {
   const [step, setStep] = useState(1);
@@ -321,6 +322,9 @@ const BecomeTailor = () => {
           isLoading={isLoading}
         />
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

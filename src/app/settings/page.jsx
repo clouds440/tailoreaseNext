@@ -29,6 +29,7 @@ import {
 } from "../../../public/icons/svgIcons";
 import SimpleButton from "@/components/SimpleButton";
 import DialogBox from "@/components/DialogBox";
+import Footer from "@/components/Footer";
 
 function AccountSettings() {
   const {
@@ -252,7 +253,7 @@ function AccountSettings() {
   return (
     <div className="h-full overflow-y-auto">
       <div
-        className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-lg select-none ${theme.mainTheme}`}
+        className={`max-w-[99.5%] mx-auto mt-4 mb-14 md:my-1 w-auto p-6 rounded-t-lg select-none ${theme.mainTheme}`}
       >
         <h2
           className={`flex text-2xl font-bold mb-6 pt-6 border-b ${theme.colorBorder}`}
@@ -480,6 +481,7 @@ function AccountSettings() {
           />
         )}
       </div>
+      <Footer />
     </div>
   );
 }

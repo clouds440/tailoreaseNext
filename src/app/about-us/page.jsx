@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { motion } from "framer-motion";
 import UserContext from "@/utils/UserContext";
 import Image from "next/image";
+import Footer from "@/components/Footer";
 
 const AboutUs = () => {
   const { theme } = useContext(UserContext);
@@ -14,9 +15,9 @@ const AboutUs = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
-    }
+        delayChildren: 0.3,
+      },
+    },
   };
 
   const itemVariants = {
@@ -27,15 +28,15 @@ const AboutUs = () => {
       transition: {
         type: "spring",
         stiffness: 100,
-        damping: 10
-      }
-    }
+        damping: 10,
+      },
+    },
   };
 
   const cardVariants = {
     offscreen: {
       y: 100,
-      opacity: 0
+      opacity: 0,
     },
     onscreen: {
       y: 0,
@@ -43,9 +44,9 @@ const AboutUs = () => {
       transition: {
         type: "spring",
         bounce: 0.4,
-        duration: 0.8
-      }
-    }
+        duration: 0.8,
+      },
+    },
   };
 
   const sections = [
@@ -57,8 +58,8 @@ const AboutUs = () => {
         "Personalized recommendations and services",
         "Accurate measurements with 3D visualization tools",
         "Enhanced communication and transparency",
-        "Streamlined processes for tailors and customers"
-      ]
+        "Streamlined processes for tailors and customers",
+      ],
     },
     {
       title: "Our Achievements",
@@ -68,8 +69,8 @@ const AboutUs = () => {
         "Connected hundreds of tailors with loyal customers",
         "97% positive feedback from our user base",
         "Thousands of customized garments delivered",
-        "Recognized as a leading innovator in online tailoring"
-      ]
+        "Recognized as a leading innovator in online tailoring",
+      ],
     },
     {
       title: "Why Choose Us",
@@ -79,9 +80,9 @@ const AboutUs = () => {
         "Seamless and secure payment methods",
         "Dedicated support team ensuring satisfaction",
         "Transparent processes with real-time tracking",
-        "Empowering tailors with efficient business tools"
-      ]
-    }
+        "Empowering tailors with efficient business tools",
+      ],
+    },
   ];
 
   const teamMembers = [
@@ -90,28 +91,28 @@ const AboutUs = () => {
       role: "Team Lead / Project Manager",
       email: "zahidahmad440@gmail.com",
       image: "/team_data/zahid.jpg",
-      quote: "Passion drives perfection."
+      quote: "Passion drives perfection.",
     },
     {
       name: "Syed Ali Abbas Naqvi",
       role: "Co-Founder / Designer",
       email: "developwithaliabbas@gmail.com",
       image: "/team_data/ali.jpg",
-      quote: "Design is intelligence made visible."
+      quote: "Design is intelligence made visible.",
     },
     {
       name: "Abdul Rehman",
       role: "Documenter / Internal System Designer",
       email: "abdulrehman@example.com",
       image: "/team_data/abdul_rehman.jpg",
-      quote: "Precision in documentation leads to excellence."
-    }
+      quote: "Precision in documentation leads to excellence.",
+    },
   ];
 
   return (
     <div className={`${theme.mainTheme} h-full w-full overflow-auto`}>
       {/* Hero Section */}
-      <motion.section 
+      <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -119,7 +120,7 @@ const AboutUs = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
-          <motion.h1 
+          <motion.h1
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", stiffness: 100 }}
@@ -139,7 +140,7 @@ const AboutUs = () => {
       </motion.section>
 
       {/* Mission Section */}
-      <motion.section 
+      <motion.section
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
@@ -169,12 +170,14 @@ const AboutUs = () => {
               className={`${theme.colorBg} p-8 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300`}
             >
               <div className="text-center mb-6">
-                <i className={`fas fa-${section.icon} text-4xl mb-4 text-blue-500`}></i>
+                <i
+                  className={`fas fa-${section.icon} text-4xl mb-4 text-blue-500`}
+                ></i>
                 <h3 className="text-2xl font-bold mb-4">{section.title}</h3>
               </div>
               <ul className="space-y-4">
                 {section.items.map((item, i) => (
-                  <motion.li 
+                  <motion.li
                     key={i}
                     initial={{ x: -20, opacity: 0 }}
                     whileInView={{ x: 0, opacity: 1 }}
@@ -194,7 +197,7 @@ const AboutUs = () => {
 
       {/* Team Section */}
       <section className="py-16 px-4 md:px-16 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-gray-800/50 dark:to-gray-900/50">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -202,7 +205,9 @@ const AboutUs = () => {
         >
           <div className="text-center mb-16">
             <i className="fas fa-users text-4xl text-purple-500 mb-4"></i>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Meet Our Team</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Meet Our Team
+            </h2>
             <p className="text-lg max-w-2xl mx-auto">
               The brilliant minds behind TailorEase&apos;s success
             </p>
@@ -227,7 +232,9 @@ const AboutUs = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                   <div className="absolute bottom-4 left-4">
-                    <h3 className="text-2xl font-bold text-white">{member.name}</h3>
+                    <h3 className="text-2xl font-bold text-white">
+                      {member.name}
+                    </h3>
                     <p className="text-blue-200">{member.role}</p>
                   </div>
                 </div>
@@ -239,8 +246,8 @@ const AboutUs = () => {
                   )}
                   <div className="flex items-center mt-4">
                     <i className="fas fa-envelope mr-2 text-blue-500"></i>
-                    <a 
-                      href={`mailto:${member.email}`} 
+                    <a
+                      href={`mailto:${member.email}`}
                       className="hover:text-blue-600 transition-colors"
                     >
                       {member.email}
@@ -265,16 +272,19 @@ const AboutUs = () => {
       </section>
 
       {/* CTA Section */}
-      <motion.section 
+      <motion.section
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         className="py-20 px-4 md:px-16 text-center"
       >
         <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-8 md:p-12 shadow-2xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Transform Your Tailoring Experience?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Ready to Transform Your Tailoring Experience?
+          </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join thousands of satisfied customers and tailors who are already revolutionizing their craft with TailorEase.
+            Join thousands of satisfied customers and tailors who are already
+            revolutionizing their craft with TailorEase.
           </p>
           <motion.a
             href="/contact-us"
@@ -288,11 +298,7 @@ const AboutUs = () => {
       </motion.section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 text-center">
-        <p className="text-gray-600 dark:text-gray-300">
-          © {new Date().getFullYear()} TailorEase. All rights reserved.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 };
