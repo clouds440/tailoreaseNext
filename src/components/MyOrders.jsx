@@ -8,11 +8,15 @@ import {
   getDocs,
   doc,
   getDoc,
+  addDoc,
+  updateDoc,
+  setDoc,
 } from "firebase/firestore";
 import UserContext from "@/utils/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClipLoader } from "react-spinners";
 import Image from "next/image";
+import axios from "axios";
 
 const MyOrders = () => {
   const { theme, userData } = useContext(UserContext);
@@ -21,6 +25,10 @@ const MyOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchActive, setSearchActive] = useState(false);
+  const [sortOrder, setSortOrder] = useState("newest");
+  const [productRatings, setProductRatings] = useState({});
+  const [productReviews, setProductReviews] = useState({});
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   // Order status configuration
   const statusConfig = {
@@ -119,10 +127,13 @@ const MyOrders = () => {
           });
         }
 
-        // Sort orders by date (newest first)
-        ordersData.sort(
-          (a, b) => new Date(b.placedOnDate) - new Date(a.placedOnDate)
-        );
+        // Sort orders based on selected sort order
+        ordersData.sort((a, b) => {
+          const dateA = new Date(a.placedOnDate);
+          const dateB = new Date(b.placedOnDate);
+          return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+        });
+
         setOrders(ordersData);
 
         // Select the first order by default if available
@@ -137,7 +148,57 @@ const MyOrders = () => {
     };
 
     fetchOrders();
-  }, [userData?.uid]);
+  }, [userData?.uid, sortOrder]);
+
+  // Fetch product ratings and reviews when selected order changes
+  useEffect(() => {
+    const fetchProductRatingsAndReviews = async () => {
+      if (!selectedOrder || selectedOrder.orderStatus !== "delivered") return;
+
+      const ratings = {};
+      const reviews = {};
+
+      // Fetch ratings and reviews for each product in the order
+      for (const product of selectedOrder.products) {
+        if (!product.productId) continue;
+
+        try {
+          // Fetch product rating
+          const ratingDocRef = doc(db, "productRatings", product.productId);
+          const ratingDocSnap = await getDoc(ratingDocRef);
+
+          if (ratingDocSnap.exists()) {
+            ratings[product.productId] = ratingDocSnap.data();
+          } else {
+            ratings[product.productId] = {
+              productId: product.productId,
+              totalRating: 0,
+              rating: 0,
+            };
+          }
+
+          // Fetch user's review for this product
+          const reviewsQuery = query(
+            collection(db, "productReviews"),
+            where("productId", "==", product.productId),
+            where("userId", "==", userData.uid)
+          );
+          const reviewsSnapshot = await getDocs(reviewsQuery);
+
+          if (!reviewsSnapshot.empty) {
+            reviews[product.productId] = reviewsSnapshot.docs[0].data();
+          }
+        } catch (error) {
+          console.error("Error fetching product ratings/reviews:", error);
+        }
+      }
+
+      setProductRatings(ratings);
+      setProductReviews(reviews);
+    };
+
+    fetchProductRatingsAndReviews();
+  }, [selectedOrder, userData?.uid]);
 
   // Toggle search bar
   const toggleSearch = () => {
@@ -151,7 +212,6 @@ const MyOrders = () => {
   const filteredOrders = orders.filter(
     (order) =>
       order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.orderStatus.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.tailorDetails?.businessName
         ?.toLowerCase()
         .includes(searchQuery.toLowerCase())
@@ -193,6 +253,103 @@ const MyOrders = () => {
     return statusProgression.indexOf(status);
   };
 
+  // Handle submitting a product review
+  const handleSubmitReview = async (productId, stars, message) => {
+    if (!userData?.uid || !selectedOrder || !productId || stars === 0) return;
+
+    setIsSubmittingReview(true);
+
+    try {
+      // Step 1: Store the review in "productReviews"
+      const reviewData = {
+        productId,
+        userId: userData.uid,
+        stars,
+        message,
+        createdAt: new Date().toISOString(),
+      };
+
+      // Check if user already reviewed this product
+      const reviewsQuery = query(
+        collection(db, "productReviews"),
+        where("productId", "==", productId),
+        where("userId", "==", userData.uid)
+      );
+      const querySnapshot = await getDocs(reviewsQuery);
+
+      if (!querySnapshot.empty) {
+        console.log("User already reviewed this product");
+        setIsSubmittingReview(false);
+        return;
+      }
+
+      // Add the new review
+      await addDoc(collection(db, "productReviews"), reviewData);
+
+      // Step 2: Analyze sentiment score using API
+      const options = {
+        method: "GET",
+        url: "https://twinword-sentiment-analysis.p.rapidapi.com/analyze/",
+        params: {
+          text: message,
+        },
+        headers: {
+          "x-rapidapi-key": process.env.NEXT_PUBLIC_RAPIDAPI_KEY,
+          "x-rapidapi-host": process.env.NEXT_PUBLIC_RAPIDAPI_HOST,
+        },
+      };
+
+      const response = await axios.request(options);
+      const sentimentScore = response.data.score;
+
+      // Step 3: Update product rating in "productRatings"
+      const ratingDocRef = doc(db, "productRatings", productId);
+      const ratingDocSnap = await getDoc(ratingDocRef);
+
+      if (ratingDocSnap.exists()) {
+        // Update existing rating
+        const currentData = ratingDocSnap.data();
+        const updatedRating = currentData.rating + stars + sentimentScore;
+        const updatedTotalRating = currentData.totalRating + 6;
+
+        await updateDoc(ratingDocRef, {
+          rating: updatedRating,
+          totalRating: updatedTotalRating,
+        });
+      } else {
+        // Create new rating document
+        await setDoc(ratingDocRef, {
+          productId,
+          rating: stars + sentimentScore,
+          totalRating: 6,
+        });
+      }
+
+      // Update local state
+      setProductReviews((prev) => ({
+        ...prev,
+        [productId]: { stars, message },
+      }));
+
+      setProductRatings((prev) => {
+        const currentRating = prev[productId]?.rating || 0;
+        const currentTotalRating = prev[productId]?.totalRating || 0;
+        return {
+          ...prev,
+          [productId]: {
+            productId,
+            rating: currentRating + stars + sentimentScore,
+            totalRating: currentTotalRating + 6,
+          },
+        };
+      });
+    } catch (error) {
+      console.error("Error submitting review:", error);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
   return (
     <div className={`h-full overflow-y-auto ${theme.mainTheme}`}>
       <div className="max-w-[99.5%] mx-auto my-4 md:my-1 h-full select-none p-4">
@@ -203,6 +360,21 @@ const MyOrders = () => {
             </h2>
 
             <div className="flex items-center gap-4">
+              {/* Sort Dropdown */}
+              <div className="relative">
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className={`appearance-none p-2 pr-8 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer`}
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                </select>
+                <i
+                  className={`fas fa-chevron-down absolute right-3 top-3 ${theme.iconColor} pointer-events-none`}
+                ></i>
+              </div>
+
               {/* Search Bar */}
               <div
                 className={`relative transition-all duration-300 ${
@@ -220,7 +392,7 @@ const MyOrders = () => {
                     ></i>
                     <input
                       type="text"
-                      placeholder="Search orders..."
+                      placeholder="Search by order ID or tailor..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className={`w-full p-2 pl-10 pr-8 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
@@ -278,8 +450,8 @@ const MyOrders = () => {
                       onClick={() => setSelectedOrder(order)}
                       className={`p-4 rounded-lg cursor-pointer transition-all ${
                         selectedOrder?.id === order.id
-                          ? `${theme.hoverBg} bg-opacity-50 border-l-4 border-blue-500`
-                          : `${theme.colorBg}`
+                          ? `${theme.colorBg} border-l-4 border-blue-500`
+                          : `${theme.hoverBg} bg-opacity-50`
                       } ${theme.colorBorder} border`}
                     >
                       <div className="flex justify-between items-start">
@@ -293,6 +465,17 @@ const MyOrders = () => {
                             {formatDate(order.placedOnDate)}
                           </p>
                         </div>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            statusConfig[order.orderStatus]?.color ||
+                            "bg-gray-500"
+                          } text-white`}
+                        >
+                          {order.orderStatus === "paymentVerificationPending"
+                            ? "Payment Pending"
+                            : statusConfig[order.orderStatus]?.title ||
+                              order.orderStatus}
+                        </span>
                       </div>
                       <div className="flex items-center mt-2">
                         {order.tailorDetails?.businessPictureUrl && (
@@ -478,45 +661,92 @@ const MyOrders = () => {
                         )
                       </h4>
                       <div className="space-y-3">
-                        {selectedOrder.products?.map((product, idx) => (
-                          <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                            className={`flex gap-3 p-3 rounded-lg ${theme.colorBgSecondary}`}
-                          >
-                            <div className="relative w-16 h-16 rounded-md overflow-hidden">
-                              <Image
-                                src={
-                                  product.image || "/images/default-product.png"
-                                }
-                                alt={product.name}
-                                fill
-                                className="object-cover"
-                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                                priority
-                              />
-                            </div>
-                            <div>
-                              <p className={`font-medium ${theme.colorText}`}>
-                                {product.name}
-                              </p>
-                              <p
-                                className={`text-sm ${theme.colorText} opacity-80`}
-                              >
-                                Qty: {product.quantity}
-                              </p>
-                              {product.tailorName && (
-                                <p
-                                  className={`text-xs ${theme.colorText} opacity-70`}
-                                >
-                                  By {product.tailorName}
-                                </p>
+                        {selectedOrder.products?.map((product, idx) => {
+                          const productRating = productRatings[product.productId];
+                          const userReview = productReviews[product.productId];
+                          const calculatedRating = productRating
+                            ? (productRating.rating / productRating.totalRating) * 5
+                            : 0;
+
+                          return (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: idx * 0.05 }}
+                              className={`flex flex-col gap-3 p-3 rounded-lg ${theme.colorBgSecondary}`}
+                            >
+                              <div className="flex gap-3">
+                                <div className="relative w-16 h-16 rounded-md overflow-hidden">
+                                  <Image
+                                    src={
+                                      product.image || "/images/default-product.png"
+                                    }
+                                    alt={product.name}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                                    priority
+                                  />
+                                </div>
+                                <div>
+                                  <p className={`font-medium ${theme.colorText}`}>
+                                    {product.name}
+                                  </p>
+                                  <p
+                                    className={`text-sm ${theme.colorText} opacity-80`}
+                                  >
+                                    Qty: {product.quantity}
+                                  </p>
+                                  {product.tailorName && (
+                                    <p
+                                      className={`text-xs ${theme.colorText} opacity-70`}
+                                    >
+                                      By {product.tailorName}
+                                    </p>
+                                  )}
+                                  {productRating && (
+                                    <div className="flex items-center mt-1">
+                                      <span className="text-yellow-500 text-xs">
+                                        {"★".repeat(Math.floor(calculatedRating))}
+                                        {"☆".repeat(5 - Math.floor(calculatedRating))}
+                                      </span>
+                                      <span className="text-xs ml-1 opacity-70">
+                                        ({calculatedRating.toFixed(1)})
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Review Section for Delivered Orders */}
+                              {selectedOrder.orderStatus === "delivered" && (
+                                <div className="mt-2">
+                                  {userReview ? (
+                                    <div className={`p-2 rounded ${theme.colorBg} border ${theme.colorBorder}`}>
+                                      <div className="flex items-center mb-1">
+                                        <span className="text-yellow-500 text-sm">
+                                          {"★".repeat(userReview.stars)}
+                                          {"☆".repeat(5 - userReview.stars)}
+                                        </span>
+                                      </div>
+                                      <p className={`text-sm ${theme.colorText}`}>
+                                        {userReview.message}
+                                      </p>
+                                    </div>
+                                  ) : (
+                                    <ProductReviewForm
+                                      productId={product.productId}
+                                      onSubmit={handleSubmitReview}
+                                      isSubmitting={isSubmittingReview}
+                                      theme={theme}
+                                    />
+                                  )}
+                                </div>
                               )}
-                            </div>
-                          </motion.div>
-                        ))}
+                            </motion.div>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -645,6 +875,70 @@ const MyOrders = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const ProductReviewForm = ({ productId, onSubmit, isSubmitting, theme }) => {
+  const [stars, setStars] = useState(0);
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (stars > 0 && message.trim().length >= 3) {
+      onSubmit(productId, stars, message);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div>
+        <label className={`block text-sm mb-1 ${theme.colorText}`}>
+          Your Rating:
+        </label>
+        <div className="flex space-x-1">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setStars(i)}
+              className={`text-2xl focus:outline-none ${
+                i <= stars ? "text-yellow-500" : "text-gray-300"
+              }`}
+            >
+              ★
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className={`block text-sm mb-1 ${theme.colorText}`}>
+          Your Review:
+        </label>
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          className={`w-full p-2 rounded ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-1 focus:ring-blue-500`}
+          rows={3}
+          minLength={3}
+          maxLength={250}
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={isSubmitting || stars === 0 || message.trim().length < 3}
+        className={`px-4 py-2 rounded ${theme.colorBg} ${theme.colorText} ${theme.hoverBg} ${theme.hoverText} transition-colors disabled:opacity-50`}
+      >
+        {isSubmitting ? (
+          <span className="flex items-center justify-center">
+            <ClipLoader size={16} color={theme.iconColor} className="mr-2" />
+            Submitting...
+          </span>
+        ) : (
+          "Submit Review"
+        )}
+      </button>
+    </form>
   );
 };
 

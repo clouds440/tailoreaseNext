@@ -26,7 +26,7 @@ import UserContext from "@/utils/UserContext";
 import ImageCropper from "@/components/ImageCropper";
 
 const AdminDashboard = () => {
-  const { theme, inputStyles, placeHolderStyles } = useContext(UserContext);
+  const { theme, inputStyles, placeHolderStyles, setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
 
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -112,6 +112,7 @@ const AdminDashboard = () => {
       setPendingOrders(orders);
     } catch (error) {
       console.error("Error fetching orders:", error);
+      showAlert("error", "Failed to fetch pending orders");
     }
   };
 
@@ -126,21 +127,76 @@ const AdminDashboard = () => {
       setProducts(productsData);
     } catch (error) {
       console.error("Error fetching products:", error);
+      showAlert("error", "Failed to fetch products");
+    }
+  };
+
+  // Show alert notification
+  const showAlert = (type, message) => {
+    setShowMessage({
+      type,
+      message,
+    });
+    setPopUpMessageTrigger(true);
+  };
+
+  // Create user-tailor connection
+  const createUserTailorConnection = async (userId, tailorId) => {
+    try {
+      await addDoc(collection(db, "userTailorConnections"), {
+        userId,
+        tailorId,
+        timestamp: new Date().toISOString(),
+      });
+      return true;
+    } catch (error) {
+      console.error("Error creating user-tailor connection:", error);
+      return false;
     }
   };
 
   // Handle order verification
   const handleOrderVerification = async (orderId, action) => {
     try {
+      const order = pendingOrders.find((o) => o.id === orderId);
+      if (!order) {
+        showAlert("error", "Order not found");
+        return;
+      }
+
       const orderRef = doc(db, "OrdersManagement", orderId);
-      await updateDoc(orderRef, {
-        orderStatus:
-          action === "approve" ? "paymentVerified" : "paymentRejected",
-        updatedAt: new Date().toISOString(),
-      });
+      
+      if (action === "approve") {
+        // First create the user-tailor connection
+        const connectionCreated = await createUserTailorConnection(
+          order.userId,
+          order.tailorId
+        );
+
+        if (!connectionCreated) {
+          showAlert("error", "Failed to create user-tailor connection");
+          return;
+        }
+
+        // Then update the order status
+        await updateDoc(orderRef, {
+          orderStatus: "paymentVerified",
+          updatedAt: new Date().toISOString(),
+        });
+
+        showAlert("success", "Payment verified and user-tailor connection created");
+      } else {
+        await updateDoc(orderRef, {
+          orderStatus: "paymentRejected",
+          updatedAt: new Date().toISOString(),
+        });
+        showAlert("success", "Payment rejected");
+      }
+
       fetchPendingOrders();
     } catch (error) {
       console.error("Error updating order:", error);
+      showAlert("error", "Failed to update order status");
     }
   };
 
@@ -201,6 +257,7 @@ const AdminDashboard = () => {
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Error handling file upload:", error);
+      showAlert("error", "Failed to process image");
     }
   };
 
@@ -227,9 +284,10 @@ const AdminDashboard = () => {
         imageUrl: "",
       });
       fetchProducts();
+      showAlert("success", "Product added successfully");
     } catch (error) {
       console.error("Error adding product:", error);
-      alert(`Error: ${error.message}`);
+      showAlert("error", error.message);
     }
   };
 
@@ -484,6 +542,28 @@ const AdminDashboard = () => {
                             className={`font-medium text-lg ${theme.colorText}`}
                           >
                             ${order.totalAmount?.toFixed(2) || "0.00"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p
+                            className={`text-sm ${theme.colorText} opacity-80`}
+                          >
+                            User ID
+                          </p>
+                          <p className={`font-medium ${theme.colorText}`}>
+                            {order.userId || "N/A"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p
+                            className={`text-sm ${theme.colorText} opacity-80`}
+                          >
+                            Tailor ID
+                          </p>
+                          <p className={`font-medium ${theme.colorText}`}>
+                            {order.tailorId || "N/A"}
                           </p>
                         </div>
                       </div>
