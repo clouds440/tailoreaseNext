@@ -168,6 +168,8 @@ const TailorOrdersManagement = () => {
         // Select the first order by default if available
         if (ordersData.length > 0 && !selectedOrder) {
           setSelectedOrder(ordersData[0]);
+        } else {
+          setSelectedOrder(null);
         }
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -543,8 +545,8 @@ const TailorOrdersManagement = () => {
                       onClick={() => setSelectedOrder(order)}
                       className={`p-4 rounded-lg cursor-pointer transition-all ${
                         selectedOrder?.id === order.id
-                          ? `${theme.hoverBg} bg-opacity-50 border-l-4 border-blue-500`
-                          : `${theme.colorBg}`
+                          ? `${theme.colorBg} border-l-4 border-blue-500`
+                          : `${theme.hoverBg} bg-opacity-50`
                       } ${theme.colorBorder} border`}
                     >
                       <div className="flex justify-between items-start">
@@ -584,7 +586,14 @@ const TailorOrdersManagement = () => {
 
             {/* Order Details */}
             <div className={`lg:w-2/3 ${theme.mainTheme} rounded-xl p-6`}>
-              {!selectedOrder ? (
+              {filteredOrders.length === 0 ? (
+                <div
+                  className={`text-center py-12 ${theme.colorText} opacity-70`}
+                >
+                  <i className="fas fa-box-open text-4xl mb-3"></i>
+                  <p>No orders to display</p>
+                </div>
+              ) : !selectedOrder ? (
                 <div
                   className={`text-center py-12 ${theme.colorText} opacity-70`}
                 >
@@ -850,12 +859,7 @@ const TailorOrdersManagement = () => {
                           }
                           type="secondary"
                           onClick={() => {
-                            setShowMessage({
-                              type: "info",
-                              message:
-                                "Measurements functionality will be implemented soon",
-                            });
-                            setPopUpMessageTrigger(true);
+                            window.open(`/user?share=${selectedOrder.userId}`, '_blank');
                           }}
                           fullWidth
                         />
