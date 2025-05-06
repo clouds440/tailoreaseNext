@@ -6,9 +6,11 @@ import SimpleButton from "@/components/SimpleButton";
 import Link from "next/link";
 import Image from "next/image";
 import Footer from "@/components/Footer";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { theme } = useContext(UserContext);
+  const router = useRouter();
 
   // Animation variants
   const containerVariants = {
@@ -181,6 +183,7 @@ export default function Home() {
                     alt="TailorEase Platform"
                     fill
                     className="object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                     priority
                   />
                 </div>
@@ -199,8 +202,17 @@ export default function Home() {
                       alt="3D Try-On"
                       fill
                       className="object-contain"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                      priority
                     />
-                    <div className="absolute inset-0 flex items-end justify-center pb-2">
+                    <div
+                      className="absolute inset-0 flex items-end justify-center pb-2"
+                      onClick={() =>
+                        router.push(
+                          "/outfit-customization?outfit=kameezShalwar"
+                        )
+                      }
+                    >
                       <span className="text-xs font-medium bg-black/70 text-white px-2 py-1 rounded-full">
                         <i className="fas fa-vr-cardboard mr-1"></i> Try It!
                       </span>

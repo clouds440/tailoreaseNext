@@ -18,7 +18,8 @@ import SimpleButton from "@/components/SimpleButton";
 import DialogBox from "@/components/DialogBox";
 
 const TailorOrdersManagement = () => {
-  const { theme, userData, setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
+  const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
+    useContext(UserContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -79,7 +80,11 @@ const TailorOrdersManagement = () => {
   // All possible status filters
   const statusFilters = [
     { value: "all", label: "All Orders", icon: "list" },
-    { value: "paymentVerified", label: "Payment Verified", icon: "check-circle" },
+    {
+      value: "paymentVerified",
+      label: "Payment Verified",
+      icon: "check-circle",
+    },
     { value: "startedStitching", label: "Stitching Started", icon: "cut" },
     { value: "onDelivery", label: "On Delivery", icon: "truck" },
     { value: "delivered", label: "Delivered", icon: "box-open" },
@@ -104,7 +109,11 @@ const TailorOrdersManagement = () => {
           q = query(
             collection(db, "OrdersManagement"),
             where("tailorId", "==", userData.bId),
-            where("orderStatus", "not-in", ["inCart", "paymentVerificationPending", "paymentRejected"])
+            where("orderStatus", "not-in", [
+              "inCart",
+              "paymentVerificationPending",
+              "paymentRejected",
+            ])
           );
         } else {
           q = query(
@@ -119,7 +128,7 @@ const TailorOrdersManagement = () => {
 
         for (const orderDoc of querySnapshot.docs) {
           const orderData = orderDoc.data();
-          
+
           let userDetails = {};
           if (orderData.userId) {
             try {
@@ -130,7 +139,8 @@ const TailorOrdersManagement = () => {
                 const userData = userDocSnap.data();
                 userDetails = {
                   fullName: userData.fullName,
-                  profilePictureUrl: userData.profilePictureUrl || "/images/default-user.png",
+                  profilePictureUrl:
+                    userData.profilePictureUrl || "/images/default-user.png",
                 };
               }
             } catch (error) {
@@ -206,7 +216,9 @@ const TailorOrdersManagement = () => {
     (order) =>
       order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.orderStatus.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.userDetails?.fullName?.toLowerCase().includes(searchQuery.toLowerCase())
+      order.userDetails?.fullName
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase())
   );
 
   // Format date
@@ -214,9 +226,10 @@ const TailorOrdersManagement = () => {
     if (!dateString) return "N/A";
 
     try {
-      const date = typeof dateString === "object" && dateString.toDate
-        ? dateString.toDate()
-        : new Date(dateString);
+      const date =
+        typeof dateString === "object" && dateString.toDate
+          ? dateString.toDate()
+          : new Date(dateString);
 
       if (isNaN(date.getTime())) {
         return "Invalid date";
@@ -249,17 +262,21 @@ const TailorOrdersManagement = () => {
       });
 
       // Update local state
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
           order.id === orderId
-            ? { ...order, orderStatus: newStatus, updatedAt: new Date().toISOString() }
+            ? {
+                ...order,
+                orderStatus: newStatus,
+                updatedAt: new Date().toISOString(),
+              }
             : order
         )
       );
 
       // Update selected order if it's the one being updated
       if (selectedOrder && selectedOrder.id === orderId) {
-        setSelectedOrder(prev => ({
+        setSelectedOrder((prev) => ({
           ...prev,
           orderStatus: newStatus,
           updatedAt: new Date().toISOString(),
@@ -355,8 +372,12 @@ const TailorOrdersManagement = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 className={`px-3 py-1 text-xs rounded-full ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} flex items-center`}
               >
-                <i className={`fas fa-${statusFilters.find(f => f.value === statusFilter)?.icon} mr-1`}></i>
-                {statusFilters.find(f => f.value === statusFilter)?.label}
+                <i
+                  className={`fas fa-${
+                    statusFilters.find((f) => f.value === statusFilter)?.icon
+                  } mr-1`}
+                ></i>
+                {statusFilters.find((f) => f.value === statusFilter)?.label}
               </motion.span>
             )}
             {searchQuery && (
@@ -395,14 +416,18 @@ const TailorOrdersManagement = () => {
               className={`absolute right-[20px] mt-2 w-64 ${theme.mainTheme} rounded-xl shadow-xl border ${theme.colorBorder} z-50 overflow-y-auto max-h-[80vh]`}
             >
               <div className="p-4">
-                <h3 className={`font-bold text-lg mb-3 ${theme.colorText} flex items-center`}>
+                <h3
+                  className={`font-bold text-lg mb-3 ${theme.colorText} flex items-center`}
+                >
                   <i className="fas fa-sliders-h mr-2"></i>
                   Filter & Sort
                 </h3>
-                
+
                 {/* Status Filter Section */}
                 <div className="mb-4">
-                  <h4 className={`text-sm font-semibold mb-2 ${theme.colorText} opacity-80 flex items-center`}>
+                  <h4
+                    className={`text-sm font-semibold mb-2 ${theme.colorText} opacity-80 flex items-center`}
+                  >
                     <i className="fas fa-tag mr-2"></i>
                     Filter by Status
                   </h4>
@@ -427,10 +452,12 @@ const TailorOrdersManagement = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 {/* Sort Section */}
                 <div>
-                  <h4 className={`text-sm font-semibold mb-2 ${theme.colorText} opacity-80 flex items-center`}>
+                  <h4
+                    className={`text-sm font-semibold mb-2 ${theme.colorText} opacity-80 flex items-center`}
+                  >
                     <i className="fas fa-sort-amount-down mr-2"></i>
                     Sort by Date
                   </h4>
@@ -456,9 +483,11 @@ const TailorOrdersManagement = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Close Button */}
-              <div className={`p-3 border-t ${theme.colorBorder} flex justify-end`}>
+              <div
+                className={`p-3 border-t ${theme.colorBorder} flex justify-end`}
+              >
                 <SimpleButton
                   btnText="Close"
                   type="simple"
@@ -479,7 +508,11 @@ const TailorOrdersManagement = () => {
             {/* Orders List */}
             <div className={`lg:w-1/3 ${theme.mainTheme} rounded-xl p-4`}>
               <h3 className={`text-lg font-semibold mb-4 ${theme.colorText}`}>
-                {statusFilter === "all" ? "All Orders" : statusFilters.find(f => f.value === statusFilter)?.label} ({filteredOrders.length})
+                {statusFilter === "all"
+                  ? "All Orders"
+                  : statusFilters.find((f) => f.value === statusFilter)
+                      ?.label}{" "}
+                ({filteredOrders.length})
               </h3>
 
               {filteredOrders.length === 0 ? (
@@ -631,8 +664,8 @@ const TailorOrdersManagement = () => {
                             selectedOrder.orderStatus}
                         </h4>
                         <p className="text-sm opacity-80">
-                          {statusConfig[selectedOrder.orderStatus]?.description ||
-                            "Current order status"}
+                          {statusConfig[selectedOrder.orderStatus]
+                            ?.description || "Current order status"}
                         </p>
                       </div>
                     </div>
@@ -656,21 +689,23 @@ const TailorOrdersManagement = () => {
                           disabled={updatingStatus}
                         />
                       )}
-                      
+
                       {statusConfig[selectedOrder.orderStatus]?.nextAction && (
                         <SimpleButton
                           btnText={
                             updatingStatus ? (
                               <ClipLoader size={16} color="white" />
                             ) : (
-                              statusConfig[selectedOrder.orderStatus]?.nextAction
+                              statusConfig[selectedOrder.orderStatus]
+                                ?.nextAction
                             )
                           }
                           type="primary"
                           onClick={() =>
                             updateOrderStatus(
                               selectedOrder.id,
-                              statusConfig[selectedOrder.orderStatus]?.nextStatus
+                              statusConfig[selectedOrder.orderStatus]
+                                ?.nextStatus
                             )
                           }
                           disabled={updatingStatus}
@@ -707,6 +742,8 @@ const TailorOrdersManagement = () => {
                                 alt={product.name}
                                 fill
                                 className="object-cover"
+                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                                priority
                               />
                             </div>
                             <div className="flex-1">
@@ -718,7 +755,7 @@ const TailorOrdersManagement = () => {
                               >
                                 Qty: {product.quantity}
                               </p>
-                              
+
                               {/* Customization Link Button */}
                               {product.customizedProductLink && (
                                 <div className="mt-2">
@@ -756,10 +793,11 @@ const TailorOrdersManagement = () => {
                       >
                         <div className="flex items-center gap-3 mb-3">
                           <p className={`font-medium ${theme.colorText}`}>
-                            Name: {selectedOrder.deliveryAddress?.name || "Customer"}
+                            Name:{" "}
+                            {selectedOrder.deliveryAddress?.name || "Customer"}
                           </p>
                         </div>
-                        
+
                         <h4 className={`font-semibold mb-3 ${theme.colorText}`}>
                           Delivery Information
                         </h4>
@@ -814,7 +852,8 @@ const TailorOrdersManagement = () => {
                           onClick={() => {
                             setShowMessage({
                               type: "info",
-                              message: "Measurements functionality will be implemented soon",
+                              message:
+                                "Measurements functionality will be implemented soon",
                             });
                             setPopUpMessageTrigger(true);
                           }}
@@ -861,8 +900,8 @@ const TailorOrdersManagement = () => {
           {
             label: "Cancel Order",
             onClick: () => updateOrderStatus(selectedOrder?.id, "cancelled"),
-            type: "danger"
-          }
+            type: "danger",
+          },
         ]}
       />
     </div>

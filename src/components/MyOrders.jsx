@@ -29,37 +29,37 @@ const MyOrders = () => {
       icon: "hourglass-half",
       color: "bg-yellow-500",
       description: "We're verifying your payment details",
-  },
-  paymentVerified: {
+    },
+    paymentVerified: {
       title: "Payment Verified",
       icon: "check-circle",
       color: "bg-green-500",
       description: "Your payment has been confirmed",
-  },
-  startedStichting: {
+    },
+    startedStichting: {
       title: "Stitching Started",
       icon: "cut",
       color: "bg-blue-500",
       description: "Tailor has started working on your order",
-  },
-  onDelivery: {
+    },
+    onDelivery: {
       title: "On Delivery",
       icon: "truck",
       color: "bg-purple-500",
       description: "Your order is on its way",
-  },
-  delivered: {
+    },
+    delivered: {
       title: "Delivered",
       icon: "box-open",
       color: "bg-green-600",
       description: "Order has been delivered",
-  },
-  cancelled: {
+    },
+    cancelled: {
       title: "Cancelled",
       icon: "ban",
       color: "bg-gray-500",
       description: "Order was cancelled",
-  }
+    },
   };
 
   // Status progression for the timeline
@@ -293,7 +293,6 @@ const MyOrders = () => {
                             {formatDate(order.placedOnDate)}
                           </p>
                         </div>
-                        
                       </div>
                       <div className="flex items-center mt-2">
                         {order.tailorDetails?.businessPictureUrl && (
@@ -303,6 +302,8 @@ const MyOrders = () => {
                               alt={order.tailorDetails.businessName}
                               fill
                               className="object-cover"
+                              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                              priority
                             />
                           </div>
                         )}
@@ -493,6 +494,8 @@ const MyOrders = () => {
                                 alt={product.name}
                                 fill
                                 className="object-cover"
+                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                                priority
                               />
                             </div>
                             <div>
@@ -618,6 +621,8 @@ const MyOrders = () => {
                             alt={selectedOrder.tailorDetails.businessName}
                             fill
                             className="object-cover"
+                            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                            priority
                           />
                         </div>
                         <div>
