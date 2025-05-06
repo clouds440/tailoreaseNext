@@ -1,9 +1,7 @@
 "use client";
 import React, { useState, useCallback, useContext } from "react";
 import Cropper from "react-easy-crop";
-import { motion } from "framer-motion";
 import { UserContext } from "@/utils/UserContext";
-import SimpleButton from "./SimpleButton";
 import DialogBox from "./DialogBox";
 
 // Load image
@@ -45,9 +43,13 @@ async function getCroppedImg(imageSrc, pixelCrop, rotation = 0) {
   ctx.restore();
 
   return new Promise((resolve) => {
-    canvas.toBlob((blob) => {
-      resolve(URL.createObjectURL(blob));
-    }, "image/jpeg", 0.9);
+    canvas.toBlob(
+      (blob) => {
+        resolve(URL.createObjectURL(blob));
+      },
+      "image/jpeg",
+      0.9
+    );
   });
 }
 
@@ -71,6 +73,12 @@ const ImageCropper = ({
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
+  const onZoomChangeHandler = (newZoom) => {
+    // always recenter
+    setCrop({ x: 0, y: 0 });
+    setZoom(newZoom);
+  };
+
   const handleClose = useCallback(() => {
     setCrop({ x: 0, y: 0 });
     setZoom(1);
@@ -82,7 +90,11 @@ const ImageCropper = ({
   const handleCropComplete = useCallback(async () => {
     try {
       if (!croppedAreaPixels) return;
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
+      const croppedImage = await getCroppedImg(
+        imageSrc,
+        croppedAreaPixels,
+        rotation
+      );
       onCropComplete(croppedImage);
       handleClose();
     } catch (e) {
@@ -99,26 +111,31 @@ const ImageCropper = ({
             image={imageSrc}
             crop={crop}
             zoom={zoom}
+            minZoom={0.7}
             rotation={rotation}
             aspect={aspectRatio}
             onCropChange={setCrop}
-            onZoomChange={setZoom}
+            onZoomChange={onZoomChangeHandler}
             onRotationChange={setRotation}
             onCropComplete={onCropCompleteCallback}
             cropShape="rect"
             showGrid={false}
+            restrictPosition={false}
+            style={{ containerStyle: { width: "100%", height: "100%" } }}
           />
         </div>
 
         {/* Controls - Both sliders in one row */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className={`block mb-1 text-sm ${theme.colorText} font-medium`}>
+            <label
+              className={`block mb-1 text-sm ${theme.colorText} font-medium`}
+            >
               Zoom: {zoom.toFixed(1)}x
             </label>
             <input
               type="range"
-              min={0.1}
+              min={0.7}
               max={3}
               step={0.01}
               value={zoom}
@@ -128,7 +145,9 @@ const ImageCropper = ({
           </div>
 
           <div>
-            <label className={`block mb-1 text-sm ${theme.colorText} font-medium`}>
+            <label
+              className={`block mb-1 text-sm ${theme.colorText} font-medium`}
+            >
               Rotation: {rotation}°
             </label>
             <input
@@ -148,19 +167,14 @@ const ImageCropper = ({
 
   const buttons = [
     {
-      label: "Cancel",
-      onClick: handleClose,
-      type: "default"
-    },
-    {
       label: (
         <>
           <i className="fas fa-crop mr-2"></i> Crop
         </>
       ),
       onClick: handleCropComplete,
-      type: "primary"
-    }
+      type: "primary",
+    },
   ];
 
   return (

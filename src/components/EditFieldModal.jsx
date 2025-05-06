@@ -67,6 +67,22 @@ function EditFieldModal({
         setPopUpMessageTrigger("true");
         return;
       }
+      if (inputValue.length < 7 || inputValue.length > 10) {
+        setShowMessage({
+          type: "warning",
+          message: "Please enter a valid phone number",
+        });
+        setPopUpMessageTrigger("true");
+        return;
+      }
+      if (inputValue.startsWith("0")) {
+        setShowMessage({
+          type: "warning",
+          message: "Please remove prefix (0) from phone number",
+        });
+        setPopUpMessageTrigger(true);
+        return;
+      }
     }
 
     // Call the onSave function if validation passes

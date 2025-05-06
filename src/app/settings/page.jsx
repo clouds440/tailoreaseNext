@@ -98,7 +98,7 @@ function AccountSettings() {
           setPopUpMessageTrigger("true");
           return;
         }
-        if (newValue.length < 7) {
+        if (newValue.length < 7 || newValue.length > 10) {
           setShowMessage({
             type: "warning",
             message: "Please enter a valid phone number",

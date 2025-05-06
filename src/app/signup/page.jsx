@@ -118,7 +118,10 @@ const SignUpForm = () => {
       setPopUpMessageTrigger("true");
       return;
     }
-    if (formData.phone && formData.phone.length < 7) {
+    if (
+      (formData.phone && formData.phone.length < 7) ||
+      formData.phone.length > 10
+    ) {
       setShowMessage({
         type: "warning",
         message: "Please enter a valid phone number",
