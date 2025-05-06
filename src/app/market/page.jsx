@@ -71,25 +71,21 @@ const Market = () => {
         where("isActive", "==", true)
       );
       const productsSnapshot = await getDocs(productsQuery);
-
-      // Process each product to get tailor details
+  
+      // Process each product to get tailor and rating details
       const productsData = await Promise.all(
         productsSnapshot.docs.map(async (Doc) => {
           const productData = {
             id: Doc.id,
             ...Doc.data(),
           };
-
-          // Get tailor's business name
+  
+          // Get tailor's business name and image
           let tailorName = "Unknown Tailor";
           let tailorImage = "/images/default-tailor.png";
           try {
             if (productData.tailorId) {
-              const tailorDocReference = doc(
-                db,
-                "tailors",
-                productData.tailorId
-              );
+              const tailorDocReference = doc(db, "tailors", productData.tailorId);
               const tailorDoc = await getDoc(tailorDocReference);
               if (tailorDoc.exists()) {
                 const tailorData = tailorDoc.data();
@@ -100,20 +96,45 @@ const Market = () => {
           } catch (error) {
             console.error("Error fetching tailor data:", error);
           }
-
+  
+          // Get rating data
+          let rating = 0;
+          let totalReviews = 0;
+          try {
+            const ratingQuery = query(
+              collection(db, "productRatings"),
+              where("productId", "==", productData.productId)
+            );
+            const ratingSnapshot = await getDocs(ratingQuery);
+  
+            if (!ratingSnapshot.empty) {
+              const ratingDoc = ratingSnapshot.docs[0];
+              const ratingData = ratingDoc.data();
+              const { rating: totalScore = 0, totalRating = 0 } = ratingData;
+  
+              if (totalRating > 0) {
+                rating = (totalScore / totalRating) * 5;
+                totalReviews = totalRating / 6;
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching rating data:", error);
+          }
+  
           return {
-            id: doc.id,
+            id: productData.id,
             ...productData,
             tailor: tailorName,
             tailorImage,
-            rating: 4.5, // Mock rating for now
+            rating,
+            totalReviews: Math.floor(totalReviews),
             gender: productData.baseProductData.gender,
           };
         })
       );
-
+  
       let products = [...productsData];
-
+  
       // Apply search filter
       if (searchQuery) {
         products = products.filter(
@@ -127,14 +148,14 @@ const Market = () => {
               .includes(searchQuery.toLowerCase())
         );
       }
-
+  
       // Apply gender filters
       if (appliedGenderFilter.length > 0) {
         products = products.filter((product) =>
           appliedGenderFilter.includes(product.gender)
         );
       }
-
+  
       // Apply sorting
       switch (filters.sortBy) {
         case "Price: Low to High":
@@ -157,13 +178,14 @@ const Market = () => {
           });
           break;
       }
-
+  
       setProductList(products);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
     setLoading(false);
   }, [filters.sortBy, appliedGenderFilter, searchQuery]);
+  
 
   useEffect(() => {
     fetchProducts();
@@ -601,7 +623,7 @@ const Market = () => {
                           {renderStars(product.rating)}
                         </div>
                         <span className={`text-xs ml-1 ${theme.colorText}`}>
-                          ({Math.floor(Math.random() * 100)})
+                          ({product.totalReviews})
                         </span>
                       </div>
                       <p
@@ -811,7 +833,7 @@ const Market = () => {
                       {renderStars(selectedProduct.rating)}
                     </div>
                     <span className={`text-sm ${theme.colorText} opacity-80`}>
-                      ({Math.floor(Math.random() * 100)} reviews)
+                      ({selectedProduct.totalReviews} reviews)
                     </span>
                   </div>
 
