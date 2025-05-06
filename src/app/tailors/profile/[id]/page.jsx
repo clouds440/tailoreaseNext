@@ -20,7 +20,7 @@ import UserContext from "@/utils/UserContext";
 import Link from "next/link";
 import UpdateTailorRating from "@/components/UpdateTailorRating";
 import DialogBox from "@/components/DialogBox";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TailorProfile = () => {
   const [tailorData, setTailorData] = useState(null);
@@ -56,6 +56,39 @@ const TailorProfile = () => {
     type: "",
     buttons: [],
   });
+
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(
+        <i
+          key={`full-${i}`}
+          className="fas fa-star text-yellow-400 text-sm"
+        ></i>
+      );
+    }
+
+    if (hasHalfStar) {
+      stars.push(
+        <i
+          key="half"
+          className="fas fa-star-half-alt text-yellow-400 text-sm"
+        ></i>
+      );
+    }
+
+    const emptyStars = 5 - stars.length;
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(
+        <i key={`empty-${i}`} className="far fa-star text-gray-400 text-sm"></i>
+      );
+    }
+
+    return stars;
+  };
 
   useEffect(() => {
     const fetchTailorData = async () => {
@@ -104,19 +137,18 @@ const TailorProfile = () => {
 
           setFetchedReviews(reviewsData);
 
-          // Fetch order statistics and top products
+          // Fetch order statistics and top rated products
           const fetchOrderData = async () => {
             const ordersQuery = query(
               collection(db, "OrdersManagement"),
               where("tailorId", "==", id)
             );
             const ordersSnapshot = await getDocs(ordersQuery);
-            
+
             let inQueue = 0;
             let active = 0;
             let successful = 0;
             let cancelled = 0;
-            const productCounts = {};
 
             ordersSnapshot.forEach((doc) => {
               const order = doc.data();
@@ -124,20 +156,13 @@ const TailorProfile = () => {
                 case "paymentVerificationPending":
                   inQueue++;
                   break;
-                case "startedStichting":
+                case "paymentVerified":
+                case "startedStitching":
+                case "onDelivery":
                   active++;
                   break;
                 case "delivered":
                   successful++;
-                  // Count products for delivered orders
-                  if (order.products && Array.isArray(order.products)) {
-                    order.products.forEach(product => {
-                      if (product.productId) {
-                        productCounts[product.productId] = 
-                          (productCounts[product.productId] || 0) + 1;
-                      }
-                    });
-                  }
                   break;
                 case "cancelled":
                   cancelled++;
@@ -149,46 +174,61 @@ const TailorProfile = () => {
               inQueue,
               active,
               successful,
-              cancelled
+              cancelled,
             });
 
-            // Get top 3 product IDs by count
-            const sortedProductIds = Object.entries(productCounts)
-              .sort((a, b) => b[1] - a[1])
-              .slice(0, 3)
-              .map(item => item[0]);
+            // Fetch top rated products
+            const productsQuery = query(
+              collection(db, "tailorProducts"),
+              where("tailorId", "==", id),
+              where("isActive", "==", true),
+              limit(10)
+            );
+            const productsSnapshot = await getDocs(productsQuery);
 
-            // Fetch product details for top products
-            if (sortedProductIds.length > 0) {
-              const productsQuery = query(
-                collection(db, "tailorProducts"),
-                where("__name__", "in", sortedProductIds)
-              );
-              const productsSnapshot = await getDocs(productsQuery);
-              const productsData = productsSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-              }));
-              // Sort the products to match the order of sortedProductIds
-              const sortedProducts = sortedProductIds.map(id => 
-                productsData.find(p => p.id === id)
-              ).filter(Boolean);
-              setTopProducts(sortedProducts);
-            } else {
-              // If no delivered products, get any 3 active products from this tailor
-              const fallbackQuery = query(
-                collection(db, "tailorProducts"),
-                where("tailorId", "==", id),
-                where("isActive", "==", true),
-                limit(3)
-              );
-              const fallbackSnapshot = await getDocs(fallbackQuery);
-              const fallbackData = fallbackSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-              }));
-              setTopProducts(fallbackData);
-            }
+            const productsWithRatings = await Promise.all(
+              productsSnapshot.docs.map(async (productDoc) => {
+                const productData = productDoc.data();
+                let rating = 0;
+                let totalReviews = 0;
+
+                try {
+                  const ratingQuery = query(
+                    collection(db, "productRatings"),
+                    where("productId", "==", productData.productId)
+                  );
+                  const ratingSnapshot = await getDocs(ratingQuery);
+
+                  if (!ratingSnapshot.empty) {
+                    const ratingDoc = ratingSnapshot.docs[0];
+                    const ratingData = ratingDoc.data();
+                    const { rating: totalScore = 0, totalRating = 0 } = ratingData;
+
+                    if (totalRating > 0) {
+                      rating = (totalScore / totalRating) * 5;
+                      totalReviews = totalRating / 6;
+                    }
+                  }
+                } catch (error) {
+                  console.error("Error fetching rating data:", error);
+                }
+
+                return {
+                  id: productDoc.id,
+                  ...productData,
+                  rating,
+                  totalReviews: Math.floor(totalReviews),
+                };
+              })
+            );
+
+            // Sort by rating (highest first) then by number of reviews
+            const sortedProducts = productsWithRatings.sort((a, b) => {
+              if (b.rating !== a.rating) return b.rating - a.rating;
+              return b.totalReviews - a.totalReviews;
+            });
+
+            setTopProducts(sortedProducts.slice(0, 3));
             setLoadingProducts(false);
           };
 
@@ -324,126 +364,227 @@ const TailorProfile = () => {
   const calculatedRating =
     totalRating > 0 ? (ratingValue / totalRating) * 5 : 0;
 
-  const numberOfReviews = totalRating > 0 ? Math.floor(totalRating / 6) : 0;
+  const numberOfReviews = totalRating > 0 ? totalRating/6 : 0;
 
   return tailorData ? (
     <div className="h-full overflow-y-auto">
       <div
         className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg h-fit py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
       >
-        <div className="flex flex-col sm:flex-row items-center space-x-6 mb-6">
-          <Image
-            src={
-              tailorData.businessPictureUrl ||
-              "/images/profile/business/default.png"
-            }
-            alt={tailorData.businessName || "Business Name"}
-            width={256}
-            height={256}
-            className={`object-cover rounded-lg lg:rounded-xl shadow-md max-h-40 border ${theme.colorBorder}`}
-            placeholder="blur"
-            blurDataURL="/images/profile/business/default.png"
-          />
-          <div className="flex w-full flex-col mt-4 sm:mt-0">
-            <div className="flex w-full justify-between items-center mb-6">
-              <h1 className={`border-b-[1px] pb-1 w-full text-3xl font-bold `}>
-                {tailorData.businessName}
-              </h1>
-            </div>
-            <p className={`text-lg `}>
-              Experience:{" "}
-              {tailorData.experience ? (
-                tailorData.experience + " years"
-              ) : (
-                <i className="text-sm">Not specified</i>
-              )}
-            </p>
-            <p className={`text-lg `}>
-              Working Hours: {tailorData.openTime} - {tailorData.closeTime}
-            </p>
-            <p className={`text-lg `}>
-              Address: {tailorData.businessAddress || "Not provided"}
-            </p>
-            <div>
-              <p>
-                Contact:{" "}
-                <span
-                  onClick={handleClickContact}
-                  className={`cursor-pointer ${theme.hoverText}`}
-                >
-                  {" "}
-                  <i className="fab fa-whatsapp text-green-700"></i>{" "}
-                  {tailorData.countryCode}-{tailorData.businessPhone}
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Order Statistics Section */}
+        {/* Hero Section */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+          transition={{ duration: 0.6 }}
+          className="flex flex-col lg:flex-row items-center gap-8 mb-10"
         >
-          <div className={`p-4 rounded-lg shadow-md ${theme.colorBgSecondary} flex flex-col items-center`}>
-            <div className="flex items-center mb-2">
-              <i className="fas fa-clock text-blue-500 text-xl mr-2"></i>
-              <span className="text-lg font-semibold">Orders In Queue</span>
-            </div>
-            <span className="text-3xl font-bold">
-              {orderStats?.inQueue || 0}
-            </span>
-          </div>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="relative border-white border w-full lg:w-64 h-48 rounded-xl overflow-hidden shadow-xl"
+            style={{ aspectRatio: '3/2' }}
+          >
+            <Image
+              src={
+                tailorData.businessPictureUrl ||
+                "/images/profile/business/default.png"
+              }
+              alt={tailorData.businessName || "Business Name"}
+              fill
+              className="object-cover"
+              placeholder="blur"
+              blurDataURL="/images/profile/business/default.png"
+            />
+          </motion.div>
           
-          <div className={`p-4 rounded-lg shadow-md ${theme.colorBgSecondary} flex flex-col items-center`}>
-            <div className="flex items-center mb-2">
-              <i className="fas fa-tools text-yellow-500 text-xl mr-2"></i>
-              <span className="text-lg font-semibold">Active Orders</span>
-            </div>
-            <span className="text-3xl font-bold">
-              {orderStats?.active || 0}
-            </span>
-          </div>
-          
-          <div className={`p-4 rounded-lg shadow-md ${theme.colorBgSecondary} flex flex-col items-center`}>
-            <div className="flex items-center mb-2">
-              <i className="fas fa-check-circle text-green-500 text-xl mr-2"></i>
-              <span className="text-lg font-semibold">Successful Orders</span>
-            </div>
-            <span className="text-3xl font-bold">
-              {orderStats?.successful || 0}
-            </span>
-          </div>
-          
-          <div className={`p-4 rounded-lg shadow-md ${theme.colorBgSecondary} flex flex-col items-center`}>
-            <div className="flex items-center mb-2">
-              <i className="fas fa-times-circle text-red-500 text-xl mr-2"></i>
-              <span className="text-lg font-semibold">Cancelled Orders</span>
-            </div>
-            <span className="text-3xl font-bold">
-              {orderStats?.cancelled || 0}
-            </span>
+          <div className="flex-1">
+            <motion.h1 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-3xl md:text-4xl font-bold mb-2"
+            >
+              {tailorData.businessName}
+            </motion.h1>
+            
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="flex items-center mb-4"
+            >
+              <div className="flex mr-2">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className={`w-6 h-6 ${i < Math.floor(calculatedRating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <span className="text-lg">
+                {calculatedRating.toFixed(1)} ({numberOfReviews} reviews)
+              </span>
+            </motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="flex flex-wrap gap-4 mb-6"
+            >
+              <div className="flex items-center">
+                <i className="fas fa-clock mr-2 text-blue-500"></i>
+                <span>{tailorData.openTime} - {tailorData.closeTime}</span>
+              </div>
+              <div className="flex items-center">
+                <i className="fas fa-briefcase mr-2 text-purple-500"></i>
+                <span>{tailorData.experience || 'N/A'} years experience</span>
+              </div>
+              <div className="flex items-center">
+                <i className="fas fa-map-marker-alt mr-2 text-red-500"></i>
+                <span>{tailorData.businessAddress || 'Address not provided'}</span>
+              </div>
+            </motion.div>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleClickContact}
+              className={`px-6 py-3 rounded-full font-medium ${theme.hoverBg} transition-all duration-300 flex items-center`}
+            >
+              <i className="fab fa-whatsapp text-xl mr-2"></i>
+              Contact via WhatsApp
+            </motion.button>
           </div>
         </motion.div>
 
-        {/* Top Selling Products Section */}
+        {/* Stats Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-8"
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
         >
-          <div className="flex justify-between items-center mb-4">
-            <h2 className={`text-2xl font-bold ${theme.colorText}`}>
-              {topProducts.length > 0 ? "Top Selling Products" : "Featured Products"}
+          {[
+            {
+              icon: 'fas fa-clock',
+              color: 'text-blue-500',
+              title: 'In Queue',
+              value: orderStats?.inQueue || 0,
+              bg: 'bg-blue-100',
+            },
+            {
+              icon: 'fas fa-tools',
+              color: 'text-yellow-500',
+              title: 'Active',
+              value: orderStats?.active || 0,
+              bg: 'bg-yellow-100',
+            },
+            {
+              icon: 'fas fa-check-circle',
+              color: 'text-green-500',
+              title: 'Completed',
+              value: orderStats?.successful || 0,
+              bg: 'bg-green-100',
+            },
+            {
+              icon: 'fas fa-times-circle',
+              color: 'text-red-500',
+              title: 'Cancelled',
+              value: orderStats?.cancelled || 0,
+              bg: 'bg-red-100',
+            },
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+              className={`p-6 rounded-xl shadow-md ${theme.colorBgSecondary} flex flex-col items-center transition-all duration-300`}
+            >
+              <div className={`w-16 h-16 ${stat.bg} rounded-full flex items-center justify-center mb-4`}>
+                <i className={`${stat.icon} ${stat.color} text-2xl`}></i>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">{stat.title}</h3>
+              <span className="text-3xl font-bold">{stat.value}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* About Section */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mb-12"
+        >
+          <h2 className="text-2xl font-bold mb-4 border-b-2 pb-2 inline-block">About</h2>
+          <p className="text-lg leading-relaxed">
+            {tailorData.description || (
+              <span className="italic text-gray-500">No description provided</span>
+            )}
+          </p>
+        </motion.section>
+
+        {/* Specialties Section */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mb-12"
+        >
+          <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2 inline-block">Craftsmanship Specialties</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {tailorData.specialities?.length > 0 ? (
+              tailorData.specialities.map((speciality, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -5 }}
+                  className={`p-4 rounded-lg ${theme.colorBgSecondary} flex flex-col items-center justify-center text-center h-32 ${theme.hoverShadow} transition-all duration-300`}
+                >
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mb-3">
+                    <i className="fas fa-cut text-white"></i>
+                  </div>
+                  <h3 className="font-medium text-sm md:text-base">{speciality}</h3>
+                  <div className="absolute inset-0 border-2 border-transparent hover:border-blue-400 rounded-lg transition-all duration-300 pointer-events-none"></div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <i className="fas fa-tshirt text-4xl mb-4 opacity-50"></i>
+                <p className="italic text-gray-500">No specialties listed yet</p>
+              </div>
+            )}
+          </div>
+        </motion.section>
+
+        {/* Top Products Section */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mb-12"
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold border-b-2 pb-2 inline-block">
+              {topProducts.length > 0 ? "Featured Products" : "Products"}
             </h2>
             <Link href={`/market?tailor=${id}`}>
-              <button className={`px-4 py-2 rounded-lg ${theme.hoverBg} ${theme.colorText} flex items-center`}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-4 py-2 rounded-lg ${theme.hoverBg} ${theme.colorText} flex items-center`}
+              >
                 <i className="fas fa-eye mr-2"></i>
-                See All Products
-              </button>
+                View All Products
+              </motion.button>
             </Link>
           </div>
 
@@ -452,17 +593,18 @@ const TailorProfile = () => {
               <ClipLoader size={40} color="#ffffff" />
             </div>
           ) : topProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {topProducts.map((product, index) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className={`rounded-lg overflow-hidden border ${theme.colorBorder} ${theme.hoverShadow} cursor-pointer`}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -5 }}
+                  className={`rounded-xl overflow-hidden border ${theme.colorBorder} ${theme.hoverShadow} cursor-pointer transition-all duration-300`}
                   onClick={() => router.push(`/market/product?id=${product.id}`)}
                 >
-                  <div className="relative h-48 w-full">
+                  <div className="relative h-64">
                     <Image
                       src={
                         product.baseProductData?.imageUrl ||
@@ -473,15 +615,27 @@ const TailorProfile = () => {
                       className="object-cover"
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                     />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                      <h3 className="text-white font-semibold text-lg">
+                        {product.baseProductData?.name || "Unnamed Product"}
+                      </h3>
+                    </div>
                   </div>
                   <div className={`p-4 ${theme.colorBg}`}>
-                    <h3 className={`font-semibold ${theme.colorText}`}>
-                      {product.baseProductData?.name || "Unnamed Product"}
-                    </h3>
-                    <p className={`text-sm mt-1 ${theme.colorText} opacity-80`}>
-                      {product.baseProductData?.category || "Uncategorized"}
-                    </p>
-                    <p className={`mt-2 font-bold ${theme.colorText}`}>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className={`text-sm ${theme.colorText} opacity-80`}>
+                        {product.baseProductData?.category || "Uncategorized"}
+                      </span>
+                      <div className="flex items-center">
+                        <div className="flex mr-1">
+                          {renderStars(product.rating)}
+                        </div>
+                        <span className={`text-xs ${theme.colorText} opacity-80 ml-1`}>
+                          ({product.totalReviews || 0})
+                        </span>
+                      </div>
+                    </div>
+                    <p className={`text-lg font-bold ${theme.colorText}`}>
                       PKR {product.price?.toLocaleString("en-PK") || "0"}
                     </p>
                   </div>
@@ -489,94 +643,67 @@ const TailorProfile = () => {
               ))}
             </div>
           ) : (
-            <div className={`p-8 text-center rounded-lg ${theme.colorBgSecondary}`}>
-              <i className={`fas fa-tshirt text-4xl mb-4 ${theme.colorText} opacity-50`}></i>
-              <p className={`${theme.colorText}`}>No products available yet</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`p-8 text-center rounded-xl ${theme.colorBgSecondary}`}
+            >
+              <i className={`fas fa-tshirt text-5xl mb-4 ${theme.colorText} opacity-50`}></i>
+              <p className={`text-lg ${theme.colorText}`}>No products available yet</p>
+            </motion.div>
           )}
-        </motion.div>
+        </motion.section>
 
-        <div className="mb-6">
-          <p className={`text-xl mb-2 border-b-[1px] pb-1 font-semibold `}>
-            Description
-          </p>
-          <p className={`text-lg `}>
-            {tailorData.description || <sub>No description available</sub>}
-          </p>
-        </div>
-
-        <div className="mb-6 select-none">
-          <p className={`text-xl mb-2 pb-1 font-semibold `}>Specialties</p>
-          <div className="flex flex-wrap gap-2">
-            {tailorData.specialities?.length > 0 ? (
-              tailorData.specialities.map((speciality, index) => (
-                <span
-                  key={index}
-                  className={`px-4 py-2 rounded-lg text-sm  ${theme.mainTheme} ${theme.colorBorder}`}
-                >
-                  {speciality}
-                </span>
-              ))
-            ) : (
-              <span className={`italic`}>No specialties listed</span>
-            )}
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <p className={`text-xl font-semibold `}>Rating</p>
-          <div className="flex items-center space-x-2">
-            <span className="text-yellow-500 font-bold text-xl">
-              {"★".repeat(Math.floor(calculatedRating))}
-              {"☆".repeat(5 - Math.floor(calculatedRating))}
-            </span>
-            <span className={`text-sm `}>({calculatedRating.toFixed(1)})</span>
-          </div>
-          <p className={`text-sm `}>Total Reviews: {numberOfReviews}</p>
-        </div>
-
-        <div className="mb-6">
-          {/* Common Heading */}
-          <div className=" w-full text-center md:text-left md:w-auto md:mb-0">
-            <p className="mb-6 text-2xl font-bold border-b-2 border-gray-300 pb-1">
-              Reviews & Feedback
-            </p>
-          </div>
-
-          <div className="w-full flex flex-col md:flex-row justify-between gap-6">
-            {/* Reviews Section */}
-            <div className="w-full md:w-[65%] lg:w-[70%]">
+        {/* Reviews Section */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mb-12"
+        >
+          <h2 className="text-2xl font-bold mb-8 border-b-2 pb-2 inline-block">Customer Reviews</h2>
+          
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Reviews Carousel */}
+            <div className="w-full lg:w-2/3">
               {fetchedReviews.length > 0 ? (
-                <>
-                  <div
-                    key={fetchedReviews[currentReviewIndex].userName}
-                    className={`relative w-full mt-8 border p-6 rounded-lg shadow-md ${theme.mainTheme}`}
-                  >
-                    <div
-                      className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center w-16 h-16 rounded-full overflow-hidden bg-opacity-100 ${theme.colorBg}`}
+                <div className="relative h-96">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentReviewIndex}
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -50 }}
+                      transition={{ duration: 0.5 }}
+                      className={`absolute inset-0 p-8 rounded-xl shadow-lg ${theme.colorBgSecondary} flex flex-col items-center justify-center`}
                     >
-                      <i
-                        className={`fas fa-user ${theme.colorText} text-3xl`}
-                      ></i>
-                    </div>
-                    <div className="mt-8 flex flex-col items-center">
-                      <p className="font-bold text-lg text-center">
-                        {fetchedReviews[currentReviewIndex].userName}
-                      </p>
-                      <span className="text-yellow-500 text-base">
-                        {"★".repeat(fetchedReviews[currentReviewIndex].stars)}
-                        {"☆".repeat(
-                          5 - fetchedReviews[currentReviewIndex].stars
-                        )}
-                      </span>
-                    </div>
-                    <p className={`text-center ${theme.colorText} mt-4`}>
-                      {fetchedReviews[currentReviewIndex].message}
-                    </p>
-                  </div>
+                      <div className="text-center mb-6">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
+                          <i className="fas fa-user text-white text-3xl"></i>
+                        </div>
+                        <h3 className="text-xl font-bold">
+                          {fetchedReviews[currentReviewIndex].userName}
+                        </h3>
+                        <div className="flex justify-center my-3">
+                          {[...Array(5)].map((_, i) => (
+                            <svg
+                              key={i}
+                              className={`w-6 h-6 ${i < fetchedReviews[currentReviewIndex].stars ? 'text-yellow-400' : 'text-gray-300'}`}
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                        <p className={`text-lg italic ${theme.colorText}`}>
+                          "{fetchedReviews[currentReviewIndex].message}"
+                        </p>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
 
-                  {/* Navigation buttons */}
-                  <div className="flex justify-center mt-6 space-x-4">
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
                     <button
                       onClick={() => {
                         setCurrentReviewIndex((prevIndex) =>
@@ -585,10 +712,19 @@ const TailorProfile = () => {
                             : prevIndex - 1
                         );
                       }}
-                      className={`p-3 w-12 h-12 ${theme.mainTheme} ${theme.colorText} ${theme.hoverShadow} rounded-full flex justify-center items-center`}
+                      className={`w-12 h-12 rounded-full ${theme.colorBg} ${theme.hoverShadow} flex items-center justify-center`}
                     >
                       <i className="fas fa-chevron-left"></i>
                     </button>
+                    <div className="flex items-center gap-2">
+                      {fetchedReviews.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentReviewIndex(index)}
+                          className={`w-3 h-3 rounded-full ${index === currentReviewIndex ? 'bg-blue-500' : 'bg-gray-300'}`}
+                        />
+                      ))}
+                    </div>
                     <button
                       onClick={() => {
                         setCurrentReviewIndex((prevIndex) =>
@@ -597,52 +733,68 @@ const TailorProfile = () => {
                             : prevIndex + 1
                         );
                       }}
-                      className={`p-3 w-12 h-12 ${theme.mainTheme} ${theme.colorText} ${theme.hoverShadow} rounded-full flex justify-center items-center`}
+                      className={`w-12 h-12 rounded-full ${theme.colorBg} ${theme.hoverShadow} flex items-center justify-center`}
                     >
                       <i className="fas fa-chevron-right"></i>
                     </button>
                   </div>
-                </>
+                </div>
               ) : (
-                <p className="text-sm italic text-gray-500">No reviews yet</p>
+                <div className={`p-8 rounded-xl text-center ${theme.colorBgSecondary}`}>
+                  <i className="fas fa-comment-slash text-4xl mb-4 opacity-50"></i>
+                  <p className="text-lg">No reviews yet</p>
+                  <p className="text-sm mt-2">Be the first to review this tailor!</p>
+                </div>
               )}
             </div>
 
-            {/* Right Section: Leave a Review */}
-            <div className="w-full md:w-[35%] lg:w-[30%]">
-              <div className={`${theme.mainTheme} p-6 rounded-lg shadow-md`}>
-                <p className="text-xl font-semibold mb-4">Leave a Review</p>
-                <div className="flex items-center space-x-2 mb-4">
-                  {[...Array(5)].map((_, index) => (
-                    <span
-                      key={index}
-                      onClick={() => setRating(index + 1)}
-                      className={`text-2xl cursor-pointer transition-colors duration-200 ${
-                        index < rating ? "text-yellow-500" : "text-gray-300"
-                      }`}
-                    >
-                      ★
-                    </span>
-                  ))}
+            {/* Leave Review Form */}
+            <div className="w-full lg:w-1/3">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className={`p-6 rounded-xl shadow-md ${theme.colorBgSecondary} sticky top-4`}
+              >
+                <h3 className="text-xl font-bold mb-4">Share Your Experience</h3>
+                
+                <div className="mb-6">
+                  <p className="mb-2">Your Rating</p>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setRating(star)}
+                        className={`text-3xl ${star <= rating ? 'text-yellow-400' : 'text-gray-300'} transition-colors duration-200`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="relative mb-4">
+                
+                <div className="relative mb-6">
                   <textarea
                     value={userReview}
                     maxLength={250}
                     id="userReview"
                     name="userReview"
                     onChange={(e) => setUserReview(e.target.value)}
-                    className={`${inputStyles}  rounded-sm min-h-[100px] max-h-[150px]`}
+                    className={`${inputStyles} rounded-lg min-h-[120px] max-h-[180px] p-3 ${theme.colorBorder} border`}
                     rows={4}
-                    placeholder=""
+                    placeholder=" "
                   />
                   <label
-                    className={`${placeHolderStyles}`}
+                    className={`${placeHolderStyles} top-3 left-3`}
                     htmlFor="userReview"
                   >
-                    Write your review here
+                    Your review...
                   </label>
+                  <div className="text-right text-xs mt-1">
+                    {userReview.length}/250
+                  </div>
                 </div>
+                
                 <SimpleButton
                   btnText={
                     isSubmitting ? (
@@ -656,10 +808,10 @@ const TailorProfile = () => {
                   disabled={isSubmitting}
                   onClick={handleReviewSubmit}
                 />
-              </div>
+              </motion.div>
             </div>
           </div>
-        </div>
+        </motion.section>
 
         {showDialog && (
           <DialogBox
@@ -675,18 +827,24 @@ const TailorProfile = () => {
     </div>
   ) : (
     <div
-      className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg p-10 h-screen ${theme.mainTheme}`}
+      className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg p-10 h-screen ${theme.mainTheme} flex items-center justify-center`}
     >
-      <div className="flex flex-col sm:flex-row items-center justify-center space-x-6 mb-6">
-        <div className="flex flex-col items-center">
-          <span className="text-3xl mb-4">
-            <h1>Tailor Not Found!</h1>
-          </span>
-          <Link href={"/tailors"}>
-            <SimpleButton btnText={"See All Tailors"} type={"primary"} />
-          </Link>
-        </div>
-      </div>
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="text-center"
+      >
+        <h1 className="text-3xl font-bold mb-6">Tailor Not Found!</h1>
+        <Link href={"/tailors"}>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg font-medium"
+          >
+            Browse All Tailors
+          </motion.button>
+        </Link>
+      </motion.div>
     </div>
   );
 };
