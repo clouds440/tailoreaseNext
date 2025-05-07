@@ -202,7 +202,8 @@ const TailorProfile = () => {
                   if (!ratingSnapshot.empty) {
                     const ratingDoc = ratingSnapshot.docs[0];
                     const ratingData = ratingDoc.data();
-                    const { rating: totalScore = 0, totalRating = 0 } = ratingData;
+                    const { rating: totalScore = 0, totalRating = 0 } =
+                      ratingData;
 
                     if (totalRating > 0) {
                       rating = (totalScore / totalRating) * 5;
@@ -364,7 +365,7 @@ const TailorProfile = () => {
   const calculatedRating =
     totalRating > 0 ? (ratingValue / totalRating) * 5 : 0;
 
-  const numberOfReviews = totalRating > 0 ? totalRating/6 : 0;
+  const numberOfReviews = totalRating > 0 ? totalRating / 6 : 0;
 
   return tailorData ? (
     <div className="h-full overflow-y-auto">
@@ -372,7 +373,7 @@ const TailorProfile = () => {
         className={`max-w-[99.5%] mx-auto my-4 md:my-1 rounded-lg h-fit py-5 md:py-12 px-5 lg:px-10 ${theme.mainTheme} ${theme.colorText}`}
       >
         {/* Hero Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -381,7 +382,7 @@ const TailorProfile = () => {
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="relative border-white border w-full lg:w-64 h-48 rounded-xl overflow-hidden shadow-xl"
-            style={{ aspectRatio: '3/2' }}
+            style={{ aspectRatio: "3/2" }}
           >
             <Image
               src={
@@ -395,9 +396,9 @@ const TailorProfile = () => {
               blurDataURL="/images/profile/business/default.png"
             />
           </motion.div>
-          
+
           <div className="flex-1">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -405,8 +406,8 @@ const TailorProfile = () => {
             >
               {tailorData.businessName}
             </motion.h1>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -416,7 +417,11 @@ const TailorProfile = () => {
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
-                    className={`w-6 h-6 ${i < Math.floor(calculatedRating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                    className={`w-6 h-6 ${
+                      i < Math.floor(calculatedRating)
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    }`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -428,8 +433,8 @@ const TailorProfile = () => {
                 {calculatedRating.toFixed(1)} ({numberOfReviews} reviews)
               </span>
             </motion.div>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
@@ -437,18 +442,22 @@ const TailorProfile = () => {
             >
               <div className="flex items-center">
                 <i className="fas fa-clock mr-2 text-blue-500"></i>
-                <span>{tailorData.openTime} - {tailorData.closeTime}</span>
+                <span>
+                  {tailorData.openTime} - {tailorData.closeTime}
+                </span>
               </div>
               <div className="flex items-center">
                 <i className="fas fa-briefcase mr-2 text-purple-500"></i>
-                <span>{tailorData.experience || 'N/A'} years experience</span>
+                <span>{tailorData.experience || "N/A"} years experience</span>
               </div>
               <div className="flex items-center">
                 <i className="fas fa-map-marker-alt mr-2 text-red-500"></i>
-                <span>{tailorData.businessAddress || 'Address not provided'}</span>
+                <span>
+                  {tailorData.businessAddress || "Address not provided"}
+                </span>
               </div>
             </motion.div>
-            
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -470,32 +479,32 @@ const TailorProfile = () => {
         >
           {[
             {
-              icon: 'fas fa-clock',
-              color: 'text-blue-500',
-              title: 'In Queue',
+              icon: "fas fa-clock",
+              color: "text-blue-500",
+              title: "In Queue",
               value: orderStats?.inQueue || 0,
-              bg: 'bg-blue-100',
+              bg: "bg-blue-100",
             },
             {
-              icon: 'fas fa-tools',
-              color: 'text-yellow-500',
-              title: 'Active',
+              icon: "fas fa-tools",
+              color: "text-yellow-500",
+              title: "Active",
               value: orderStats?.active || 0,
-              bg: 'bg-yellow-100',
+              bg: "bg-yellow-100",
             },
             {
-              icon: 'fas fa-check-circle',
-              color: 'text-green-500',
-              title: 'Completed',
+              icon: "fas fa-check-circle",
+              color: "text-green-500",
+              title: "Completed",
               value: orderStats?.successful || 0,
-              bg: 'bg-green-100',
+              bg: "bg-green-100",
             },
             {
-              icon: 'fas fa-times-circle',
-              color: 'text-red-500',
-              title: 'Cancelled',
+              icon: "fas fa-times-circle",
+              color: "text-red-500",
+              title: "Cancelled",
               value: orderStats?.cancelled || 0,
-              bg: 'bg-red-100',
+              bg: "bg-red-100",
             },
           ].map((stat, index) => (
             <motion.div
@@ -506,7 +515,9 @@ const TailorProfile = () => {
               whileHover={{ y: -5 }}
               className={`p-6 rounded-xl shadow-md ${theme.colorBgSecondary} flex flex-col items-center transition-all duration-300`}
             >
-              <div className={`w-16 h-16 ${stat.bg} rounded-full flex items-center justify-center mb-4`}>
+              <div
+                className={`w-16 h-16 ${stat.bg} rounded-full flex items-center justify-center mb-4`}
+              >
                 <i className={`${stat.icon} ${stat.color} text-2xl`}></i>
               </div>
               <h3 className="text-lg font-semibold mb-2">{stat.title}</h3>
@@ -522,10 +533,14 @@ const TailorProfile = () => {
           transition={{ delay: 0.2 }}
           className="mb-12"
         >
-          <h2 className="text-2xl font-bold mb-4 border-b-2 pb-2 inline-block">About</h2>
+          <h2 className="text-2xl font-bold mb-4 border-b-2 pb-2 inline-block">
+            About
+          </h2>
           <p className="text-lg leading-relaxed">
             {tailorData.description || (
-              <span className="italic text-gray-500">No description provided</span>
+              <span className="italic text-gray-500">
+                No description provided
+              </span>
             )}
           </p>
         </motion.section>
@@ -537,7 +552,9 @@ const TailorProfile = () => {
           transition={{ delay: 0.3 }}
           className="mb-12"
         >
-          <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2 inline-block">Craftsmanship Specialties</h2>
+          <h2 className="text-2xl font-bold mb-6 border-b-2 pb-2 inline-block">
+            Craftsmanship Specialties
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {tailorData.specialities?.length > 0 ? (
               tailorData.specialities.map((speciality, index) => (
@@ -552,14 +569,18 @@ const TailorProfile = () => {
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mb-3">
                     <i className="fas fa-cut text-white"></i>
                   </div>
-                  <h3 className="font-medium text-sm md:text-base">{speciality}</h3>
+                  <h3 className="font-medium text-sm md:text-base">
+                    {speciality}
+                  </h3>
                   <div className="absolute inset-0 border-2 border-transparent hover:border-blue-400 rounded-lg transition-all duration-300 pointer-events-none"></div>
                 </motion.div>
               ))
             ) : (
               <div className="col-span-full text-center py-8">
                 <i className="fas fa-tshirt text-4xl mb-4 opacity-50"></i>
-                <p className="italic text-gray-500">No specialties listed yet</p>
+                <p className="italic text-gray-500">
+                  No specialties listed yet
+                </p>
               </div>
             )}
           </div>
@@ -602,7 +623,9 @@ const TailorProfile = () => {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -5 }}
                   className={`rounded-xl overflow-hidden border ${theme.colorBorder} ${theme.hoverShadow} cursor-pointer transition-all duration-300`}
-                  onClick={() => router.push(`/market/product?id=${product.id}`)}
+                  onClick={() =>
+                    router.push(`/market/product?id=${product.id}`)
+                  }
                 >
                   <div className="relative h-64">
                     <Image
@@ -630,7 +653,9 @@ const TailorProfile = () => {
                         <div className="flex mr-1">
                           {renderStars(product.rating)}
                         </div>
-                        <span className={`text-xs ${theme.colorText} opacity-80 ml-1`}>
+                        <span
+                          className={`text-xs ${theme.colorText} opacity-80 ml-1`}
+                        >
                           ({product.totalReviews || 0})
                         </span>
                       </div>
@@ -648,8 +673,12 @@ const TailorProfile = () => {
               animate={{ opacity: 1 }}
               className={`p-8 text-center rounded-xl ${theme.colorBgSecondary}`}
             >
-              <i className={`fas fa-tshirt text-5xl mb-4 ${theme.colorText} opacity-50`}></i>
-              <p className={`text-lg ${theme.colorText}`}>No products available yet</p>
+              <i
+                className={`fas fa-tshirt text-5xl mb-4 ${theme.colorText} opacity-50`}
+              ></i>
+              <p className={`text-lg ${theme.colorText}`}>
+                No products available yet
+              </p>
             </motion.div>
           )}
         </motion.section>
@@ -661,8 +690,10 @@ const TailorProfile = () => {
           transition={{ delay: 0.5 }}
           className="mb-12"
         >
-          <h2 className="text-2xl font-bold mb-8 border-b-2 pb-2 inline-block">Customer Reviews</h2>
-          
+          <h2 className="text-2xl font-bold mb-8 border-b-2 pb-2 inline-block">
+            Customer Reviews
+          </h2>
+
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Reviews Carousel */}
             <div className="w-full lg:w-2/3">
@@ -688,7 +719,11 @@ const TailorProfile = () => {
                           {[...Array(5)].map((_, i) => (
                             <svg
                               key={i}
-                              className={`w-6 h-6 ${i < fetchedReviews[currentReviewIndex].stars ? 'text-yellow-400' : 'text-gray-300'}`}
+                              className={`w-6 h-6 ${
+                                i < fetchedReviews[currentReviewIndex].stars
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
+                              }`}
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -697,7 +732,8 @@ const TailorProfile = () => {
                           ))}
                         </div>
                         <p className={`text-lg italic ${theme.colorText}`}>
-                          "{fetchedReviews[currentReviewIndex].message}"
+                          &quot;{fetchedReviews[currentReviewIndex].message}
+                          &quot;
                         </p>
                       </div>
                     </motion.div>
@@ -721,7 +757,11 @@ const TailorProfile = () => {
                         <button
                           key={index}
                           onClick={() => setCurrentReviewIndex(index)}
-                          className={`w-3 h-3 rounded-full ${index === currentReviewIndex ? 'bg-blue-500' : 'bg-gray-300'}`}
+                          className={`w-3 h-3 rounded-full ${
+                            index === currentReviewIndex
+                              ? "bg-blue-500"
+                              : "bg-gray-300"
+                          }`}
                         />
                       ))}
                     </div>
@@ -740,24 +780,30 @@ const TailorProfile = () => {
                   </div>
                 </div>
               ) : (
-                <div className={`p-8 rounded-xl text-center ${theme.colorBgSecondary}`}>
+                <div
+                  className={`p-8 rounded-xl text-center ${theme.colorBgSecondary}`}
+                >
                   <i className="fas fa-comment-slash text-4xl mb-4 opacity-50"></i>
                   <p className="text-lg">No reviews yet</p>
-                  <p className="text-sm mt-2">Be the first to review this tailor!</p>
+                  <p className="text-sm mt-2">
+                    Be the first to review this tailor!
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Leave Review Form */}
             <div className="w-full lg:w-1/3">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 className={`p-6 rounded-xl shadow-md ${theme.colorBgSecondary} sticky top-4`}
               >
-                <h3 className="text-xl font-bold mb-4">Share Your Experience</h3>
-                
+                <h3 className="text-xl font-bold mb-4">
+                  Share Your Experience
+                </h3>
+
                 <div className="mb-6">
                   <p className="mb-2">Your Rating</p>
                   <div className="flex gap-1">
@@ -765,14 +811,16 @@ const TailorProfile = () => {
                       <button
                         key={star}
                         onClick={() => setRating(star)}
-                        className={`text-3xl ${star <= rating ? 'text-yellow-400' : 'text-gray-300'} transition-colors duration-200`}
+                        className={`text-3xl ${
+                          star <= rating ? "text-yellow-400" : "text-gray-300"
+                        } transition-colors duration-200`}
                       >
                         ★
                       </button>
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="relative mb-6">
                   <textarea
                     value={userReview}
@@ -794,7 +842,7 @@ const TailorProfile = () => {
                     {userReview.length}/250
                   </div>
                 </div>
-                
+
                 <SimpleButton
                   btnText={
                     isSubmitting ? (

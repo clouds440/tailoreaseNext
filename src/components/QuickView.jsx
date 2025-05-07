@@ -64,27 +64,27 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
   // Enhanced animations
   const backdropVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
       transition: {
         duration: 0.4,
-        ease: [0.33, 1, 0.68, 1]
-      }
+        ease: [0.33, 1, 0.68, 1],
+      },
     },
     exit: {
       opacity: 0,
       transition: {
         duration: 0.3,
-        ease: [0.33, 1, 0.68, 1]
-      }
-    }
+        ease: [0.33, 1, 0.68, 1],
+      },
+    },
   };
 
   const popupVariants = {
-    hidden: { 
+    hidden: {
       scale: 0.96,
       opacity: 0,
-      y: 20
+      y: 20,
     },
     visible: {
       scale: 1,
@@ -92,8 +92,8 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
       y: 0,
       transition: {
         duration: 0.5,
-        ease: [0.33, 1, 0.68, 1]
-      }
+        ease: [0.33, 1, 0.68, 1],
+      },
     },
     exit: {
       scale: 0.96,
@@ -101,9 +101,9 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
       y: 20,
       transition: {
         duration: 0.3,
-        ease: [0.33, 1, 0.68, 1]
-      }
-    }
+        ease: [0.33, 1, 0.68, 1],
+      },
+    },
   };
 
   const itemVariants = {
@@ -114,9 +114,9 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
       transition: {
         delay: 0.1 + i * 0.05,
         duration: 0.4,
-        ease: [0.33, 1, 0.68, 1]
-      }
-    })
+        ease: [0.33, 1, 0.68, 1],
+      },
+    }),
   };
 
   const starVariants = {
@@ -128,9 +128,9 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
         delay: 0.3 + i * 0.07,
         type: "spring",
         stiffness: 500,
-        damping: 15
-      }
-    })
+        damping: 15,
+      },
+    }),
   };
 
   return (
@@ -161,7 +161,7 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
               >
                 {/* Header with close button */}
                 <div className="flex justify-between items-start mb-4">
-                  <motion.h3 
+                  <motion.h3
                     className={`text-xl font-bold ${theme.colorText} line-clamp-2`}
                     variants={itemVariants}
                     custom={0}
@@ -170,7 +170,7 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
                   >
                     {tailor.businessName}
                   </motion.h3>
-                  
+
                   <motion.button
                     onClick={handleClose}
                     className={`text-lg ${theme.colorText} ${theme.hoverText} rounded-full p-1`}
@@ -186,7 +186,7 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
                 </div>
 
                 {/* Profile section with 3:2 image ratio */}
-                <motion.div 
+                <motion.div
                   className="flex flex-col sm:flex-row gap-4 mb-5"
                   variants={itemVariants}
                   custom={0.4}
@@ -211,35 +211,61 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
                       blurDataURL="/images/profile/business/default.png"
                     />
                   </motion.div>
-                  
+
                   <div className="flex-1 min-w-0">
-                    <motion.div 
+                    <motion.div
                       className="grid grid-cols-2 gap-2"
                       variants={itemVariants}
                       custom={0.6}
                       initial="hidden"
                       animate="visible"
                     >
-                      <div className={`p-2 rounded-lg ${theme.hoverBg} border ${theme.colorBorder}`}>
-                        <p className={`text-xs font-medium ${theme.colorText} mb-1`}>Experience</p>
-                        <p className={`text-sm font-bold ${theme.iconColor}`}>{tailor.experience} yrs</p>
+                      <div
+                        className={`p-2 rounded-lg ${theme.hoverBg} border ${theme.colorBorder}`}
+                      >
+                        <p
+                          className={`text-xs font-medium ${theme.colorText} mb-1`}
+                        >
+                          Experience
+                        </p>
+                        <p className={`text-sm font-bold ${theme.iconColor}`}>
+                          {tailor.experience} yrs
+                        </p>
                       </div>
-                      
-                      <div className={`p-2 rounded-lg ${theme.hoverBg} border ${theme.colorBorder}`}>
-                        <p className={`text-xs font-medium ${theme.colorText} mb-1`}>Hours</p>
-                        <p className={`text-sm font-bold ${theme.iconColor}`}>{tailor.openTime}-{tailor.closeTime}</p>
+
+                      <div
+                        className={`p-2 rounded-lg ${theme.hoverBg} border ${theme.colorBorder}`}
+                      >
+                        <p
+                          className={`text-xs font-medium ${theme.colorText} mb-1`}
+                        >
+                          Hours
+                        </p>
+                        <p className={`text-sm font-bold ${theme.iconColor}`}>
+                          {tailor.openTime}-{tailor.closeTime}
+                        </p>
                       </div>
-                      
-                      <div className={`p-2 rounded-lg ${theme.hoverBg} border ${theme.colorBorder} col-span-2`}>
-                        <p className={`text-xs font-medium ${theme.colorText} mb-1`}>Address</p>
-                        <p className={`text-xs ${theme.iconColor} line-clamp-2`}>{tailor.businessAddress}</p>
+
+                      <div
+                        className={`p-2 rounded-lg ${theme.hoverBg} border ${theme.colorBorder} col-span-2`}
+                      >
+                        <p
+                          className={`text-xs font-medium ${theme.colorText} mb-1`}
+                        >
+                          Address
+                        </p>
+                        <p
+                          className={`text-xs ${theme.iconColor} line-clamp-2`}
+                        >
+                          {tailor.businessAddress}
+                        </p>
                       </div>
                     </motion.div>
                   </div>
                 </motion.div>
 
                 {/* Specialities */}
-                <motion.div 
+                <motion.div
                   className="mb-5"
                   variants={itemVariants}
                   custom={0.8}
@@ -259,9 +285,9 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
                           custom={0.8 + index * 0.05}
                           initial="hidden"
                           animate="visible"
-                          whileHover={{ 
+                          whileHover={{
                             y: -2,
-                            boxShadow: `0 2px 4px rgba(0,0,0,0.1)`
+                            boxShadow: `0 2px 4px rgba(0,0,0,0.1)`,
                           }}
                         >
                           {speciality}
@@ -276,7 +302,7 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
                 </motion.div>
 
                 {/* Rating */}
-                <motion.div 
+                <motion.div
                   className="mb-5"
                   variants={itemVariants}
                   custom={1}
@@ -291,7 +317,11 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
                       {[1, 2, 3, 4, 5].map((star, i) => (
                         <motion.span
                           key={i}
-                          className={`text-xl ${i < Math.floor(normalizedRating) ? 'text-yellow-500' : theme.iconColor}`}
+                          className={`text-xl ${
+                            i < Math.floor(normalizedRating)
+                              ? "text-yellow-500"
+                              : theme.iconColor
+                          }`}
                           variants={starVariants}
                           custom={i}
                           initial="hidden"
@@ -306,11 +336,12 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
                       {normalizedRating.toFixed(1)}
                     </span>
                   </div>
-                  <motion.p 
+                  <motion.p
                     className={`text-xs mt-1 ${theme.colorText}`}
                     whileHover={{ x: 3 }}
                   >
-                    {reviewCount || 0} {reviewCount === 1 ? "review" : "reviews"}
+                    {reviewCount || 0}{" "}
+                    {reviewCount === 1 ? "review" : "reviews"}
                   </motion.p>
                 </motion.div>
 
@@ -326,7 +357,7 @@ const QuickView = ({ theme, tailor, setPopupVisible, popupVisible }) => {
                   <SimpleButton
                     btnText={"View Profile"}
                     type="primary-submit"
-                    extraclasses={`w-full py-2 text-sm ${theme.hoverShadow}`}
+                    extraclasses={`w-full py-2 text-sm`}
                     onClick={handleViewProfile}
                   />
                 </motion.div>

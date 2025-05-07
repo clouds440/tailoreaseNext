@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useContext, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import UserContext from "@/utils/UserContext";
 import SimpleButton from "@/components/SimpleButton";
@@ -15,9 +15,6 @@ import {
   query,
   where,
   getDoc,
-  setDoc,
-  updateDoc,
-  arrayUnion,
 } from "firebase/firestore";
 import TrendPop from "@/components/TrendPop";
 import AddToCart from "@/components/AddToCart";
@@ -26,6 +23,8 @@ const Market = () => {
   const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
     useContext(UserContext);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const TailorProductsView = searchParams.get("tailor");
 
   const genders = [
     { name: "Male", icon: "male" },
@@ -66,12 +65,18 @@ const Market = () => {
     setLoading(true);
     try {
       // Fetch all active tailor products
-      const productsQuery = query(
-        collection(db, "tailorProducts"),
-        where("isActive", "==", true)
-      );
+      const productsQuery = TailorProductsView
+        ? query(
+            collection(db, "tailorProducts"),
+            where("isActive", "==", true),
+            where("tailorId", "==", TailorProductsView)
+          )
+        : query(
+            collection(db, "tailorProducts"),
+            where("isActive", "==", true)
+          );
       const productsSnapshot = await getDocs(productsQuery);
-  
+
       // Process each product to get tailor and rating details
       const productsData = await Promise.all(
         productsSnapshot.docs.map(async (Doc) => {
@@ -79,13 +84,17 @@ const Market = () => {
             id: Doc.id,
             ...Doc.data(),
           };
-  
+
           // Get tailor's business name and image
           let tailorName = "Unknown Tailor";
           let tailorImage = "/images/default-tailor.png";
           try {
             if (productData.tailorId) {
-              const tailorDocReference = doc(db, "tailors", productData.tailorId);
+              const tailorDocReference = doc(
+                db,
+                "tailors",
+                productData.tailorId
+              );
               const tailorDoc = await getDoc(tailorDocReference);
               if (tailorDoc.exists()) {
                 const tailorData = tailorDoc.data();
@@ -96,7 +105,7 @@ const Market = () => {
           } catch (error) {
             console.error("Error fetching tailor data:", error);
           }
-  
+
           // Get rating data
           let rating = 0;
           let totalReviews = 0;
@@ -106,12 +115,12 @@ const Market = () => {
               where("productId", "==", productData.productId)
             );
             const ratingSnapshot = await getDocs(ratingQuery);
-  
+
             if (!ratingSnapshot.empty) {
               const ratingDoc = ratingSnapshot.docs[0];
               const ratingData = ratingDoc.data();
               const { rating: totalScore = 0, totalRating = 0 } = ratingData;
-  
+
               if (totalRating > 0) {
                 rating = (totalScore / totalRating) * 5;
                 totalReviews = totalRating / 6;
@@ -120,7 +129,7 @@ const Market = () => {
           } catch (error) {
             console.error("Error fetching rating data:", error);
           }
-  
+
           return {
             id: productData.id,
             ...productData,
@@ -132,9 +141,9 @@ const Market = () => {
           };
         })
       );
-  
+
       let products = [...productsData];
-  
+
       // Apply search filter
       if (searchQuery) {
         products = products.filter(
@@ -148,14 +157,14 @@ const Market = () => {
               .includes(searchQuery.toLowerCase())
         );
       }
-  
+
       // Apply gender filters
       if (appliedGenderFilter.length > 0) {
         products = products.filter((product) =>
           appliedGenderFilter.includes(product.gender)
         );
       }
-  
+
       // Apply sorting
       switch (filters.sortBy) {
         case "Price: Low to High":
@@ -178,14 +187,13 @@ const Market = () => {
           });
           break;
       }
-  
+
       setProductList(products);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
     setLoading(false);
   }, [filters.sortBy, appliedGenderFilter, searchQuery]);
-  
 
   useEffect(() => {
     fetchProducts();
@@ -397,7 +405,9 @@ const Market = () => {
         <div className={`p-4 ${theme.mainTheme} rounded-lg`}>
           <div className="flex justify-between items-center mb-6">
             <h2 className={`text-2xl font-bold ${theme.colorText}`}>
-              TailorEase Market
+              {TailorProductsView
+                ? productList?.[0]?.tailor
+                : "TailorEase Market"}
             </h2>
 
             <div className="flex items-center gap-4">
@@ -585,7 +595,7 @@ const Market = () => {
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                        priority={index < 5}
+                        priority
                       />
                       {product.has3DTryOn && (
                         <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
@@ -817,6 +827,7 @@ const Market = () => {
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                        priority
                       />
                     </div>
                     <span className={`font-medium ${theme.colorText}`}>
