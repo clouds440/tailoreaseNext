@@ -399,15 +399,48 @@ const Market = () => {
       : [selectedProduct.baseProductData?.imageUrl];
   };
 
+  const [tailorName, setTailorName] = useState(null);
+
+  useEffect(() => {
+    if (!TailorProductsView) return;
+
+    setTailorName(null); // start loading
+    const tailorDocRef = doc(db, "tailors", TailorProductsView);
+
+    getDoc(tailorDocRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          setTailorName(docSnap.data().businessName);
+        } else {
+          setTailorName("");
+        }
+      })
+      .catch(() => {
+        setTailorName("");
+      });
+  }, [TailorProductsView]);
+
+  // Now build the message
+  let emptyMessage = "No products found";
+
+  if (TailorProductsView) {
+    if (tailorName === null) {
+      emptyMessage += ". Checking tailor info…";
+    } else if (tailorName === "") {
+      emptyMessage +=
+        ". This tailor doesn't exist. Check the tailor ID and try again";
+    } else {
+      emptyMessage += `. ${tailorName} hasn't listed any products yet`;
+    }
+  }
+
   return (
     <div className="h-full overflow-y-auto">
       <div className={`max-w-[99.5%] mx-auto my-4 md:my-1 h-full select-none`}>
         <div className={`p-4 ${theme.mainTheme} rounded-lg`}>
           <div className="flex justify-between items-center mb-6">
             <h2 className={`text-2xl font-bold ${theme.colorText}`}>
-              {TailorProductsView
-                ? productList?.[0]?.tailor
-                : "TailorEase Market"}
+              {TailorProductsView ? tailorName : "TailorEase Market"}
             </h2>
 
             <div className="flex items-center gap-4">
@@ -560,9 +593,16 @@ const Market = () => {
                     className={`fas fa-tshirt text-4xl mb-4 ${theme.colorText} opacity-50`}
                   ></i>
                   <span
-                    className={`text-2xl font-bold mb-4 ${theme.colorText}`}
+                    className={`text-2xl font-bold text-center mb-4 ${theme.colorText}`}
                   >
-                    No products found
+                    {emptyMessage}
+                    {TailorProductsView && (
+                      <div
+                        className={`block text-sm mt-4 w-fit mx-auto p-2 rounded-lg ${theme.hoverBg}`}
+                      >
+                        <a href="/market">Browse all products</a>
+                      </div>
+                    )}
                   </span>
                   <button
                     onClick={clearFilters}
