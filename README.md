@@ -25,7 +25,7 @@ TailorEase is a next-generation web platform that blends traditional tailoring w
 - **Frontend**: Next.js 13+, Tailwind CSS, Framer Motion
 - **Backend**: Firebase Firestore, Firebase Auth, Cloud Functions
 - **3D Tools**: Three.js for virtual try-ons
-- **Others**: Zustand (for state), NextAuth (if used), React Hook Form, etc.
+- **Others**: Zustand (for state), NextAuth, React Hook Form, etc.
 
 ---
 
