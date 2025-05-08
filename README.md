@@ -31,8 +31,6 @@ TailorEase is a next-generation web platform that blends traditional tailoring w
 
 ## 📸 Screenshots
 
-```
-
 ### 🏠 Homepage
 ![Homepage](./public/screenshots/homepage.png)
 
