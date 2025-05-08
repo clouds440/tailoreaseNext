@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 👔 TailorEase - Modern Tailoring Platform
 
-## Getting Started
+TailorEase is a next-generation web platform that blends traditional tailoring with digital convenience. With 3D visualization, personalized recommendations, and seamless tailor-customer collaboration, TailorEase empowers both users and tailors to take control of custom fashion like never before.
 
-First, run the development server:
+![TailorEase](./public/cover.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+[![Live Site](https://img.shields.io/badge/Live_Site-blue?style=for-the-badge&logo=vercel)](https://tailorease.vercel.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](./LICENSE)
+
+---
+
+## ✨ Features
+
+- 🔒 Secure user and tailor accounts with smooth onboarding
+- 📏 3D body measurement visualization and customization
+- 🧵 Tailor dashboard for managing listings, orders, and customers
+- 📦 Users can browse, customize, and place orders easily
+- 🔔 Real-time notification system using Firebase
+- 💬 Enhanced transparency and communication
+
+---
+
+## 🔧 Tech Stack
+
+- **Frontend**: Next.js 13+, Tailwind CSS, Framer Motion
+- **Backend**: Firebase Firestore, Firebase Auth, Cloud Functions
+- **3D Tools**: Three.js for virtual try-ons
+- **Others**: Zustand (for state), NextAuth (if used), React Hook Form, etc.
+
+---
+
+## 📸 Screenshots
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🏠 Homepage
+![Homepage](./public/screenshots/homepage.png)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### 🧵 Business Dashboard -> Orders
+![Orders](./public/screenshots/tailor-orders.png)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🧍 3D Try-On Feature
+![3D Try-On](./public/screenshots/tryon.png)
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 📱 Responsive UI
+![Responsive UI](./public/screenshots/responsive.png)
