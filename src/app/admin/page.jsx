@@ -10,6 +10,7 @@ import {
   updateDoc,
   doc,
   addDoc,
+  getDoc,
 } from "firebase/firestore";
 import {
   FaLock,
@@ -19,6 +20,7 @@ import {
   FaTimes,
   FaShoppingBag,
   FaMoneyBillWave,
+  FaWallet,
 } from "react-icons/fa";
 import { ClipLoader } from "react-spinners";
 import Image from "next/image";
@@ -67,6 +69,7 @@ const AdminDashboard = () => {
 
   // Order management state
   const [pendingOrders, setPendingOrders] = useState([]);
+  const [pendingPayouts, setPendingPayouts] = useState([]);
   const [activeTab, setActiveTab] = useState("orders");
 
   // Handle image cropped
@@ -119,6 +122,86 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error("Error fetching orders:", error);
       showAlert("error", "Failed to fetch pending orders");
+    }
+  };
+
+  // Fetch pending payouts
+  const fetchPendingPayouts = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "tailorWallet"));
+      const wallets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      const payouts = [];
+      for (const wallet of wallets) {
+        if (wallet.transactions && wallet.transactions.length > 0) {
+          wallet.transactions.forEach((tx, index) => {
+            if (tx.type === "payOut" && tx.status === "pending") {
+              payouts.push({
+                ...tx,
+                tailorId: wallet.tailorId,
+                walletId: wallet.id,
+                transactionIndex: index,
+                bankDetails: {
+                  bankName: wallet.bankName,
+                  accountName: wallet.accountName,
+                  accountNumber: wallet.accountNumber
+                }
+              });
+            }
+          });
+        }
+      }
+      
+      setPendingPayouts(payouts);
+    } catch (error) {
+      console.error("Error fetching pending payouts:", error);
+      showAlert("error", "Failed to fetch pending payouts");
+    }
+  };
+
+  // Update payout status
+  const updatePayoutStatus = async (walletId, transactionIndex, status) => {
+    try {
+      const walletRef = doc(db, "tailorWallet", walletId);
+      const walletSnap = await getDoc(walletRef);
+      
+      if (!walletSnap.exists()) {
+        showAlert("error", "Wallet not found");
+        return;
+      }
+      
+      const walletData = walletSnap.data();
+      const updatedTransactions = [...walletData.transactions];
+      
+      if (!updatedTransactions[transactionIndex]) {
+        showAlert("error", "Transaction not found");
+        return;
+      }
+      
+      // Create a new transaction object with updated status
+      updatedTransactions[transactionIndex] = {
+        ...updatedTransactions[transactionIndex],
+        status,
+        processedAt: new Date().toISOString()
+      };
+      
+      // Update balance if completing payout
+      let newBalance = walletData.currentBalance || 0;
+      if (status === "completed") {
+        newBalance -= updatedTransactions[transactionIndex].amount;
+      }
+      
+      await updateDoc(walletRef, {
+        transactions: updatedTransactions,
+        currentBalance: newBalance,
+        updatedAt: new Date().toISOString()
+      });
+      
+      showAlert("success", `Payout ${status} successfully`);
+      fetchPendingPayouts();
+    } catch (error) {
+      console.error("Error updating payout status:", error);
+      showAlert("error", "Failed to update payout status");
     }
   };
 
@@ -300,10 +383,54 @@ const AdminDashboard = () => {
     }
   };
 
+  // Format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-PK", {
+      style: "currency",
+      currency: "PKR",
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
+  // Format date - handles both Firestore Timestamp and regular date strings
+  const formatDate = (dateValue) => {
+    if (!dateValue) return "N/A";
+    
+    try {
+      let date;
+      if (dateValue.toDate) {
+        // Handle Firestore Timestamp
+        date = dateValue.toDate();
+      } else if (typeof dateValue === 'string') {
+        // Handle ISO string
+        date = new Date(dateValue);
+      } else if (typeof dateValue === 'number') {
+        // Handle timestamp
+        date = new Date(dateValue);
+      } else {
+        return "N/A";
+      }
+      
+      if (isNaN(date.getTime())) return "N/A";
+      
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "N/A";
+    }
+  };
+
   // Load data when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       fetchPendingOrders();
+      fetchPendingPayouts();
       fetchProducts();
     }
   }, [isAuthenticated]);
@@ -478,6 +605,19 @@ const AdminDashboard = () => {
             Pending Orders
           </motion.button>
           <motion.button
+            onClick={() => setActiveTab("payouts")}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`px-4 py-2 font-medium text-sm flex items-center ${
+              activeTab === "payouts"
+                ? `${theme.colorText} border-b-2 border-blue-500`
+                : `${theme.colorText} opacity-70 hover:opacity-100`
+            }`}
+          >
+            <FaWallet className="mr-2" />
+            Pending Payouts
+          </motion.button>
+          <motion.button
             onClick={() => setActiveTab("products")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -599,6 +739,126 @@ const AdminDashboard = () => {
                         >
                           <FaTimes className="mr-2" />
                           Reject
+                        </motion.button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Payouts Tab */}
+        {activeTab === "payouts" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h2 className={`text-xl font-semibold mb-4 ${theme.colorText}`}>
+              Pending Payout Requests
+            </h2>
+
+            {pendingPayouts.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className={`rounded-lg shadow p-6 text-center ${theme.colorBg}`}
+              >
+                <p className={`${theme.colorText}`}>
+                  No pending payout requests
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ staggerChildren: 0.1 }}
+              >
+                {pendingPayouts.map((payout, index) => (
+                  <motion.div
+                    key={`${payout.walletId}-${index}`}
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    className={`rounded-lg shadow overflow-hidden ${theme.colorBg}`}
+                  >
+                    <div className="p-6">
+                      <div className="space-y-4">
+                        <div>
+                          <p className={`text-sm ${theme.colorText} opacity-80`}>
+                            Tailor ID
+                          </p>
+                          <p className={`font-medium ${theme.colorText}`}>
+                            {payout.tailorId || "N/A"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className={`text-sm ${theme.colorText} opacity-80`}>
+                            Amount
+                          </p>
+                          <p className={`font-medium text-lg text-blue-500`}>
+                            {formatCurrency(payout.amount)}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className={`text-sm ${theme.colorText} opacity-80`}>
+                            Request Date
+                          </p>
+                          <p className={`font-medium ${theme.colorText}`}>
+                            {formatDate(payout.date)}
+                          </p>
+                        </div>
+
+                        <div className={`p-4 rounded-lg ${theme.colorBgSecondary}`}>
+                          <h4 className={`text-sm font-semibold mb-2 ${theme.colorText}`}>
+                            Bank Details
+                          </h4>
+                          <div className="space-y-2">
+                            <div>
+                              <p className={`text-xs ${theme.colorText} opacity-70`}>Bank Name</p>
+                              <p className={`text-sm ${theme.colorText}`}>
+                                {payout.bankDetails?.bankName || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className={`text-xs ${theme.colorText} opacity-70`}>Account Name</p>
+                              <p className={`text-sm ${theme.colorText}`}>
+                                {payout.bankDetails?.accountName || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className={`text-xs ${theme.colorText} opacity-70`}>Account Number</p>
+                              <p className={`text-sm ${theme.colorText}`}>
+                                {payout.bankDetails?.accountNumber || "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 flex space-x-3">
+                        <motion.button
+                          onClick={() => updatePayoutStatus(payout.walletId, payout.transactionIndex, "completed")}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center justify-center"
+                        >
+                          <FaCheck className="mr-2" />
+                          Mark as Completed
+                        </motion.button>
+                        <motion.button
+                          onClick={() => updatePayoutStatus(payout.walletId, payout.transactionIndex, "failed")}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex items-center justify-center"
+                        >
+                          <FaTimes className="mr-2" />
+                          Mark as Failed
                         </motion.button>
                       </div>
                     </div>

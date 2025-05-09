@@ -367,9 +367,9 @@ const Navbar = () => {
       label: "Analytics",
     },
     {
-      path: "/payouts",
+      path: "/business-dashboard/tailorWallet",
       icon: <i className="fas fa-money-bill-wave" />,
-      label: "Payouts",
+      label: "Wallet",
     },
   ];
 

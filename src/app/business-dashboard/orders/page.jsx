@@ -9,6 +9,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 import UserContext from "@/utils/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -96,6 +97,46 @@ const TailorOrdersManagement = () => {
     { value: "newest", label: "Newest First", icon: "arrow-down" },
     { value: "oldest", label: "Oldest First", icon: "arrow-up" },
   ];
+
+  // Update tailor wallet when order is delivered
+  const updateTailorWallet = async (tailorId, amount) => {
+    try {
+      const walletRef = doc(db, "tailorWallet", tailorId);
+      const walletSnap = await getDoc(walletRef);
+
+      const transaction = {
+        type: "payIn",
+        amount: amount,
+        date: new Date().toISOString(),
+        status: "completed"
+      };
+
+      if (walletSnap.exists()) {
+        // Update existing wallet
+        const currentBalance = walletSnap.data().currentBalance || 0;
+        await updateDoc(walletRef, {
+          currentBalance: currentBalance + amount,
+          transactions: [...walletSnap.data().transactions, transaction],
+          updatedAt: new Date().toISOString()
+        });
+      } else {
+        // Create new wallet
+        await setDoc(walletRef, {
+          tailorId,
+          bankName:"",
+          accountName:"",
+          accountNumber:"",
+          currentBalance: amount,
+          transactions: [transaction],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error("Error updating tailor wallet:", error);
+      throw error;
+    }
+  };
 
   // Fetch and sort orders from Firestore
   useEffect(() => {
@@ -262,6 +303,14 @@ const TailorOrdersManagement = () => {
         orderStatus: newStatus,
         updatedAt: new Date().toISOString(),
       });
+
+      // If status is being updated to "delivered", update the tailor's wallet
+      if (newStatus === "delivered") {
+        const order = orders.find(o => o.id === orderId);
+        if (order && order.totalAmount) {
+          await updateTailorWallet(userData.bId, order.totalAmount);
+        }
+      }
 
       // Update local state
       setOrders((prevOrders) =>
@@ -681,7 +730,8 @@ const TailorOrdersManagement = () => {
 
                     {/* Action Buttons */}
                     <div className="mt-4 flex justify-between">
-                      {selectedOrder.orderStatus !== "delivered" && (
+                      {/* Only show cancel button if status is paymentVerified */}
+                      {selectedOrder.orderStatus === "paymentVerified" && (
                         <SimpleButton
                           btnText={
                             updatingStatus ? (
