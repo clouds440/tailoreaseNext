@@ -30,6 +30,7 @@ import {
 import SimpleButton from "@/components/SimpleButton";
 import DialogBox from "@/components/DialogBox";
 import Footer from "@/components/Footer";
+import { ClipLoader } from "react-spinners";
 
 function AccountSettings() {
   const {
@@ -40,6 +41,7 @@ function AccountSettings() {
     handleSetTheme,
     setShowMessage,
     setPopUpMessageTrigger,
+    loadingUserData,
   } = useContext(UserContext);
 
   const router = useRouter();
@@ -249,6 +251,14 @@ function AccountSettings() {
       router.push("/login");
     }
   }, [userLoggedIn, router]);
+
+  if (isLoading || loadingUserData) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <ClipLoader color="white" />
+      </div>
+    );
+  }
 
   return (
     <div className="h-full overflow-y-auto">

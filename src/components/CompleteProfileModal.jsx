@@ -23,6 +23,7 @@ export default function CompleteProfileModal({ isVisible, userData, onClose }) {
     inputStyles,
     placeHolderStyles,
     userLoggedIn,
+    loadingUserData,
   } = useContext(UserContext);
 
   const [formData, setFormData] = useState({
@@ -158,7 +159,10 @@ export default function CompleteProfileModal({ isVisible, userData, onClose }) {
     onClose,
   ]);
 
-  if (!userData || !userLoggedIn) return null;
+  if (!userData || !userLoggedIn || loadingUserData) return null;
+  const { age, phone, gender } = userData;
+  const isComplete = age && phone && gender;
+  if (isComplete) return null;
 
   return createPortal(
     <AnimatePresence>

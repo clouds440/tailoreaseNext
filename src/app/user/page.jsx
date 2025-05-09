@@ -16,7 +16,8 @@ const MyTailors = lazy(() => import("@/components/MyTailors"));
 const MyOutfits = lazy(() => import("@/components/MyOutfits"));
 
 const UserDashboard = () => {
-  const { theme, userData, userLoggedIn } = useContext(UserContext);
+  const { theme, userData, userLoggedIn, loadingUserData } =
+    useContext(UserContext);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -82,8 +83,12 @@ const UserDashboard = () => {
   }, [isSharedMode, userData?.bId, sharedId]);
 
   // Render content based on active tab in dashboard mode
+  if (!isSharedMode && !userLoggedIn) {
+    router.push("/login");
+    return null; // <-- stops rendering this component entirely
+  }
   const renderContent = () => {
-    if (isLoading) {
+    if (isLoading || loadingUserData) {
       return (
         <div className="flex justify-center items-center h-screen">
           <ClipLoader color="white" />

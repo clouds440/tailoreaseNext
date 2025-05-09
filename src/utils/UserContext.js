@@ -1,5 +1,14 @@
 "use client";
 import React, { createContext, useState, useEffect } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { db } from "./firebaseConfig";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 
 // Create the context
 export const UserContext = createContext();
@@ -17,6 +26,7 @@ export const UserProvider = ({ children }) => {
     message: "",
   });
   const [activeDashboard, setActiveDashboard] = useState("user");
+  const [loadingUserData, setLoadingUserData] = useState(true);
 
   const themes = {
     midnightWhisper: {
@@ -100,7 +110,16 @@ export const UserProvider = ({ children }) => {
         sessionStorage.getItem("userData") || localStorage.getItem("userData");
       const parsedUser = savedUser
         ? JSON.parse(savedUser)
-        : { uid: "", fullName: "", email: "", password: "" };
+        : {
+            uid: "",
+            fullName: "",
+            email: "",
+            phone: "",
+            age: "",
+            gender: "",
+            countryCode: "",
+            activeDashboard: "",
+          };
 
       // Set active dashboard from storage if available
       if (parsedUser.activeDashboard) {
@@ -112,6 +131,71 @@ export const UserProvider = ({ children }) => {
       setIsReady(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const auth = getAuth();
+    // Subscribe to auth changes; unsubscribe on unmount
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        // Tell UI we’re signed-in
+        setUserLoggedIn(true);
+
+        // Pull full profile from Firestore where field uid == fbUser.uid
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("uid", "==", fbUser.uid));
+        const snap = await getDocs(q);
+
+        // Build fresh userData
+        let freshData = {
+          uid: "",
+          fullName: "",
+          email: "",
+          phone: "",
+          age: "",
+          gender: "",
+          countryCode: "",
+        };
+
+        if (!snap.empty) {
+          const d = snap.docs[0].data();
+          freshData = {
+            uid: fbUser.uid,
+            fullName: d.fullName || "",
+            email: d.email || "",
+            phone: d.phone || "",
+            age: d.age || "",
+            gender: d.gender || "",
+            countryCode: d.countryCode || "",
+          };
+        }
+
+        // Overwrite context + storage
+        setUserData(freshData);
+        localStorage.setItem("userData", JSON.stringify(freshData));
+        sessionStorage.setItem("userData", JSON.stringify(freshData));
+      } else {
+        // Signed out: clear everything
+        setUserLoggedIn(false);
+        const empty = {
+          uid: "",
+          fullName: "",
+          email: "",
+          phone: "",
+          age: "",
+          gender: "",
+          countryCode: "",
+        };
+        setUserData(empty);
+        setUserLoggedIn(false);
+        setActiveDashboard("");
+        localStorage.removeItem("userData");
+        sessionStorage.removeItem("userData");
+      }
+      setLoadingUserData(false);
+    });
+
+    return unsubscribe; // clean up listener on unmount :contentReference[oaicite:4]{index=4} :contentReference[oaicite:5]{index=5}
   }, []);
 
   // Show a loader until the app is ready
@@ -153,6 +237,7 @@ export const UserProvider = ({ children }) => {
         showMessage,
         inputStyles,
         placeHolderStyles,
+        loadingUserData,
       }}
     >
       {children}
