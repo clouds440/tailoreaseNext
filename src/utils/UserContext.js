@@ -118,6 +118,7 @@ export const UserProvider = ({ children }) => {
             age: "",
             gender: "",
             countryCode: "",
+            bId: "",
             activeDashboard: "",
           };
 
@@ -155,6 +156,7 @@ export const UserProvider = ({ children }) => {
           age: "",
           gender: "",
           countryCode: "",
+          bId: "",
         };
 
         if (!snap.empty) {
@@ -167,6 +169,7 @@ export const UserProvider = ({ children }) => {
             age: d.age || "",
             gender: d.gender || "",
             countryCode: d.countryCode || "",
+            bId: d.bId || "",
           };
         }
 
@@ -185,6 +188,7 @@ export const UserProvider = ({ children }) => {
           age: "",
           gender: "",
           countryCode: "",
+          bId: "",
         };
         setUserData(empty);
         setUserLoggedIn(false);
