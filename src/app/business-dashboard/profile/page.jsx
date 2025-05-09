@@ -899,60 +899,6 @@ const TailorBusinessProfile = () => {
                   )}
                 </div>
               </motion.div>
-
-              {/* Stats */}
-              <motion.div
-                className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.1 }}
-              >
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className={`p-4 rounded-lg text-center ${theme.colorBg} shadow-md`}
-                >
-                  <div className={`text-3xl font-bold mb-2 ${theme.iconColor}`}>
-                    <i className="fas fa-calendar-check"></i>
-                  </div>
-                  <div className="text-sm">Orders Completed</div>
-                  <div className="text-xl font-bold mt-1">1620+</div>
-                </motion.div>
-
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className={`p-4 rounded-lg text-center ${theme.colorBg} shadow-md`}
-                >
-                  <div className={`text-3xl font-bold mb-2 ${theme.iconColor}`}>
-                    <i className="fas fa-smile"></i>
-                  </div>
-                  <div className="text-sm">Happy Customers</div>
-                  <div className="text-xl font-bold mt-1">95%</div>
-                </motion.div>
-
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className={`p-4 rounded-lg text-center ${theme.colorBg} shadow-md`}
-                >
-                  <div className={`text-3xl font-bold mb-2 ${theme.iconColor}`}>
-                    <i className="fas fa-clock"></i>
-                  </div>
-                  <div className="text-sm">Avg. Delivery Time</div>
-                  <div className="text-xl font-bold mt-1">3-5 Days</div>
-                </motion.div>
-
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className={`p-4 rounded-lg text-center ${theme.colorBg} shadow-md`}
-                >
-                  <div className={`text-3xl font-bold mb-2 ${theme.iconColor}`}>
-                    <i className="fas fa-award"></i>
-                  </div>
-                  <div className="text-sm">Years Experience</div>
-                  <div className="text-xl font-bold mt-1">
-                    {tailorData.experience || "0"}
-                  </div>
-                </motion.div>
-              </motion.div>
             </div>
           )}
         </motion.div>
