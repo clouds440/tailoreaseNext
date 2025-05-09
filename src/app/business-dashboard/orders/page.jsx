@@ -124,7 +124,7 @@ const TailorOrdersManagement = () => {
         await setDoc(walletRef, {
           tailorId,
           bankName:"",
-          accountTitle:"",
+          accountName:"",
           accountNumber:"",
           currentBalance: amount,
           transactions: [transaction],
