@@ -493,7 +493,7 @@ const Navbar = () => {
               windowWidth >= 768
                 ? "md:bottom-[45px]"
                 : "right-1 top-[100px] px-2 py-2 " + theme?.colorBg
-            } ${windowHeight <= 650 && theme?.colorBg}`}
+            } ${windowHeight <= 730 && theme?.colorBg}`}
             initial={{ opacity: 0, y: animate }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: animate }}

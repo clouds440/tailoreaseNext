@@ -131,7 +131,7 @@ export default function ImageCropper({
               step={0.01}
               value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
-              className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${theme.colorPrimaryBg}`}
+              className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${theme.colorBg}`}
             />
           </div>
         </div>
@@ -147,6 +147,7 @@ export default function ImageCropper({
             btnText={"Crop"}
             type={"primary"}
             icon={<i className="fas fa-crop-alt"></i>}
+            extraclasses="px-10"
             onClick={handleCrop}
           />
         </div>
