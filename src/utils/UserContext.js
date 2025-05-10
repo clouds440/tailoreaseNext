@@ -2,13 +2,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "./firebaseConfig";
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 // Create the context
 export const UserContext = createContext();
@@ -180,17 +174,7 @@ export const UserProvider = ({ children }) => {
       } else {
         // Signed out: clear everything
         setUserLoggedIn(false);
-        const empty = {
-          uid: "",
-          fullName: "",
-          email: "",
-          phone: "",
-          age: "",
-          gender: "",
-          countryCode: "",
-          bId: "",
-        };
-        setUserData(empty);
+        setUserData(null);
         setUserLoggedIn(false);
         setActiveDashboard("");
         localStorage.removeItem("userData");
@@ -199,7 +183,7 @@ export const UserProvider = ({ children }) => {
       setLoadingUserData(false);
     });
 
-    return unsubscribe; // clean up listener on unmount :contentReference[oaicite:4]{index=4} :contentReference[oaicite:5]{index=5}
+    return unsubscribe; // clean up listener on unmount
   }, []);
 
   // Show a loader until the app is ready

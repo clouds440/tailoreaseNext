@@ -87,6 +87,13 @@ const UserDashboard = () => {
     router.push("/login");
     return null; // <-- stops rendering this component entirely
   }
+  if (!isSharedMode && userLoggedIn && !userData) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <ClipLoader color="white" />
+      </div>
+    );
+  }
   const renderContent = () => {
     if (isLoading || loadingUserData) {
       return (
@@ -107,7 +114,10 @@ const UserDashboard = () => {
         return (
           <>
             <UserProfile userData={userData} />
-            <BodyMeasurements uid={userData.uid} authorization={userLoggedIn} />
+            <BodyMeasurements
+              uid={userData?.uid}
+              authorization={userLoggedIn}
+            />
           </>
         );
     }

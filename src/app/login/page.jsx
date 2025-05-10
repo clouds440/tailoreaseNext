@@ -75,8 +75,8 @@ const LoginForm = () => {
         localStorage.setItem("userData", JSON.stringify(userData));
 
         // set the user logged in state to true
-        setUserLoggedIn(true);
         setUserData(userData);
+        setUserLoggedIn(true);
       }
     } catch (error) {
       let errorMessage = "An error occurred: " + ` ${error.message}`;

@@ -29,6 +29,7 @@ import SimpleButton from "@/components/SimpleButton";
 import ContentSlider from "@/components/ContentSlider";
 import ShareLinkDialog from "@/components/ShareLinkDialog";
 import Footer from "@/components/Footer";
+import AddToCart from "@/components/AddToCart";
 
 const ProductPage = () => {
   const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
@@ -41,16 +42,31 @@ const ProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [currentImg, setCurrentImg] = useState(0);
+  const [tailorName, setTailorName] = useState("");
+  const [showAddToCart, setShowAddToCart] = useState(false);
 
   useEffect(() => {
     if (!id) {
       router.push("/404");
+      return;
     }
+
     (async () => {
       setLoading(true);
       try {
-        const snap = await getDoc(doc(db, "tailorProducts", id));
-        if (snap.exists()) setProduct({ id: snap.id, ...snap.data() });
+        const productSnap = await getDoc(doc(db, "tailorProducts", id));
+        if (productSnap.exists()) {
+          const productData = { id: productSnap.id, ...productSnap.data() };
+          setProduct(productData);
+
+          // Fetch tailor's name using tailorId
+          const tailorSnap = await getDoc(
+            doc(db, "tailors", productData.tailorId)
+          );
+          if (tailorSnap.exists()) {
+            setTailorName(tailorSnap.data().businessName || "Unknown Tailor");
+          }
+        }
       } catch (e) {
         console.error(e);
       }
@@ -97,8 +113,33 @@ const ProductPage = () => {
       setPopUpMessageTrigger(true);
       return;
     }
-    // trigger cart...
+    setShowAddToCart(true);
   };
+
+  const handleCustomizeClick = () => {
+    if (!product) return;
+    // Before navigating
+    sessionStorage.setItem("product", JSON.stringify(product));
+    const formatCategory = (str = "") => {
+      const words = str.trim().split(/\s+/);
+      if (words.length === 1) {
+        return words[0].toLowerCase();
+      }
+      return words
+        .map((word, index) =>
+          index === 0
+            ? word.toLowerCase()
+            : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join("");
+    };
+
+    const category = formatCategory(
+      product.baseProductData?.category || "shirt"
+    );
+    router.push(`/outfit-customization?outfit=${category}`);
+  };
+
   const inc = () => setQuantity((q) => Math.min(10, q + 1));
   const dec = () => setQuantity((q) => Math.max(1, q - 1));
 
@@ -268,7 +309,7 @@ const ProductPage = () => {
                       href={`/tailors/profile/${product.tailorId}`}
                       className="text-blue-600 hover:underline font-bold"
                     >
-                      {product.listedBy}
+                      {tailorName}
                     </a>
                   </div>
                   <div>Added: {formattedDate}</div>
@@ -294,27 +335,30 @@ const ProductPage = () => {
               {/* Actions */}
               <div className="mt-6 flex flex-wrap gap-3">
                 <SimpleButton
-                  onClick={() => {}}
-                  btnText={`Buy Now (${quantity})`}
-                  type="primary"
-                  icon={<FaBolt />}
-                />
-                <SimpleButton
                   onClick={handleAddToCart}
                   btnText={`Add to Cart (${quantity})`}
                   type="accent"
                   icon={<FaCartPlus />}
                 />
+                {product.has3DTryOn && (
+                  <SimpleButton
+                    btnText={
+                      <>
+                        <i className="fas fa-magic mr-2"></i>
+                        Try-On In 3D
+                      </>
+                    }
+                    type="default"
+                    fullWidth
+                    onClick={() => {
+                      handleCustomizeClick();
+                    }}
+                  />
+                )}
                 <ShareLinkDialog
                   shareLink={window.location.toString()}
                   sender={userData ? userData : { fullName: "Someone" }}
                   subject={"Product"}
-                />
-                <SimpleButton
-                  onClick={() => {}}
-                  btnText="Save"
-                  type="default"
-                  icon={<FaHeart />}
                 />
               </div>
             </div>
@@ -331,6 +375,16 @@ const ProductPage = () => {
         )}
       </div>
       <Footer />
+
+      {showAddToCart && product && (
+        <AddToCart
+          product={product}
+          onClose={() => setShowAddToCart(false)}
+          theme={theme}
+          customizedProductLink={""}
+          userId={userData?.uid}
+        />
+      )}
     </div>
   );
 };

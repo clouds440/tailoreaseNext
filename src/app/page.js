@@ -43,8 +43,8 @@ export default function Home() {
       description:
         "Personalized experiences tailored to meet unique needs of both tailors and customers.",
       icon: "user-tie",
-      bg: "bg-blue-100 dark:bg-blue-900/30",
-      iconColor: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-300 dark:bg-blue-700",
+      iconColor: "text-blue-700 dark:text-blue-400",
       link: "/tailors",
     },
     {
@@ -52,8 +52,8 @@ export default function Home() {
       description:
         "Get assistance anytime with our advanced AI chatbot, always ready to help.",
       icon: "robot",
-      bg: "bg-purple-100 dark:bg-purple-900/30",
-      iconColor: "text-purple-600 dark:text-purple-400",
+      bg: "bg-purple-300 dark:bg-purple-700",
+      iconColor: "text-purple-700 dark:text-purple-400",
       link: "",
     },
     {
@@ -61,16 +61,16 @@ export default function Home() {
       description:
         "Choose from wide designs and customize products to suit your style.",
       icon: "palette",
-      bg: "bg-amber-100 dark:bg-amber-900/30",
-      iconColor: "text-amber-600 dark:text-amber-400",
+      bg: "bg-amber-300 dark:bg-amber-700",
+      iconColor: "text-amber-700 dark:text-amber-400",
       link: "/market",
     },
     {
       title: "Free Virtual Try-On",
       description: "Experience realistic virtual try-on for your convenience.",
       icon: "vr-cardboard",
-      bg: "bg-emerald-100 dark:bg-emerald-900/30",
-      iconColor: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-emerald-300 dark:bg-emerald-700",
+      iconColor: "text-emerald-700 dark:text-emerald-400",
       link: "/outfit-customization?outfit=jacket,pants",
     },
   ];
@@ -79,16 +79,16 @@ export default function Home() {
     <div className="h-full overflow-y-auto">
       {/* Hero Section */}
       <div
-        className={`relative overflow-hidden max-w-[99.5%] mx-auto flex items-center justify-center w-auto rounded-t-lg select-none ${theme.mainTheme}`}
+        className={`relative overflow-hidden max-w-[99.5%] mx-auto flex items-center justify-center w-auto rounded-t-lg select-none`}
       >
         {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-600/10 to-pink-500/10 animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-600/30 to-pink-500/30"></div>
 
         {/* Floating decorative elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-blue-500/20 blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-40 h-40 rounded-full bg-purple-500/20 blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-blue-500 blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-40 h-40 rounded-full bg-purple-500/30 blur-3xl"></div>
 
-        <div className="max-w-7xl mx-auto px-6 py-24 md:py-32 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 py-24 md:py-32 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <motion.div
@@ -101,7 +101,7 @@ export default function Home() {
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.08 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
+                className="text-4xl md:text-5xl lg:text-6xl font-extrabold"
               >
                 Revolutionizing <br /> Tailoring Experience
               </motion.h1>
@@ -129,7 +129,8 @@ export default function Home() {
                         <i className="fas fa-arrow-right ml-3 transition-transform group-hover:translate-x-1"></i>
                       </div>
                     }
-                    extraclasses="px-8 py-4 text-lg group"
+                    type={"accent"}
+                    extraclasses="px-8 py-4 text-lg"
                   />
                 </Link>
                 <Link href="/tailors">
@@ -140,7 +141,7 @@ export default function Home() {
                         <i className="fas fa-user-tie ml-3 transition-transform group-hover:translate-x-1"></i>
                       </div>
                     }
-                    extraclasses="px-8 py-4 text-lg bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-600/10 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 group"
+                    extraclasses="px-8 py-4 text-lg"
                   />
                 </Link>
               </motion.div>
@@ -153,15 +154,15 @@ export default function Home() {
                 className="flex flex-wrap items-center gap-6 pt-4"
               >
                 <div className="flex items-center">
-                  <i className="fas fa-users text-blue-500 text-xl mr-2"></i>
+                  <i className="fas fa-users text-blue-600 text-xl mr-2"></i>
                   <span className="text-sm text-gray-600 dark:text-gray-300">
-                    500+ Happy Customers
+                    Connecting clients and tailors
                   </span>
                 </div>
                 <div className="flex items-center">
                   <i className="fas fa-check-circle text-green-500 text-xl mr-2"></i>
                   <span className="text-sm text-gray-600 dark:text-gray-300">
-                    97% Satisfaction Rate
+                    Safe transactions and delivery
                   </span>
                 </div>
               </motion.div>
@@ -176,8 +177,12 @@ export default function Home() {
             >
               <div className="relative w-full aspect-square max-w-lg mx-auto">
                 {/* Main product showcase */}
-                <div className="absolute inset-0 rounded-[40px] bg-gradient-to-br from-blue-500/20 to-purple-600/20 shadow-2xl backdrop-blur-sm border border-white/10"></div>
-                <div className="absolute inset-8 rounded-3xl overflow-hidden border-8 border-white/20 shadow-xl">
+                <div
+                  className={`absolute inset-0 rounded-[40px] bg-gradient-to-br from-blue-500 to-purple-600/30 shadow-2xl backdrop-blur-sm border ${theme.colorBorder}`}
+                ></div>
+                <div
+                  className={`absolute inset-8 rounded-3xl overflow-hidden border-8 ${theme.colorBorder} shadow-xl`}
+                >
                   <Image
                     src="/images/assets/hero-model.png"
                     alt="TailorEase Platform"
@@ -193,7 +198,7 @@ export default function Home() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.24 }}
-                  className="absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl bg-white dark:bg-gray-800 shadow-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  className="absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl bg-gray-800 shadow-lg p-4 border border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer"
                   whileHover={{ y: -5 }}
                 >
                   <div className="relative w-full h-full">
@@ -213,7 +218,7 @@ export default function Home() {
                         )
                       }
                     >
-                      <span className="text-xs font-medium bg-black/70 text-white px-2 py-1 rounded-full">
+                      <span className="text-xs font-medium bg-gray-800 text-white border px-2 py-1 rounded-full">
                         <i className="fas fa-vr-cardboard mr-1"></i> Try It!
                       </span>
                     </div>
@@ -225,14 +230,12 @@ export default function Home() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="absolute -top-6 -left-6 w-32 h-32 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center border border-gray-200 dark:border-gray-700"
+                  className="absolute -top-6 -left-6 w-32 h-32 rounded-full bg-gray-800 shadow-lg flex items-center justify-center border border-gray-200"
                   whileHover={{ rotate: 5 }}
                 >
                   <div className="text-center p-4">
-                    <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">
-                      97%
-                    </div>
-                    <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    <div className="text-4xl font-bold text-blue-600">97%</div>
+                    <div className="text-sm font-medium text-gray-300">
                       <i className="fas fa-thumbs-up mr-1"></i> Satisfaction
                     </div>
                   </div>
@@ -245,7 +248,7 @@ export default function Home() {
 
       {/* Why Choose Us Section */}
       <section
-        className={` ${theme.mainTheme} py-20 px-6 bg-gradient-to-b from-white/50 to-blue-50/50 dark:from-gray-900/50 dark:to-gray-800/50 max-w-[99.5%] mx-auto flex items-center justify-center w-auto select-none`}
+        className={` ${theme.mainTheme} py-20 px-6 max-w-[99.5%] mx-auto flex items-center justify-center w-auto select-none`}
       >
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -257,7 +260,7 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               Why Choose TailorEase
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl max-w-3xl mx-auto">
               The perfect blend of technology and traditional craftsmanship
             </p>
           </motion.div>
@@ -273,7 +276,7 @@ export default function Home() {
               <motion.div
                 key={index}
                 variants={itemVariants}
-                className={`${theme.colorBg} p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 group`}
+                className={`${theme.mainTheme} p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 group`}
                 whileHover={{ y: -10 }}
               >
                 <div
@@ -284,10 +287,8 @@ export default function Home() {
                 <h3 className="text-xl font-bold mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {feature.description}
-                </p>
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p className={`${theme.colorText}`}>{feature.description}</p>
+                <div className="mt-4 pt-4 border-t">
                   <Link
                     href={feature.link}
                     className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center"
@@ -308,23 +309,21 @@ export default function Home() {
             className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6"
           >
             {[
-              { value: "500+", label: "Happy Customers", icon: "users" },
+              { value: "50,000+", label: "Happy Customers", icon: "users" },
               { value: "97%", label: "Satisfaction Rate", icon: "thumbs-up" },
-              { value: "50+", label: "Expert Tailors", icon: "user-tie" },
-              { value: "24/7", label: "Support Available", icon: "headset" },
+              { value: "8,500+", label: "Expert Tailors", icon: "user-tie" },
+              { value: "24/7", label: "Live Support", icon: "headset" },
             ].map((stat, index) => (
               <motion.div
                 key={index}
                 whileHover={{ scale: 1.05 }}
                 className={`p-6 rounded-2xl ${
                   index % 2 === 0
-                    ? "bg-blue-50 dark:bg-blue-900/20"
-                    : "bg-purple-50 dark:bg-purple-900/20"
+                    ? "bg-blue-50 dark:bg-blue-900"
+                    : "bg-purple-50 dark:bg-purple-900/60"
                 } text-center`}
               >
-                <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-2">
-                  {stat.value}
-                </div>
+                <div className="text-4xl font-bold mb-2">{stat.value}</div>
                 <div className="text-gray-600 dark:text-gray-300 flex items-center justify-center">
                   <i className={`fas fa-${stat.icon} mr-2 text-blue-500`}></i>
                   {stat.label}
@@ -336,12 +335,12 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white relative overflow-hidden border-x max-w-[99.7%] mx-auto flex items-center justify-center w-auto select-none">
+      <section className="py-20 px-6 bg-gradient-to-r from-blue-600 via-purple-600/40 to-gray-600/50 text-white relative overflow-hidden border-x max-w-[99.7%] mx-auto flex items-center justify-center w-auto select-none">
         {/* Floating elements */}
         <div className="absolute top-0 left-0 w-32 h-32 rounded-full bg-white/10 blur-xl"></div>
         <div className="absolute bottom-0 right-0 w-48 h-48 rounded-full bg-white/10 blur-xl"></div>
 
-        <div className="max-w-4xl mx-auto text-center relative z-10">
+        <div className="max-w-4xl mx-auto text-center relative">
           <motion.h2
             initial={{ y: -20, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -373,7 +372,8 @@ export default function Home() {
                     <i className="fas fa-store ml-3 transition-transform group-hover:translate-x-1"></i>
                   </div>
                 }
-                extraclasses="px-8 py-4 text-lg bg-white text-blue-600 hover:bg-gray-100 group"
+                type={"accent"}
+                extraclasses="px-8 py-4 text-lg border"
               />
             </Link>
             <Link href="/tailors">
@@ -384,7 +384,7 @@ export default function Home() {
                     <i className="fas fa-user-tie ml-3 transition-transform group-hover:translate-x-1"></i>
                   </div>
                 }
-                extraclasses="px-8 py-4 text-lg bg-transparent border-2 border-white text-white hover:bg-white/10 group"
+                extraclasses="px-8 py-4 text-lg"
               />
             </Link>
           </motion.div>

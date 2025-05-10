@@ -367,15 +367,6 @@ const Market = () => {
     setShowAddToCart(true);
   };
 
-  const handleBuyNow = () => {
-    setShowMessage({
-      type: "info",
-      message: "We're adding Buy Now functionality later. Stay tuned!",
-    });
-    setPopUpMessageTrigger(true);
-    setQuickViewOpen(false);
-  };
-
   const nextImage = () => {
     const images = selectedProduct?.isCustom
       ? selectedProduct.images
@@ -439,7 +430,11 @@ const Market = () => {
       <div className={`max-w-[99.5%] mx-auto my-4 md:my-1 h-full select-none`}>
         <div className={`p-4 ${theme.mainTheme} rounded-lg`}>
           <div className="flex justify-between items-center mb-6">
-            <h2 className={`text-2xl font-bold ${theme.colorText}`}>
+            <h2
+              className={`text-2xl font-bold ${theme.colorText}  ${
+                searchActive ? "hidden md:block" : "block"
+              }`}
+            >
               {TailorProductsView ? tailorName : "TailorEase Market"}
             </h2>
 
@@ -983,18 +978,6 @@ const Market = () => {
                       type="accent"
                       fullWidth
                       onClick={handleAddToCart}
-                    />
-
-                    <SimpleButton
-                      btnText={
-                        <>
-                          <i className="fas fa-bolt mr-2"></i>
-                          Buy Now
-                        </>
-                      }
-                      type="primary"
-                      fullWidth
-                      onClick={handleBuyNow}
                     />
                   </div>
 

@@ -232,7 +232,7 @@ Guidelines:
       className={`mt-8 rounded-xl shadow-lg bg-opacity-50 p-6`}
     >
       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-6">
-        <div className="flex items-center mb-4 sm:mb-0">
+        <div className="block lg:flex items-center mb-4 sm:mb-0">
           <i
             className={`fas fa-ruler-combined text-2xl mr-3 ${theme.iconColor}`}
           ></i>
@@ -243,7 +243,7 @@ Guidelines:
             </span>
           </h2>
           <div
-            className={`flex items-center gap-2 ml-5 mt-8 rounded-lg px-3 py-2 ${theme.colorBg}`}
+            className={`flex items-center gap-2 md:ml-2 lg:ml-5 md:mt-8 rounded-lg px-3 py-2 ${theme.colorBg}`}
           >
             <span className="text-sm font-medium">cm</span>
             <button
@@ -264,7 +264,7 @@ Guidelines:
 
         {/* BUTTONS — Only show if authorized */}
         {authorization && (
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="flex flex-col lg:flex-row gap-3 w-full sm:w-auto">
             <SimpleButton
               btnText="Generate with AI"
               type="accent"

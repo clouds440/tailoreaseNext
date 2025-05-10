@@ -259,8 +259,13 @@ const Tailors = () => {
       <div className={`max-w-[99.5%] mx-auto my-4 md:my-1 h-full select-none`}>
         <div className={`p-4 ${theme.mainTheme} rounded-lg`}>
           <div className="flex justify-between items-center mb-6">
-            <h2 className={`text-2xl font-bold ${theme.colorText}`}>
-              All Registered Tailors
+            <h2
+              className={`text-2xl font-bold ${theme.colorText} ${
+                searchActive ? "hidden md:block" : "block"
+              }
+                `}
+            >
+              All Tailors
             </h2>
 
             <div className="flex items-center gap-4">

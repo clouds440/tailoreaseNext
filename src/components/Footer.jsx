@@ -85,7 +85,7 @@ const Footer = () => {
               </h3>
               <ul className={`${theme.subTextColor} space-y-4`}>
                 <li className="flex items-start">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mr-3 mt-1">
+                  <div className="w-8 h-8 rounded-full bg-blue-700 text-blue-200 flex items-center justify-center mr-3 mt-1">
                     <i className="fas fa-envelope"></i>
                   </div>
                   <a
@@ -96,7 +96,7 @@ const Footer = () => {
                   </a>
                 </li>
                 <li className="flex items-start">
-                  <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center mr-3 mt-1">
+                  <div className="w-8 h-8 rounded-full bg-green-700 text-green-200 flex items-center justify-center mr-3 mt-1">
                     <i className="fab fa-whatsapp"></i>
                   </div>
                   <a
@@ -109,7 +109,7 @@ const Footer = () => {
                   </a>
                 </li>
                 <li className="flex items-start">
-                  <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center mr-3 mt-1">
+                  <div className="w-8 h-8 rounded-full bg-red-700 text-red-200 flex items-center justify-center mr-3 mt-1">
                     <i className="fas fa-map-marker-alt"></i>
                   </div>
                   <span>3rd Floor, Ufone Tower, Islamabad</span>

@@ -360,6 +360,15 @@ const TailorProfile = () => {
     );
   }
 
+  const iconMap = {
+    "Men Specialist": "fas fa-male",
+    "Women Specialist": "fas fa-female",
+    "Kids Specialist": "fas fa-child",
+    Alterations: "fas fa-sync-alt",
+    "Custom Tailoring": "fas fa-tshirt",
+    Other: "fas fa-ellipsis-h",
+  };
+
   const ratingValue = tailorData?.rating || 0;
   const totalRating = tailorData?.total_rating || 0;
   const calculatedRating =
@@ -475,7 +484,7 @@ const TailorProfile = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12`}
         >
           {[
             {
@@ -483,7 +492,7 @@ const TailorProfile = () => {
               color: "text-blue-500",
               title: "In Queue",
               value: orderStats?.inQueue || 0,
-              bg: "bg-blue-100",
+              bg: "bg-blue-200",
             },
             {
               icon: "fas fa-tools",
@@ -513,7 +522,7 @@ const TailorProfile = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -5 }}
-              className={`p-6 rounded-xl shadow-md ${theme.colorBgSecondary} flex flex-col items-center transition-all duration-300`}
+              className={`p-6 rounded-xl shadow-md ${theme.colorBg} flex flex-col items-center transition-all duration-300`}
             >
               <div
                 className={`w-16 h-16 ${stat.bg} rounded-full flex items-center justify-center mb-4`}
@@ -557,24 +566,27 @@ const TailorProfile = () => {
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {tailorData.specialities?.length > 0 ? (
-              tailorData.specialities.map((speciality, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -5 }}
-                  className={`p-4 rounded-lg ${theme.colorBgSecondary} flex flex-col items-center justify-center text-center h-32 ${theme.hoverShadow} transition-all duration-300`}
-                >
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mb-3">
-                    <i className="fas fa-cut text-white"></i>
-                  </div>
-                  <h3 className="font-medium text-sm md:text-base">
-                    {speciality}
-                  </h3>
-                  <div className="absolute inset-0 border-2 border-transparent hover:border-blue-400 rounded-lg transition-all duration-300 pointer-events-none"></div>
-                </motion.div>
-              ))
+              tailorData.specialities.map((speciality, index) => {
+                const iconClass = iconMap[speciality] || "fas fa-scissors";
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ y: -5 }}
+                    className={`p-4 rounded-lg ${theme.colorBg} flex flex-col items-center justify-center text-center h-32 transition-all duration-300`}
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mb-3">
+                      <i className={`${iconClass} text-white`}></i>
+                    </div>
+                    <h3 className="font-medium text-sm md:text-base">
+                      {speciality}
+                    </h3>
+                    <div className="absolute inset-0 border-2 border-transparent hover:border-blue-400 rounded-lg transition-all duration-300 pointer-events-none"></div>
+                  </motion.div>
+                );
+              })
             ) : (
               <div className="col-span-full text-center py-8">
                 <i className="fas fa-tshirt text-4xl mb-4 opacity-50"></i>
