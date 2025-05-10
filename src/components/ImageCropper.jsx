@@ -2,31 +2,26 @@
 import React, { useState, useCallback, useContext } from "react";
 import Cropper from "react-easy-crop";
 import { UserContext } from "@/utils/UserContext";
-import DialogBox from "./DialogBox";
+import SimpleButton from "./SimpleButton";
 
-// Load image
+// Load image helper
 const createImage = (url) =>
   new Promise((resolve, reject) => {
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.onload = () => resolve(image);
-    image.onerror = (error) => reject(error);
-    image.src = url;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = (err) => reject(err);
+    img.src = url;
   });
 
-// Get cropped image
-async function getCroppedImg(imageSrc, pixelCrop, rotation = 0) {
+// Simplified crop function (no rotation)
+async function getCroppedImg(imageSrc, pixelCrop) {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
   canvas.width = pixelCrop.width;
   canvas.height = pixelCrop.height;
-
-  ctx.save();
-  ctx.translate(canvas.width / 2, canvas.height / 2);
-  ctx.rotate((rotation * Math.PI) / 180);
-  ctx.translate(-canvas.width / 2, -canvas.height / 2);
 
   ctx.drawImage(
     image,
@@ -40,12 +35,11 @@ async function getCroppedImg(imageSrc, pixelCrop, rotation = 0) {
     pixelCrop.height
   );
 
-  ctx.restore();
-
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => {
-        resolve(URL.createObjectURL(blob));
+        if (blob) resolve(URL.createObjectURL(blob));
+        else reject(new Error("Failed to create blob"));
       },
       "image/jpeg",
       0.9
@@ -53,89 +47,86 @@ async function getCroppedImg(imageSrc, pixelCrop, rotation = 0) {
   });
 }
 
-const ImageCropper = ({
+export default function ImageCropper({
   aspectRatio = 1,
   onCropComplete,
   showModal,
   setShowModal,
   imageSrc,
-  modalTitle = "TailorEase Image Cropper",
-  instructionText = "Adjust your image within the crop area",
-}) => {
+  modalTitle = "Crop Your Image",
+  instructionText = "Adjust and then crop or cancel.",
+}) {
+  const { theme } = useContext(UserContext);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [rotation, setRotation] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
-  const { theme } = useContext(UserContext);
-
-  const onCropCompleteCallback = useCallback((_, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
+  const onCropCompleteCallback = useCallback((_, pixels) => {
+    setCroppedAreaPixels(pixels);
   }, []);
-
-  const onZoomChangeHandler = (newZoom) => {
-    // always recenter
-    setCrop({ x: 0, y: 0 });
-    setZoom(newZoom);
-  };
 
   const handleClose = useCallback(() => {
     setCrop({ x: 0, y: 0 });
     setZoom(1);
-    setRotation(0);
     setCroppedAreaPixels(null);
     setShowModal(false);
   }, [setShowModal]);
 
-  const handleCropComplete = useCallback(async () => {
+  const handleCrop = useCallback(async () => {
+    if (!croppedAreaPixels) return;
     try {
-      if (!croppedAreaPixels) return;
-      const croppedImage = await getCroppedImg(
-        imageSrc,
-        croppedAreaPixels,
-        rotation
-      );
-      onCropComplete(croppedImage);
+      const blobUrl = await getCroppedImg(imageSrc, croppedAreaPixels);
+      onCropComplete(blobUrl);
       handleClose();
     } catch (e) {
-      console.error("Error cropping image:", e);
+      console.error("Crop error:", e);
     }
-  }, [croppedAreaPixels, imageSrc, rotation, onCropComplete, handleClose]);
+  }, [croppedAreaPixels, imageSrc, onCropComplete, handleClose]);
 
-  const cropperBody = (
-    <div className="flex flex-col h-full">
-      {/* Cropper Preview */}
-      <div className="p-5 flex-1 overflow-hidden">
-        <div className="relative h-48 w-full rounded-lg overflow-hidden mb-4">
-          <Cropper
-            image={imageSrc}
-            crop={crop}
-            zoom={zoom}
-            minZoom={0.7}
-            rotation={rotation}
-            aspect={aspectRatio}
-            onCropChange={setCrop}
-            onZoomChange={onZoomChangeHandler}
-            onRotationChange={setRotation}
-            onCropComplete={onCropCompleteCallback}
-            cropShape="rect"
-            showGrid={false}
-            restrictPosition={false}
-            style={{ containerStyle: { width: "100%", height: "100%" } }}
-          />
+  if (!showModal) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div
+        className={`rounded-lg overflow-hidden w-full max-w-lg mx-4 ${theme.mainTheme}`}
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center px-4 py-2 border-b">
+          <h3 className="text-lg font-medium">{modalTitle}</h3>
+          <SimpleButton btnText={"✕"} type={"default"} onClick={handleClose} />
         </div>
 
-        {/* Controls - Both sliders in one row */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label
-              className={`block mb-1 text-sm ${theme.colorText} font-medium`}
-            >
+        {/* Body */}
+        <div className="p-4">
+          <div className="relative h-48 w-full rounded-lg overflow-hidden mb-4">
+            <Cropper
+              image={imageSrc}
+              crop={crop}
+              zoom={zoom}
+              minZoom={1}
+              aspect={aspectRatio}
+              onCropChange={setCrop}
+              onZoomChange={(z) => {
+                setCrop({ x: 0, y: 0 });
+                setZoom(z);
+              }}
+              onCropComplete={onCropCompleteCallback}
+              cropShape="rect"
+              showGrid={false}
+              restrictPosition={true}
+              style={{ containerStyle: { width: "100%", height: "100%" } }}
+            />
+          </div>
+          <p className={`mb-4 text-sm ${theme.colorText}`}>{instructionText}</p>
+
+          {/* Zoom Slider */}
+          <div className="mb-4">
+            <label className={`block mb-1 text-sm ${theme.colorText}`}>
               Zoom: {zoom.toFixed(1)}x
             </label>
             <input
               type="range"
-              min={0.7}
+              min={1}
               max={3}
               step={0.01}
               value={zoom}
@@ -143,50 +134,23 @@ const ImageCropper = ({
               className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${theme.colorPrimaryBg}`}
             />
           </div>
+        </div>
 
-          <div>
-            <label
-              className={`block mb-1 text-sm ${theme.colorText} font-medium`}
-            >
-              Rotation: {rotation}°
-            </label>
-            <input
-              type="range"
-              min={0}
-              max={360}
-              step={1}
-              value={rotation}
-              onChange={(e) => setRotation(Number(e.target.value))}
-              className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${theme.colorPrimaryBg}`}
-            />
-          </div>
+        {/* Footer Buttons */}
+        <div className="flex justify-end space-x-2 px-4 py-2 border-t">
+          <SimpleButton
+            btnText={"Cancel"}
+            type={"default"}
+            onClick={handleClose}
+          />
+          <SimpleButton
+            btnText={"Crop"}
+            type={"primary"}
+            icon={<i className="fas fa-crop-alt"></i>}
+            onClick={handleCrop}
+          />
         </div>
       </div>
     </div>
   );
-
-  const buttons = [
-    {
-      label: (
-        <>
-          <i className="fas fa-crop mr-2"></i> Crop
-        </>
-      ),
-      onClick: handleCropComplete,
-      type: "primary",
-    },
-  ];
-
-  return (
-    <DialogBox
-      showDialog={showModal}
-      setShowDialog={setShowModal}
-      title={modalTitle}
-      body={cropperBody}
-      type="info"
-      buttons={buttons}
-    />
-  );
-};
-
-export default ImageCropper;
+}

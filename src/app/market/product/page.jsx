@@ -13,7 +13,6 @@ import {
 import { db } from "@/utils/firebaseConfig";
 import UserContext from "@/utils/UserContext";
 import {
-  FaBolt,
   FaCartPlus,
   FaHeart,
   FaPalette,
