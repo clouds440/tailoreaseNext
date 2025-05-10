@@ -107,7 +107,7 @@ const MyTailors = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className={`p-4 rounded-lg flex justify-between items-center ${theme.colorBg}`}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
                   {t.businessPictureUrl && (
                     <div className="w-20 h-20 rounded-full overflow-hidden">
                       <div className="relative w-full h-full">
@@ -115,8 +115,10 @@ const MyTailors = () => {
                           src={t.businessPictureUrl}
                           alt={t.businessName}
                           fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                           className="object-cover"
+                          placeholder="blur"
+                          blurDataURL="/images/profile/business/default.png"
+                          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                           priority
                         />
                       </div>
@@ -131,7 +133,7 @@ const MyTailors = () => {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col lg:flex-row gap-2 lg:items-center lg:justify-end mt-4 lg:mt-0 w-auto">
                   <SimpleButton
                     btnText="View"
                     type="primary"
