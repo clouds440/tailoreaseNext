@@ -351,7 +351,7 @@ const MyOrders = () => {
   };
 
   return (
-    <div className={`h-full overflow-y-auto ${theme.mainTheme}`}>
+    <div className={`h-full rounded-md overflow-y-auto ${theme.mainTheme}`}>
       <div className="max-w-[99.5%] mx-auto my-4 md:my-1 h-full select-none p-4">
         <div className={`p-4 ${theme.mainTheme} rounded-lg mb-4`}>
           <div className="flex justify-between items-center mb-6">
@@ -662,10 +662,13 @@ const MyOrders = () => {
                       </h4>
                       <div className="space-y-3">
                         {selectedOrder.products?.map((product, idx) => {
-                          const productRating = productRatings[product.productId];
+                          const productRating =
+                            productRatings[product.productId];
                           const userReview = productReviews[product.productId];
                           const calculatedRating = productRating
-                            ? (productRating.rating / productRating.totalRating) * 5
+                            ? (productRating.rating /
+                                productRating.totalRating) *
+                              5
                             : 0;
 
                           return (
@@ -680,7 +683,8 @@ const MyOrders = () => {
                                 <div className="relative w-16 h-16 rounded-md overflow-hidden">
                                   <Image
                                     src={
-                                      product.image || "/images/default-product.png"
+                                      product.image ||
+                                      "/images/default-product.png"
                                     }
                                     alt={product.name}
                                     fill
@@ -690,7 +694,9 @@ const MyOrders = () => {
                                   />
                                 </div>
                                 <div>
-                                  <p className={`font-medium ${theme.colorText}`}>
+                                  <p
+                                    className={`font-medium ${theme.colorText}`}
+                                  >
                                     {product.name}
                                   </p>
                                   <p
@@ -708,8 +714,12 @@ const MyOrders = () => {
                                   {productRating && (
                                     <div className="flex items-center mt-1">
                                       <span className="text-yellow-500 text-xs">
-                                        {"★".repeat(Math.floor(calculatedRating))}
-                                        {"☆".repeat(5 - Math.floor(calculatedRating))}
+                                        {"★".repeat(
+                                          Math.floor(calculatedRating)
+                                        )}
+                                        {"☆".repeat(
+                                          5 - Math.floor(calculatedRating)
+                                        )}
                                       </span>
                                       <span className="text-xs ml-1 opacity-70">
                                         ({calculatedRating.toFixed(1)})
@@ -723,14 +733,18 @@ const MyOrders = () => {
                               {selectedOrder.orderStatus === "delivered" && (
                                 <div className="mt-2">
                                   {userReview ? (
-                                    <div className={`p-2 rounded ${theme.colorBg} border ${theme.colorBorder}`}>
+                                    <div
+                                      className={`p-2 rounded ${theme.colorBg} border ${theme.colorBorder}`}
+                                    >
                                       <div className="flex items-center mb-1">
                                         <span className="text-yellow-500 text-sm">
                                           {"★".repeat(userReview.stars)}
                                           {"☆".repeat(5 - userReview.stars)}
                                         </span>
                                       </div>
-                                      <p className={`text-sm ${theme.colorText}`}>
+                                      <p
+                                        className={`text-sm ${theme.colorText}`}
+                                      >
                                         {userReview.message}
                                       </p>
                                     </div>

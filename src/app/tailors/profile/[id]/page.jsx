@@ -345,7 +345,7 @@ const TailorProfile = () => {
     const message =
       `Hi, I'm interested in your services from TailorEase.` +
       (userData?.uid
-        ? ` Here is my profile link on the TailorEase Platform: http://localhost:3000/user?share=${userData.uid}`
+        ? ` Here is my profile link on the TailorEase Platform: ${window.location.origin}/user?share=${userData.uid}`
         : "");
 
     const url = `https://wa.me/${
@@ -546,7 +546,7 @@ const TailorProfile = () => {
 
             <div className="flex space-x-2">
               <SimpleButton
-                btnText={"Contact via WhatsApp"}
+                btnText={"Contact"}
                 type={"accent"}
                 icon={
                   <i className="fab fa-whatsapp text-green-700 text-xl"></i>
@@ -555,11 +555,7 @@ const TailorProfile = () => {
               />
 
               <SimpleButton
-                btnText={
-                  isTailorConnected
-                    ? "Remove from My Tailors"
-                    : "Add to My Tailors"
-                }
+                btnText={isTailorConnected ? "Remove Tailor" : "Add Tailor"}
                 type={"default"}
                 icon={
                   <i
@@ -570,13 +566,28 @@ const TailorProfile = () => {
                   isTailorConnected ? handleRemoveTailor : handleAddTailor
                 }
               />
+              <SimpleButton
+                btnText={"Share"}
+                type={"default"}
+                icon={<i className="fas fa-share-alt"></i>}
+                onClick={() => {
+                  const url = `${window.location.origin}/tailors/profile/${id}`;
+                  navigator.clipboard.writeText(url).then(() => {
+                    setShowMessage({
+                      message: "Link copied to clipboard!",
+                      type: "success",
+                    });
+                    setPopUpMessageTrigger(true);
+                  });
+                }}
+              />
             </div>
           </div>
         </motion.div>
 
         {/* Stats Cards */}
         <h2 className="text-2xl font-bold mb-4 border-b-2 pb-2 inline-block">
-          Order Stats
+          Orders Stats
         </h2>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
