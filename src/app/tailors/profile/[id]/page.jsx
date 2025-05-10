@@ -6,6 +6,8 @@ import { db } from "@/utils/firebaseConfig";
 import {
   doc,
   getDoc,
+  setDoc,
+  deleteDoc,
   collection,
   query,
   where,
@@ -29,6 +31,8 @@ const TailorProfile = () => {
   const [rating, setRating] = useState(0);
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTailorConnected, setIsTailorConnected] = useState(false);
+
   const router = useRouter();
   const {
     theme,
@@ -341,13 +345,84 @@ const TailorProfile = () => {
     const message =
       `Hi, I'm interested in your services from TailorEase.` +
       (userData?.uid
-        ? ` Here is my profile link on the TailorEase Platform: https://tailorease.vercel.app/user?share=${userData.uid}`
+        ? ` Here is my profile link on the TailorEase Platform: http://localhost:3000/user?share=${userData.uid}`
         : "");
 
     const url = `https://wa.me/${
       tailorData.countryCode + tailorData.businessPhone
     }?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
+  };
+
+  useEffect(() => {
+    if (userLoggedIn && userData?.uid && id) {
+      const relId = `${id}_${userData.uid}`;
+      const docRef = doc(db, "userTailorConnections", relId);
+
+      getDoc(docRef)
+        .then((docSnap) => {
+          setIsTailorConnected(docSnap.exists());
+        })
+        .catch((err) => {
+          console.error("Error checking tailor connection:", err);
+        });
+    }
+  }, [userLoggedIn, userData?.uid, id]);
+
+  const handleAddTailor = async () => {
+    if (userLoggedIn && userData?.uid) {
+      try {
+        const relId = `${id}_${userData.uid}`;
+        await setDoc(doc(db, "userTailorConnections", relId), {
+          tailorId: id,
+          userId: userData.uid,
+          timestamp: new Date(),
+        });
+
+        setIsTailorConnected(true);
+        setShowMessage({
+          message: "Tailor added to My Tailors.",
+          type: "success",
+        });
+        setPopUpMessageTrigger(true);
+      } catch (error) {
+        console.error("Error adding tailor connection:", error);
+        setShowMessage({
+          message: "Couldn't add the tailor. Try again.",
+          type: "danger",
+        });
+        setPopUpMessageTrigger(true);
+      }
+    } else {
+      setShowMessage({
+        message: "Please log in to add this tailor to your tailors.",
+        type: "danger",
+      });
+      setPopUpMessageTrigger(true);
+    }
+  };
+
+  const handleRemoveTailor = async () => {
+    if (userLoggedIn && userData?.uid) {
+      try {
+        const relId = `${id}_${userData.uid}`;
+        await deleteDoc(doc(db, "userTailorConnections", relId));
+
+        setIsTailorConnected(false);
+        setShowMessage({
+          message: "Tailor removed from My Tailors.",
+          type: "success",
+        });
+        setPopUpMessageTrigger(true);
+      } catch (error) {
+        console.error("Error removing tailor connection:", error);
+        setShowMessage({
+          message: "Couldn't remove the tailor. Try again.",
+          type: "danger",
+        });
+        setPopUpMessageTrigger(true);
+      }
+    }
   };
 
   if (isLoading) {
@@ -403,6 +478,8 @@ const TailorProfile = () => {
               className="object-cover"
               placeholder="blur"
               blurDataURL="/images/profile/business/default.png"
+              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+              priority
             />
           </motion.div>
 
@@ -467,19 +544,40 @@ const TailorProfile = () => {
               </div>
             </motion.div>
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleClickContact}
-              className={`px-6 py-3 rounded-full font-medium ${theme.hoverBg} transition-all duration-300 flex items-center`}
-            >
-              <i className="fab fa-whatsapp text-xl mr-2"></i>
-              Contact via WhatsApp
-            </motion.button>
+            <div className="flex space-x-2">
+              <SimpleButton
+                btnText={"Contact via WhatsApp"}
+                type={"accent"}
+                icon={
+                  <i className="fab fa-whatsapp text-green-700 text-xl"></i>
+                }
+                onClick={handleClickContact}
+              />
+
+              <SimpleButton
+                btnText={
+                  isTailorConnected
+                    ? "Remove from My Tailors"
+                    : "Add to My Tailors"
+                }
+                type={"default"}
+                icon={
+                  <i
+                    className={`fas fa-${isTailorConnected ? "remove" : "add"}`}
+                  ></i>
+                }
+                onClick={
+                  isTailorConnected ? handleRemoveTailor : handleAddTailor
+                }
+              />
+            </div>
           </div>
         </motion.div>
 
         {/* Stats Cards */}
+        <h2 className="text-2xl font-bold mb-4 border-b-2 pb-2 inline-block">
+          Order Stats
+        </h2>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
