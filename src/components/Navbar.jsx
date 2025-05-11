@@ -362,7 +362,7 @@ const Navbar = () => {
       label: "Orders",
     },
     {
-      path: "/analytics",
+      path: "/business-dashboard/analytics",
       icon: <i className="fas fa-chart-line" />,
       label: "Analytics",
     },
