@@ -129,8 +129,11 @@ const AdminDashboard = () => {
   const fetchPendingPayouts = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "tailorWallet"));
-      const wallets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      
+      const wallets = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
       const payouts = [];
       for (const wallet of wallets) {
         if (wallet.transactions && wallet.transactions.length > 0) {
@@ -144,14 +147,14 @@ const AdminDashboard = () => {
                 bankDetails: {
                   bankName: wallet.bankName,
                   accountName: wallet.accountName,
-                  accountNumber: wallet.accountNumber
-                }
+                  accountNumber: wallet.accountNumber,
+                },
               });
             }
           });
         }
       }
-      
+
       setPendingPayouts(payouts);
     } catch (error) {
       console.error("Error fetching pending payouts:", error);
@@ -164,40 +167,43 @@ const AdminDashboard = () => {
     try {
       const walletRef = doc(db, "tailorWallet", walletId);
       const walletSnap = await getDoc(walletRef);
-      
+
       if (!walletSnap.exists()) {
         showAlert("error", "Wallet not found");
         return;
       }
-      
+
       const walletData = walletSnap.data();
       const updatedTransactions = [...walletData.transactions];
-      
+
       if (!updatedTransactions[transactionIndex]) {
         showAlert("error", "Transaction not found");
         return;
       }
-      
+
       // Create a new transaction object with updated status
       updatedTransactions[transactionIndex] = {
         ...updatedTransactions[transactionIndex],
         status,
-        processedAt: new Date().toISOString()
+        processedAt: new Date().toISOString(),
       };
-      
+
       // Update balance if completing payout
       let newBalance = walletData.currentBalance || 0;
-      if (status === "completed") {
-        newBalance -= updatedTransactions[transactionIndex].amount;
+      if (status === "failed") {
+        newBalance += updatedTransactions[transactionIndex].amount;
       }
-      
+
       await updateDoc(walletRef, {
         transactions: updatedTransactions,
         currentBalance: newBalance,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       });
-      
-      showAlert("success", `Payout ${status} successfully`);
+
+      showAlert(
+        "success",
+        `Payout ${status === "failed" ? "declined" : "approved"} successfully`
+      );
       fetchPendingPayouts();
     } catch (error) {
       console.error("Error updating payout status:", error);
@@ -388,37 +394,37 @@ const AdminDashboard = () => {
     return new Intl.NumberFormat("en-PK", {
       style: "currency",
       currency: "PKR",
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
   // Format date - handles both Firestore Timestamp and regular date strings
   const formatDate = (dateValue) => {
     if (!dateValue) return "N/A";
-    
+
     try {
       let date;
       if (dateValue.toDate) {
         // Handle Firestore Timestamp
         date = dateValue.toDate();
-      } else if (typeof dateValue === 'string') {
+      } else if (typeof dateValue === "string") {
         // Handle ISO string
         date = new Date(dateValue);
-      } else if (typeof dateValue === 'number') {
+      } else if (typeof dateValue === "number") {
         // Handle timestamp
         date = new Date(dateValue);
       } else {
         return "N/A";
       }
-      
+
       if (isNaN(date.getTime())) return "N/A";
-      
+
       return date.toLocaleString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
         hour: "2-digit",
-        minute: "2-digit"
+        minute: "2-digit",
       });
     } catch (error) {
       console.error("Error formatting date:", error);
@@ -788,7 +794,9 @@ const AdminDashboard = () => {
                     <div className="p-6">
                       <div className="space-y-4">
                         <div>
-                          <p className={`text-sm ${theme.colorText} opacity-80`}>
+                          <p
+                            className={`text-sm ${theme.colorText} opacity-80`}
+                          >
                             Tailor ID
                           </p>
                           <p className={`font-medium ${theme.colorText}`}>
@@ -797,7 +805,9 @@ const AdminDashboard = () => {
                         </div>
 
                         <div>
-                          <p className={`text-sm ${theme.colorText} opacity-80`}>
+                          <p
+                            className={`text-sm ${theme.colorText} opacity-80`}
+                          >
                             Amount
                           </p>
                           <p className={`font-medium text-lg text-blue-500`}>
@@ -806,7 +816,9 @@ const AdminDashboard = () => {
                         </div>
 
                         <div>
-                          <p className={`text-sm ${theme.colorText} opacity-80`}>
+                          <p
+                            className={`text-sm ${theme.colorText} opacity-80`}
+                          >
                             Request Date
                           </p>
                           <p className={`font-medium ${theme.colorText}`}>
@@ -814,25 +826,41 @@ const AdminDashboard = () => {
                           </p>
                         </div>
 
-                        <div className={`p-4 rounded-lg ${theme.colorBgSecondary}`}>
-                          <h4 className={`text-sm font-semibold mb-2 ${theme.colorText}`}>
+                        <div
+                          className={`p-4 rounded-lg ${theme.colorBgSecondary}`}
+                        >
+                          <h4
+                            className={`text-sm font-semibold mb-2 ${theme.colorText}`}
+                          >
                             Bank Details
                           </h4>
                           <div className="space-y-2">
                             <div>
-                              <p className={`text-xs ${theme.colorText} opacity-70`}>Bank Name</p>
+                              <p
+                                className={`text-xs ${theme.colorText} opacity-70`}
+                              >
+                                Bank Name
+                              </p>
                               <p className={`text-sm ${theme.colorText}`}>
                                 {payout.bankDetails?.bankName || "N/A"}
                               </p>
                             </div>
                             <div>
-                              <p className={`text-xs ${theme.colorText} opacity-70`}>Account Name</p>
+                              <p
+                                className={`text-xs ${theme.colorText} opacity-70`}
+                              >
+                                Account Name
+                              </p>
                               <p className={`text-sm ${theme.colorText}`}>
                                 {payout.bankDetails?.accountName || "N/A"}
                               </p>
                             </div>
                             <div>
-                              <p className={`text-xs ${theme.colorText} opacity-70`}>Account Number</p>
+                              <p
+                                className={`text-xs ${theme.colorText} opacity-70`}
+                              >
+                                Account Number
+                              </p>
                               <p className={`text-sm ${theme.colorText}`}>
                                 {payout.bankDetails?.accountNumber || "N/A"}
                               </p>
@@ -843,7 +871,13 @@ const AdminDashboard = () => {
 
                       <div className="mt-6 flex space-x-3">
                         <motion.button
-                          onClick={() => updatePayoutStatus(payout.walletId, payout.transactionIndex, "completed")}
+                          onClick={() =>
+                            updatePayoutStatus(
+                              payout.walletId,
+                              payout.transactionIndex,
+                              "completed"
+                            )
+                          }
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
                           className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center justify-center"
@@ -852,7 +886,13 @@ const AdminDashboard = () => {
                           Mark as Completed
                         </motion.button>
                         <motion.button
-                          onClick={() => updatePayoutStatus(payout.walletId, payout.transactionIndex, "failed")}
+                          onClick={() =>
+                            updatePayoutStatus(
+                              payout.walletId,
+                              payout.transactionIndex,
+                              "failed"
+                            )
+                          }
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
                           className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex items-center justify-center"
