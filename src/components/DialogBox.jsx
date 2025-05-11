@@ -89,7 +89,7 @@ const DialogBox = ({
           transition={{ duration: 0.2 }}
         >
           <div className="bg-black bg-opacity-50 fixed inset-0"></div>
-          <div className="w-auto max-w-[75%] md:max-w-[60%] fixed lex items-center justify-center md:translate-x-24">
+          <div className="w-full max-w-[75%] md:max-w-[50%] lg:max-w-[40%] xl:max-w-[30%] fixed lex items-center justify-center md:translate-x-24">
             <motion.div
               className={`rounded-xl shadow-lg w-auto z-50 ${theme.mainTheme}`}
               initial={{ scale: 0.7 }}

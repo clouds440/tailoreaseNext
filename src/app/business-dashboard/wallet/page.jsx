@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useContext } from "react";
 import { db } from "@/utils/firebaseConfig";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import UserContext from "@/utils/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClipLoader } from "react-spinners";
@@ -11,7 +11,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const TailorWallet = () => {
-  const { theme, userData, setShowMessage, setPopUpMessageTrigger } = useContext(UserContext);
+  const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
+    useContext(UserContext);
   const [walletData, setWalletData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showBankDialog, setShowBankDialog] = useState(false);
@@ -21,12 +22,12 @@ const TailorWallet = () => {
   const [transactionFilter, setTransactionFilter] = useState("all");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  
+
   // Bank form state
   const [bankForm, setBankForm] = useState({
     bankName: "",
     accountName: "",
-    accountNumber: ""
+    accountNumber: "",
   });
 
   // Fetch wallet data
@@ -42,7 +43,7 @@ const TailorWallet = () => {
         if (walletSnap.exists()) {
           const data = walletSnap.data();
           setWalletData(data);
-          
+
           // Check if bank info is missing
           if (!data.bankName || !data.accountName || !data.accountNumber) {
             setShowBankDialog(true);
@@ -56,10 +57,10 @@ const TailorWallet = () => {
             accountNumber: "",
             currentBalance: 0,
             transactions: [],
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
+            createdAt: new Date(),
+            updatedAt: new Date(),
           };
-          
+
           await setDoc(walletRef, newWallet);
           setWalletData(newWallet);
           setShowBankDialog(true);
@@ -68,7 +69,7 @@ const TailorWallet = () => {
         console.error("Error fetching wallet data:", error);
         setShowMessage({
           type: "danger",
-          message: "Failed to load wallet data. Please try again."
+          message: "Failed to load wallet data. Please try again.",
         });
         setPopUpMessageTrigger(true);
       } finally {
@@ -81,10 +82,14 @@ const TailorWallet = () => {
 
   // Handle bank info submission
   const handleBankSubmit = async () => {
-    if (!bankForm.bankName || !bankForm.accountName || !bankForm.accountNumber) {
+    if (
+      !bankForm.bankName ||
+      !bankForm.accountName ||
+      !bankForm.accountNumber
+    ) {
       setShowMessage({
         type: "warning",
-        message: "Please fill all bank details"
+        message: "Please fill all bank details",
       });
       setPopUpMessageTrigger(true);
       return;
@@ -97,20 +102,20 @@ const TailorWallet = () => {
         bankName: bankForm.bankName,
         accountName: bankForm.accountName,
         accountNumber: bankForm.accountNumber,
-        updatedAt: serverTimestamp()
+        updatedAt: new Date(),
       });
 
       // Update local state
-      setWalletData(prev => ({
+      setWalletData((prev) => ({
         ...prev,
         bankName: bankForm.bankName,
         accountName: bankForm.accountName,
-        accountNumber: bankForm.accountNumber
+        accountNumber: bankForm.accountNumber,
       }));
 
       setShowMessage({
         type: "success",
-        message: "Bank information updated successfully!"
+        message: "Bank information updated successfully!",
       });
       setPopUpMessageTrigger(true);
       setShowBankDialog(false);
@@ -118,7 +123,7 @@ const TailorWallet = () => {
       console.error("Error updating bank info:", error);
       setShowMessage({
         type: "danger",
-        message: "Failed to update bank information. Please try again."
+        message: "Failed to update bank information. Please try again.",
       });
       setPopUpMessageTrigger(true);
     } finally {
@@ -128,30 +133,48 @@ const TailorWallet = () => {
 
   // Handle payout request
   const handlePayoutRequest = async () => {
-    const amount = parseFloat(payoutAmount);
+    const amount = Number(payoutAmount);
+    let currentBalance = Number(walletData.currentBalance);
+
+    if (isNaN(currentBalance)) {
+      currentBalance = 0;
+    }
+
+    if (isNaN(amount)) {
+      setShowMessage({
+        type: "warning",
+        message: "Please enter a valid amount",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
 
     if (amount <= 0) {
       setShowMessage({
         type: "warning",
-        message: "Amount must be greater than 0"
+        message: "Amount must be greater than 0",
       });
       setPopUpMessageTrigger(true);
       return;
     }
 
-    if (amount > walletData.currentBalance) {
+    if (amount > currentBalance) {
       setShowMessage({
         type: "warning",
-        message: "Amount exceeds your current balance"
+        message: "Amount exceeds your current balance",
       });
       setPopUpMessageTrigger(true);
       return;
     }
 
-    if (!walletData.bankName || !walletData.accountName || !walletData.accountNumber) {
+    if (
+      !walletData.bankName ||
+      !walletData.accountName ||
+      !walletData.accountNumber
+    ) {
       setShowMessage({
         type: "warning",
-        message: "Please update your bank information first"
+        message: "Please update your bank information first",
       });
       setPopUpMessageTrigger(true);
       setShowBankDialog(true);
@@ -164,25 +187,26 @@ const TailorWallet = () => {
       const newTransaction = {
         type: "payOut",
         amount: amount,
-        date: new Date(), // Use client-side timestamp instead of serverTimestamp()
-        status: "pending"
+        date: new Date(), // Use client-side timestamp instead of servertimestamp
+        status: "pending",
       };
 
       await updateDoc(walletRef, {
         transactions: [...walletData.transactions, newTransaction],
-        updatedAt: serverTimestamp()
+        currentBalance: currentBalance - amount,
+        updatedAt: new Date(),
       });
 
       // Update local state
-      setWalletData(prev => ({
+      setWalletData((prev) => ({
         ...prev,
         transactions: [...prev.transactions, newTransaction],
-        currentBalance: prev.currentBalance - amount
+        currentBalance: prev.currentBalance - amount,
       }));
 
       setShowMessage({
         type: "success",
-        message: "Payout request submitted successfully!"
+        message: "Payout request submitted successfully!",
       });
       setPopUpMessageTrigger(true);
       setShowPayoutDialog(false);
@@ -191,7 +215,7 @@ const TailorWallet = () => {
       console.error("Error submitting payout request:", error);
       setShowMessage({
         type: "danger",
-        message: "Failed to submit payout request. Please try again."
+        message: "Failed to submit payout request. Please try again.",
       });
       setPopUpMessageTrigger(true);
     } finally {
@@ -202,7 +226,7 @@ const TailorWallet = () => {
   // Format date
   const formatDate = (timestamp) => {
     if (!timestamp) return "N/A";
-    
+
     try {
       const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
       return date.toLocaleString("en-US", {
@@ -210,7 +234,7 @@ const TailorWallet = () => {
         month: "short",
         day: "numeric",
         hour: "2-digit",
-        minute: "2-digit"
+        minute: "2-digit",
       });
     } catch (error) {
       console.error("Error formatting date:", error);
@@ -223,7 +247,7 @@ const TailorWallet = () => {
     return new Intl.NumberFormat("en-PK", {
       style: "currency",
       currency: "PKR",
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -235,13 +259,15 @@ const TailorWallet = () => {
 
     // Filter by type
     if (transactionFilter !== "all") {
-      transactions = transactions.filter(t => t.type === transactionFilter);
+      transactions = transactions.filter((t) => t.type === transactionFilter);
     }
 
     // Filter by date range
     if (startDate && endDate) {
-      transactions = transactions.filter(t => {
-        const transactionDate = t.date?.toDate ? t.date.toDate() : new Date(t.date);
+      transactions = transactions.filter((t) => {
+        const transactionDate = t.date?.toDate
+          ? t.date.toDate()
+          : new Date(t.date);
         return transactionDate >= startDate && transactionDate <= endDate;
       });
     }
@@ -261,7 +287,9 @@ const TailorWallet = () => {
 
   if (loading) {
     return (
-      <div className={`flex justify-center items-center h-screen ${theme.mainTheme}`}>
+      <div
+        className={`flex justify-center items-center h-screen ${theme.mainTheme}`}
+      >
         <ClipLoader size={60} color={theme.iconColor} />
       </div>
     );
@@ -279,8 +307,12 @@ const TailorWallet = () => {
         >
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <div>
-              <h1 className={`text-3xl font-bold mb-2 ${theme.colorText}`}>My Wallet</h1>
-              <p className={`${theme.colorText} opacity-80`}>Manage your earnings and transactions</p>
+              <h1 className={`text-3xl font-bold mb-2 ${theme.colorText}`}>
+                My Wallet
+              </h1>
+              <p className={`${theme.colorText} opacity-80`}>
+                Manage your earnings and transactions
+              </p>
             </div>
             <div className="mt-4 md:mt-0">
               <SimpleButton
@@ -303,7 +335,7 @@ const TailorWallet = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className={`p-6 rounded-xl mb-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg`}
+          className={`p-6 rounded-xl mb-8 bg-gradient-to-r from-blue-600/50 to-purple-600/30 text-white shadow-lg`}
         >
           <div className="flex justify-between items-start">
             <div>
@@ -318,23 +350,15 @@ const TailorWallet = () => {
             </div>
           </div>
 
-          <motion.div 
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="mt-6"
-          >
+          <div>
             <SimpleButton
-              btnText={
-                <>
-                  <i className="fas fa-money-bill-wave mr-2"></i>
-                  Request Payout
-                </>
-              }
-              type="white"
+              btnText={"Request Payout"}
+              type="default"
+              icon={<i className="fas fa-money-bill-wave"></i>}
+              extraclasses="mt-3"
               onClick={() => setShowPayoutDialog(true)}
-              fullWidth
             />
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* Bank Information */}
@@ -345,7 +369,9 @@ const TailorWallet = () => {
           className={`p-6 rounded-xl ${theme.colorBg} mb-8`}
         >
           <div className="flex justify-between items-center mb-4">
-            <h2 className={`text-xl font-bold ${theme.colorText}`}>Bank Information</h2>
+            <h2 className={`text-xl font-bold ${theme.colorText}`}>
+              Bank Information
+            </h2>
             <SimpleButton
               btnText="Edit"
               type="secondary"
@@ -354,19 +380,33 @@ const TailorWallet = () => {
             />
           </div>
 
-          {walletData?.bankName && walletData?.accountName && walletData?.accountNumber ? (
+          {walletData?.bankName &&
+          walletData?.accountName &&
+          walletData?.accountNumber ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <p className={`text-sm ${theme.colorText} opacity-70`}>Bank Name</p>
-                <p className={`font-medium ${theme.colorText}`}>{walletData.bankName}</p>
+                <p className={`text-sm ${theme.colorText} opacity-70`}>
+                  Bank Name
+                </p>
+                <p className={`font-medium ${theme.colorText}`}>
+                  {walletData.bankName}
+                </p>
               </div>
               <div>
-                <p className={`text-sm ${theme.colorText} opacity-70`}>Account Name</p>
-                <p className={`font-medium ${theme.colorText}`}>{walletData.accountName}</p>
+                <p className={`text-sm ${theme.colorText} opacity-70`}>
+                  Account Name
+                </p>
+                <p className={`font-medium ${theme.colorText}`}>
+                  {walletData.accountName}
+                </p>
               </div>
               <div>
-                <p className={`text-sm ${theme.colorText} opacity-70`}>Account Number</p>
-                <p className={`font-medium ${theme.colorText}`}>{walletData.accountNumber}</p>
+                <p className={`text-sm ${theme.colorText} opacity-70`}>
+                  Account Number
+                </p>
+                <p className={`font-medium ${theme.colorText}`}>
+                  {walletData.accountNumber}
+                </p>
               </div>
             </div>
           ) : (
@@ -391,8 +431,10 @@ const TailorWallet = () => {
           className={`p-6 rounded-xl ${theme.colorBg}`}
         >
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
-            <h2 className={`text-xl font-bold ${theme.colorText}`}>Transaction History</h2>
-            
+            <h2 className={`text-xl font-bold ${theme.colorText}`}>
+              Transaction History
+            </h2>
+
             <div className="mt-4 md:mt-0 flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-2">
               <select
                 value={transactionFilter}
@@ -403,7 +445,7 @@ const TailorWallet = () => {
                 <option value="payIn">Payments Received</option>
                 <option value="payOut">Payouts</option>
               </select>
-              
+
               <div className="flex space-x-2">
                 <DatePicker
                   selected={startDate}
@@ -446,58 +488,71 @@ const TailorWallet = () => {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ x: 5 }}
                   className={`p-4 rounded-lg flex justify-between items-center ${
-                    transaction.type === "payIn" 
-                      ? "bg-green-500 bg-opacity-10" 
+                    transaction.type === "payIn"
+                      ? "bg-green-500 bg-opacity-10"
                       : "bg-blue-500 bg-opacity-10"
                   } border-l-4 ${
-                    transaction.type === "payIn" 
-                      ? "border-green-500" 
-                      : transaction.status === "completed" 
-                        ? "border-blue-500" 
-                        : transaction.status === "pending" 
-                          ? "border-yellow-500" 
-                          : "border-red-500"
+                    transaction.type === "payIn"
+                      ? "border-green-500"
+                      : transaction.status === "completed"
+                      ? "border-blue-500"
+                      : transaction.status === "pending"
+                      ? "border-yellow-500"
+                      : "border-red-500"
                   }`}
                 >
                   <div className="flex items-center">
-                    <div className={`p-3 rounded-full mr-4 ${
-                      transaction.type === "payIn" 
-                        ? "bg-green-500 bg-opacity-20 text-green-500" 
-                        : "bg-blue-500 bg-opacity-20 text-blue-500"
-                    }`}>
-                      <i className={`fas ${
-                        transaction.type === "payIn" ? "fa-arrow-down" : "fa-arrow-up"
-                      }`}></i>
+                    <div
+                      className={`p-3 rounded-full mr-4 ${
+                        transaction.type === "payIn"
+                          ? "bg-green-500 bg-opacity-20 text-green-500"
+                          : "bg-blue-500 bg-opacity-20 text-blue-500"
+                      }`}
+                    >
+                      <i
+                        className={`fas ${
+                          transaction.type === "payIn"
+                            ? "fa-arrow-down"
+                            : "fa-arrow-up"
+                        }`}
+                      ></i>
                     </div>
                     <div>
                       <p className={`font-medium ${theme.colorText}`}>
-                        {transaction.type === "payIn" ? "Payment Received" : "Payout Request"}
+                        {transaction.type === "payIn"
+                          ? "Payment Received"
+                          : "Payout Request"}
                       </p>
                       <p className={`text-sm ${theme.colorText} opacity-80`}>
                         {formatDate(transaction.date)}
                       </p>
                       {transaction.type === "payOut" && (
-                        <span className={`text-xs px-2 py-1 rounded-full mt-1 ${
-                          transaction.status === "completed" 
-                            ? "bg-green-500 bg-opacity-20 text-green-500" 
-                            : transaction.status === "pending" 
-                              ? "bg-yellow-500 bg-opacity-20 text-yellow-500" 
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full mt-1 ${
+                            transaction.status === "completed"
+                              ? "bg-green-500 bg-opacity-20 text-green-500"
+                              : transaction.status === "pending"
+                              ? "bg-yellow-500 bg-opacity-20 text-yellow-500"
                               : "bg-red-500 bg-opacity-20 text-red-500"
-                        }`}>
+                          }`}
+                        >
                           {transaction.status}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className={`text-right ${
-                    transaction.type === "payIn" 
-                      ? "text-green-500" 
-                      : transaction.status === "failed" 
-                        ? "text-red-500" 
+                  <div
+                    className={`text-right ${
+                      transaction.type === "payIn"
+                        ? "text-green-500"
+                        : transaction.status === "failed"
+                        ? "text-red-500"
                         : "text-blue-500"
-                  }`}>
+                    }`}
+                  >
                     <p className="font-bold">
-                      {transaction.type === "payIn" ? "+" : "-"}{formatCurrency(transaction.amount)}
+                      {transaction.type === "payIn" ? "+" : "-"}
+                      {formatCurrency(transaction.amount)}
                     </p>
                   </div>
                 </motion.div>
@@ -532,37 +587,49 @@ const TailorWallet = () => {
         body={
           <div className="space-y-4">
             <div>
-              <label className={`block text-sm font-medium ${theme.colorText} mb-1`}>
+              <label
+                className={`block text-sm font-medium ${theme.colorText} mb-1`}
+              >
                 Bank Name
               </label>
               <input
                 type="text"
                 value={bankForm.bankName}
-                onChange={(e) => setBankForm({...bankForm, bankName: e.target.value})}
+                onChange={(e) =>
+                  setBankForm({ ...bankForm, bankName: e.target.value })
+                }
                 className={`w-full p-3 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder}`}
                 placeholder="e.g. HBL, UBL, etc."
               />
             </div>
             <div>
-              <label className={`block text-sm font-medium ${theme.colorText} mb-1`}>
+              <label
+                className={`block text-sm font-medium ${theme.colorText} mb-1`}
+              >
                 Account Name
               </label>
               <input
                 type="text"
                 value={bankForm.accountName}
-                onChange={(e) => setBankForm({...bankForm, accountName: e.target.value})}
+                onChange={(e) =>
+                  setBankForm({ ...bankForm, accountName: e.target.value })
+                }
                 className={`w-full p-3 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder}`}
                 placeholder="Account holder name"
               />
             </div>
             <div>
-              <label className={`block text-sm font-medium ${theme.colorText} mb-1`}>
+              <label
+                className={`block text-sm font-medium ${theme.colorText} mb-1`}
+              >
                 Account Number
               </label>
               <input
                 type="text"
                 value={bankForm.accountNumber}
-                onChange={(e) => setBankForm({...bankForm, accountNumber: e.target.value})}
+                onChange={(e) =>
+                  setBankForm({ ...bankForm, accountNumber: e.target.value })
+                }
                 className={`w-full p-3 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder}`}
                 placeholder="Account number"
               />
@@ -574,8 +641,8 @@ const TailorWallet = () => {
             label: updating ? <ClipLoader size={16} color="white" /> : "Save",
             onClick: handleBankSubmit,
             type: "primary",
-            disabled: updating
-          }
+            disabled: updating,
+          },
         ]}
       />
 
@@ -588,38 +655,64 @@ const TailorWallet = () => {
         body={
           <div className="space-y-4">
             <div>
-              <label className={`block text-sm font-medium ${theme.colorText} mb-1`}>
+              <label
+                className={`block text-sm font-medium ${theme.colorText} mb-1`}
+              >
                 Amount (PKR)
               </label>
               <input
-                type="number"
+                type="text"
                 value={payoutAmount}
-                onChange={(e) => setPayoutAmount(e.target.value)}
+                onChange={(e) => {
+                  const numericValue = e.target.value.replace(/\D/g, "");
+                  setPayoutAmount(numericValue);
+                }}
                 className={`w-full p-3 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder}`}
-                placeholder={`Max ${formatCurrency(walletData?.currentBalance || 0)}`}
-                max={walletData?.currentBalance || 0}
+                placeholder={`Max ${formatCurrency(
+                  walletData?.currentBalance || 0
+                )}`}
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
+
               <p className={`text-xs mt-1 ${theme.colorText} opacity-70`}>
-                Available balance: {formatCurrency(walletData?.currentBalance || 0)}
+                Available balance:{" "}
+                {formatCurrency(walletData?.currentBalance || 0)}
               </p>
             </div>
-            {walletData?.bankName && walletData?.accountName && walletData?.accountNumber && (
-              <div className={`p-4 rounded-lg ${theme.colorBgSecondary}`}>
-                <h4 className={`text-sm font-semibold mb-2 ${theme.colorText}`}>Payout will be sent to:</h4>
-                <p className={`text-sm ${theme.colorText}`}>{walletData.bankName}</p>
-                <p className={`text-sm ${theme.colorText}`}>{walletData.accountName}</p>
-                <p className={`text-sm ${theme.colorText}`}>{walletData.accountNumber}</p>
-              </div>
-            )}
+            {walletData?.bankName &&
+              walletData?.accountName &&
+              walletData?.accountNumber && (
+                <div className={`p-4 rounded-lg ${theme.colorBg}`}>
+                  <h4
+                    className={`text-sm font-semibold mb-2 ${theme.colorText}`}
+                  >
+                    Payout will be sent to:
+                  </h4>
+                  <p className={`text-sm ${theme.colorText}`}>
+                    {walletData.bankName}
+                  </p>
+                  <p className={`text-sm ${theme.colorText}`}>
+                    {walletData.accountName}
+                  </p>
+                  <p className={`text-sm ${theme.colorText}`}>
+                    {walletData.accountNumber}
+                  </p>
+                </div>
+              )}
           </div>
         }
         buttons={[
           {
-            label: updating ? <ClipLoader size={16} color="white" /> : "Request Payout",
+            label: updating ? (
+              <ClipLoader size={16} color="white" />
+            ) : (
+              "Request Payout"
+            ),
             onClick: handlePayoutRequest,
             type: "primary",
-            disabled: updating
-          }
+            disabled: updating,
+          },
         ]}
       />
     </div>
