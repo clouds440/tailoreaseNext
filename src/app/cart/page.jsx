@@ -3,6 +3,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import sendNotification from "@/utils/sendNotification";
 import { db } from "@/utils/firebaseConfig";
 import {
   doc,
@@ -292,7 +293,7 @@ const CartPage = () => {
       setPopUpMessageTrigger(true);
       return;
     }
-
+  
     try {
       const cartRef = doc(db, "OrdersManagement", cart.id);
       await updateDoc(cartRef, {
@@ -307,7 +308,15 @@ const CartPage = () => {
           timestamp: new Date().toISOString(),
         },
       });
-
+  
+      // ✅ Send notification to user
+      await sendNotification(
+        userData.uid, 
+        "user",    
+        "Your order has been placed successfully. Payment is under verification.",
+        `/user?tab=orders/${cart.id}`
+      );
+  
       setShowMessage({
         type: "success",
         message: "Order placed! - Payment under verification.",
@@ -323,6 +332,7 @@ const CartPage = () => {
       setPopUpMessageTrigger(true);
     }
   };
+  
 
   if (loading) {
     return (

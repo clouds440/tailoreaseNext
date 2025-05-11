@@ -150,9 +150,9 @@ const TailorAnalytics = () => {
     });
 
     const productData = Object.entries(productCounts).map(([productId, count]) => {
-        const product = products.find((p) => String(p.id) === String(productId));
+        const product = products.find((p) => String(p.productId) === String(productId));
         return {
-        name: product?.baseProductData?.name || `Product ${productId}`,
+        name: product?.baseProductData?.name,
         value: count,
       };
     });
