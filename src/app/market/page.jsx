@@ -505,19 +505,17 @@ const Market = () => {
               </div>
 
               {/* Filter Button */}
-              <div className="relative" ref={dropdownButtonRef}>
-                <SimpleButton
-                  type={"default"}
-                  btnText={
-                    <>
-                      <i className="fas fa-filter mr-2"></i>
-                      Filters
-                    </>
-                  }
-                  extraclasses={`px-4 py-2 border font-semibold ${theme.colorBorder}`}
-                  onClick={toggleDropdown}
-                />
-              </div>
+              {!addOutfit && (
+                <div className="relative" ref={dropdownButtonRef}>
+                  <SimpleButton
+                    type={"default"}
+                    btnText={"Filters"}
+                    icon={<i className="fas fa-filter"></i>}
+                    extraclasses={`px-4 py-2 border font-semibold ${theme.colorBorder}`}
+                    onClick={toggleDropdown}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
