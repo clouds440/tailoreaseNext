@@ -25,6 +25,9 @@ const Market = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const TailorProductsView = searchParams.get("tailor");
+  const addOutfit = searchParams.get("addOutfit");
+  const type = searchParams.get("type");
+  const addGender = searchParams.get("gender");
 
   const genders = [
     { name: "Male", icon: "male" },
@@ -46,7 +49,9 @@ const Market = () => {
     page: 1,
   });
   const [selectedGenderFilter, setSelectedGenderFilter] = useState([]); // Temporary selection
-  const [appliedGenderFilter, setAppliedGenderFilter] = useState([]); // Applied filters
+  const [appliedGenderFilter, setAppliedGenderFilter] = useState(
+    addGender ? [addGender.charAt(0).toUpperCase() + addGender.slice(1)] : []
+  ); // Applied filters
   const [productList, setProductList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -188,7 +193,16 @@ const Market = () => {
           break;
       }
 
-      setProductList(products);
+      setProductList(
+        addOutfit && (type === "torso" || type === "legs")
+          ? products.filter(
+              (p) =>
+                p.has3DTryOn &&
+                p.baseProductData?.type ===
+                  (type === "torso" ? "legs" : "torso")
+            )
+          : products
+      );
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -324,10 +338,16 @@ const Market = () => {
     setQuickViewOpen(true);
   };
 
+  const [disableButtons, setDisableButtons] = useState(false);
+
   const handleCustomizeClick = (product) => {
     if (!selectedProduct) return;
     // Before navigating
-    sessionStorage.setItem("product", JSON.stringify(product));
+    setDisableButtons(true);
+    const existing = JSON.parse(sessionStorage.getItem("product")) || [];
+    existing.push(product);
+    sessionStorage.setItem("product", JSON.stringify(existing));
+
     const formatCategory = (str = "") => {
       const words = str.trim().split(/\s+/);
       if (words.length === 1) {
@@ -345,7 +365,11 @@ const Market = () => {
     const category = formatCategory(
       selectedProduct.baseProductData?.category || "shirt"
     );
-    router.push(`/outfit-customization?outfit=${category}`);
+    router.push(
+      `/outfit-customization?outfit=${category}${
+        addOutfit ? `,${addOutfit}` : ""
+      }`
+    );
   };
 
   const handleAddToCart = () => {
@@ -357,6 +381,8 @@ const Market = () => {
       setPopUpMessageTrigger(true);
       return;
     }
+
+    setDisableButtons(true);
 
     const productWithEmptyLink = {
       ...selectedProduct,
@@ -421,7 +447,11 @@ const Market = () => {
       emptyMessage +=
         ". This tailor doesn't exist. Check the tailor ID and try again";
     } else {
-      emptyMessage += `. ${tailorName} hasn't listed any products yet`;
+      emptyMessage += `. ${
+        addOutfit
+          ? "No compatible outfits by this tailor"
+          : `${tailorName} hasn't listed any products yet`
+      }`;
     }
   }
 
@@ -533,13 +563,15 @@ const Market = () => {
                   Search: {searchQuery}
                 </motion.span>
               )}
-              <button
-                onClick={clearFilters}
-                className={`ml-2 text-xs underline ${theme.colorText} hover:text-blue-500 flex items-center`}
-              >
-                <i className="fas fa-broom mr-1"></i>
-                Clear all
-              </button>
+              {!addOutfit && (
+                <button
+                  onClick={clearFilters}
+                  className={`ml-2 text-xs underline ${theme.colorText} hover:text-blue-500 flex items-center`}
+                >
+                  <i className="fas fa-broom mr-1"></i>
+                  Clear all
+                </button>
+              )}
             </motion.div>
           )}
 
@@ -595,17 +627,29 @@ const Market = () => {
                       <div
                         className={`block text-sm mt-4 w-fit mx-auto p-2 rounded-lg ${theme.hoverBg}`}
                       >
-                        <a href="/market">Browse all products</a>
+                        <a
+                          href={`${
+                            addOutfit
+                              ? `/outfit-customization?outfit=${addOutfit}`
+                              : "/market"
+                          }`}
+                        >
+                          {addOutfit
+                            ? "Go Back to Customization"
+                            : "Browse All Products"}
+                        </a>
                       </div>
                     )}
                   </span>
-                  <button
-                    onClick={clearFilters}
-                    className={`px-4 py-2 rounded-lg ${theme.hoverBg} ${theme.colorText} flex items-center`}
-                  >
-                    <i className="fas fa-broom mr-2"></i>
-                    Clear filters
-                  </button>
+                  {!addOutfit && (
+                    <button
+                      onClick={clearFilters}
+                      className={`px-4 py-2 rounded-lg ${theme.hoverBg} ${theme.colorText} flex items-center`}
+                    >
+                      <i className="fas fa-broom mr-2"></i>
+                      Clear filters
+                    </button>
+                  )}
                 </motion.div>
               ) : (
                 productList.map((product, index) => (
@@ -944,41 +988,41 @@ const Market = () => {
                   </p>
 
                   <div className="flex flex-col gap-3">
-                    <SimpleButton
-                      btnText={"View Product"}
-                      type={"default"}
-                      icon={<i className="fas fa-eye"></i>}
-                      onClick={() => {
-                        router.push(`/market/product?id=${selectedProduct.id}`);
-                      }}
-                    />
+                    {!addOutfit && (
+                      <>
+                        <SimpleButton
+                          btnText={"Add to Cart"}
+                          icon={<i className="fas fa-shopping-cart mr-2"></i>}
+                          type="accent"
+                          onClick={handleAddToCart}
+                          disabled={disableButtons}
+                        />
+                        <SimpleButton
+                          btnText={"View Product"}
+                          type={"default"}
+                          icon={<i className="fas fa-eye"></i>}
+                          disabled={disableButtons}
+                          onClick={() => {
+                            setDisableButtons(true);
+                            router.push(
+                              `/market/product?id=${selectedProduct.id}`
+                            );
+                          }}
+                        />
+                      </>
+                    )}
 
                     {selectedProduct.has3DTryOn && (
                       <SimpleButton
-                        btnText={
-                          <>
-                            <i className="fas fa-magic mr-2"></i>
-                            Try-On In 3D
-                          </>
-                        }
+                        btnText={"Try-On In 3D"}
+                        icon={<i className="fas fa-magic mr-2"></i>}
                         type="default"
-                        fullWidth
+                        disabled={disableButtons}
                         onClick={() => {
                           handleCustomizeClick(selectedProduct);
                         }}
                       />
                     )}
-                    <SimpleButton
-                      btnText={
-                        <>
-                          <i className="fas fa-shopping-cart mr-2"></i>
-                          Add to Cart
-                        </>
-                      }
-                      type="accent"
-                      fullWidth
-                      onClick={handleAddToCart}
-                    />
                   </div>
 
                   <div className={`mt-6 pt-6 border-t ${theme.colorBorder}`}>

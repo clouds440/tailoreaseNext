@@ -55,6 +55,7 @@ const AdminDashboard = () => {
     name: "",
     category: "",
     material: "",
+    type: "",
     gender: "Unisex",
     has3DTryOn: false,
     isActive: true,
@@ -376,6 +377,7 @@ const AdminDashboard = () => {
         name: "",
         category: "",
         material: "",
+        type: "",
         gender: "Unisex",
         has3DTryOn: false,
         isActive: true,
@@ -1079,6 +1081,33 @@ const AdminDashboard = () => {
 
                     <div className="relative">
                       <label className={`block mb-2 ${theme.colorText}`}>
+                        Type
+                      </label>
+                      <select
+                        name="type"
+                        value={newProduct.type}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            type: e.target.value,
+                          })
+                        }
+                        className={`${inputStyles}`}
+                      >
+                        <option value="torso" className={theme.colorBg}>
+                          Torso
+                        </option>
+                        <option value="legs" className={theme.colorBg}>
+                          Legs
+                        </option>
+                        <option value="full" className={theme.colorBg}>
+                          Full
+                        </option>
+                      </select>
+                    </div>
+
+                    <div className="relative">
+                      <label className={`block mb-2 ${theme.colorText}`}>
                         Gender
                       </label>
                       <select
@@ -1092,10 +1121,18 @@ const AdminDashboard = () => {
                         }
                         className={`${inputStyles}`}
                       >
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Kids">Kids</option>
-                        <option value="Unisex">Unisex</option>
+                        <option value="Male" className={theme.colorBg}>
+                          Male
+                        </option>
+                        <option value="Female" className={theme.colorBg}>
+                          Female
+                        </option>
+                        <option value="Kids" className={theme.colorBg}>
+                          Kids
+                        </option>
+                        <option value="Unisex" className={theme.colorBg}>
+                          Unisex
+                        </option>
                       </select>
                     </div>
 

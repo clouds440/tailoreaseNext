@@ -123,6 +123,7 @@ const ShareLinkDialog = ({ sender, shareLink, subject }) => {
       <SimpleButton
         btnText={`Share ${subject}`}
         icon={<FaShareAlt />}
+        extraclasses="w-full"
         onClick={() => setShowDialog(true)}
       />
 

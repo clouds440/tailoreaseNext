@@ -136,33 +136,34 @@ const TailorProductDashboard = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-  
+
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
-  
+
     // Clear the input value to allow selecting same file again
     e.target.value = "";
-  
+
     // Create URLs for new files
     const newImageUrls = files.map((file) => URL.createObjectURL(file));
-  
+
     // Filter out any duplicates (same file name and size)
     const uniqueNewFiles = files.filter((newFile, index) => {
       return !selectedFiles.some(
         (existingFile) =>
-          existingFile.name === newFile.name && existingFile.size === newFile.size
+          existingFile.name === newFile.name &&
+          existingFile.size === newFile.size
       );
     });
-  
+
     const uniqueNewImageUrls = newImageUrls.filter((_, index) => {
       return !selectedFiles.some(
         (existingFile) =>
-          existingFile.name === files[index].name && 
+          existingFile.name === files[index].name &&
           existingFile.size === files[index].size
       );
     });
-  
+
     if (uniqueNewFiles.length === 0) {
       // All selected files are duplicates - replace them
       setSelectedFiles(files);
@@ -171,18 +172,18 @@ const TailorProductDashboard = () => {
       setCropperModalOpen(true);
       return;
     }
-  
+
     // Add new files to existing selection
     setSelectedFiles((prev) => [...prev, ...uniqueNewFiles]);
     setImagesToCrop(uniqueNewImageUrls);
     setCurrentImageIndex(0);
     setCropperModalOpen(true);
   };
-  
+
   const handleImageCropped = useCallback(
     async (croppedImageUrl) => {
       setCroppedImages((prev) => [...prev, croppedImageUrl]);
-  
+
       if (currentImageIndex < imagesToCrop.length - 1) {
         setCurrentImageIndex((prev) => prev + 1);
       } else {
@@ -319,6 +320,7 @@ const TailorProductDashboard = () => {
               category: selectedProduct.category,
               material: selectedProduct.material,
               imageUrl: selectedProduct.imageUrl,
+              type: selectedProduct.type,
               gender: selectedProduct.gender,
               isPredefined: true,
             },
@@ -638,7 +640,7 @@ const TailorProductDashboard = () => {
     >
       {/* Image Cropper Modal */}
       <ImageCropper
-        aspectRatio={1/1}
+        aspectRatio={1 / 1}
         onCropComplete={handleImageCropped}
         showModal={cropperModalOpen}
         setShowModal={(value) => {

@@ -51,11 +51,13 @@ const UserProfile = ({ userData, uid }) => {
 
           <div className="flex items-center justify-center mt-5">
             {!uid && displayUser && (
-              <ShareLinkDialog
-                sender={userData}
-                shareLink={shareLink()}
-                subject={"Profile"}
-              />
+              <div className="w-auto">
+                <ShareLinkDialog
+                  sender={userData}
+                  shareLink={shareLink()}
+                  subject={"Profile"}
+                />
+              </div>
             )}
           </div>
         </div>

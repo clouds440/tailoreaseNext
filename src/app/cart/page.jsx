@@ -408,6 +408,8 @@ const CartPage = () => {
               alt="Empty Cart"
               fill
               className="object-contain"
+              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+              priority
             />
           </motion.div>
           <h2 className={`text-2xl font-bold mb-4 ${theme.colorText}`}>
@@ -509,6 +511,7 @@ const CartPage = () => {
                           fill
                           className="object-cover"
                           sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                          priority
                         />
                       </motion.div>
 
@@ -971,6 +974,8 @@ const CartPage = () => {
                               width={80}
                               height={30}
                               className="ml-2"
+                              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                              priority
                             />
                           </label>
                         </div>

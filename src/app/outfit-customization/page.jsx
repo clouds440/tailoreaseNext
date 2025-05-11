@@ -1,6 +1,6 @@
 "use client";
 import { useContext, useState, useEffect, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import UserContext from "@/utils/UserContext";
 import CustomizationScene from "@/components/3d components/CustomizationScene";
 import { Resizable } from "re-resizable";
@@ -64,10 +64,19 @@ const OutfitCustomization = () => {
   const [generatingLink, setGeneratingLink] = useState(false);
   const [showAddToCart, setShowAddToCart] = useState(false);
   const [product, setProduct] = useState(null);
+  const [localCustomizations, setLocalCustomizations] = useState(null);
+  const router = useRouter();
 
   // Get outfit(s) from URL and convert them into an array
   const outfitTypes = searchParams.get("outfit")?.split(",") || [];
   const shareId = searchParams.get("share");
+
+  useEffect(() => {
+    const local = JSON.parse(sessionStorage.getItem("localCustomizations"));
+    if (local) {
+      setLocalCustomizations(local);
+    }
+  }, []);
 
   const fetchSharedOutfit = async (shareId) => {
     try {
@@ -141,7 +150,13 @@ const OutfitCustomization = () => {
 
   useEffect(() => {
     const getSharedOutfit = async () => {
-      const outfitData = await fetchSharedOutfit(shareId);
+      let outfitData;
+      if (localCustomizations) {
+        outfitData = localCustomizations;
+      } else if (shareId) {
+        outfitData = await fetchSharedOutfit(shareId);
+      }
+
       if (outfitData) {
         setbuttonTexturePath(outfitData.buttonTexturePath);
         setColor(outfitData.color);
@@ -152,11 +167,8 @@ const OutfitCustomization = () => {
         setshalwarTexure(outfitData.shalwarTexureURL);
       }
     };
-
-    if (shareId) {
-      getSharedOutfit();
-    }
-  }, [shareId]);
+    getSharedOutfit();
+  }, [localCustomizations, shareId]);
 
   // Fetch measurements from Firestore
   useEffect(() => {
@@ -183,7 +195,8 @@ const OutfitCustomization = () => {
   }, [setMeasurements, userData?.uid, userLoggedIn]);
 
   useEffect(() => {
-    if (!userLoggedIn || shareId || !measurements) return;
+    if (!userLoggedIn || shareId || !measurements || localCustomizations)
+      return;
 
     const useInches =
       localStorage.getItem("useInches." + userData?.uid) === "true";
@@ -250,7 +263,14 @@ const OutfitCustomization = () => {
     });
 
     setMorphValues(initialMorphValues);
-  }, [measurements, userLoggedIn, shareId, morphTargets, userData?.uid]);
+  }, [
+    measurements,
+    userLoggedIn,
+    shareId,
+    morphTargets,
+    userData?.uid,
+    localCustomizations,
+  ]);
 
   useEffect(() => {
     const p = JSON.parse(sessionStorage.getItem("product"));
@@ -429,22 +449,6 @@ const OutfitCustomization = () => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  const handleBuyNow = () => {
-    if (!userLoggedIn) {
-      setShowMessage({
-        type: "danger",
-        message: "Please log in to buy now.",
-      });
-      setPopUpMessageTrigger(true);
-      return;
-    }
-    setShowMessage({
-      type: "info",
-      message: "We're adding Buy Now functionality later. Stay tuned!",
-    });
-    setPopUpMessageTrigger(true);
-  };
-
   const handleAddToCart = () => {
     if (!userLoggedIn) {
       setShowMessage({
@@ -455,6 +459,30 @@ const OutfitCustomization = () => {
       return;
     }
     setShowAddToCart(true);
+  };
+
+  const handleAddOutfit = () => {
+    const customizations = {
+      outfit: uniqueOutfits[0],
+      shalwarTexure,
+      collarVisible,
+      buttonTexturePath,
+      morphValues,
+      colorValue,
+      color,
+      texture,
+    };
+    sessionStorage.setItem(
+      "localCustomizations",
+      JSON.stringify(customizations)
+    );
+    router.push(
+      `/market?tailor=${product[0].tailorId}&addOutfit=${
+        uniqueOutfits[0]
+      }&type=${outfitCategories[uniqueOutfits[0]].category}&gender=${
+        outfitCategories[uniqueOutfits[0]].gender
+      }`
+    );
   };
 
   return (
@@ -648,6 +676,7 @@ const OutfitCustomization = () => {
                     )
                   }
                   type="default"
+                  extraclasses="w-full"
                   onClick={uploadCustomization}
                   disabled={generatingLink}
                 />
@@ -668,13 +697,10 @@ const OutfitCustomization = () => {
             {showActionButtons && (
               <div className="flex space-x-2">
                 <SimpleButton
-                  btnText={
-                    <>
-                      <i className="fas fa-shopping-cart mr-2" />
-                      Add to Cart
-                    </>
-                  }
+                  btnText={"Add to Cart"}
+                  icon={<i className="fas fa-shopping-cart mr-2" />}
                   type="accent"
+                  extraclasses="w-full"
                   onClick={async () => {
                     if (!linkGenerated) {
                       await uploadCustomization();
@@ -682,18 +708,15 @@ const OutfitCustomization = () => {
                     handleAddToCart();
                   }}
                 />
-                <SimpleButton
-                  btnText={
-                    <>
-                      <i className="fas fa-bolt mr-2" />
-                      Buy Now
-                    </>
-                  }
-                  type="primary"
-                  onClick={handleBuyNow}
-                />
               </div>
             )}
+            <SimpleButton
+              btnText={"Add Another Item"}
+              icon={<i className="fas fa-shirt"></i>}
+              type="primary"
+              disabled={uniqueOutfits.length > 1}
+              onClick={handleAddOutfit}
+            />
           </div>
         )}
       </Resizable>
@@ -718,20 +741,27 @@ const OutfitCustomization = () => {
           collarVisible={collarVisible}
         />
       </div>
-      {showAddToCart && product && (
-        <AddToCart
-          product={{
-            ...product,
-            products: {
-              ...product.products,
-            },
-          }}
-          onClose={() => setShowAddToCart(false)}
-          theme={theme}
-          customizedProductLink={shareLink}
-          userId={userData?.uid}
-        />
-      )}
+      {showAddToCart &&
+        (Array.isArray(product)
+          ? product.map((p, idx) => (
+              <AddToCart
+                key={idx}
+                product={p}
+                onClose={() => setShowAddToCart(false)}
+                theme={theme}
+                customizedProductLink={shareLink}
+                userId={userData?.uid}
+              />
+            ))
+          : product && (
+              <AddToCart
+                product={product}
+                onClose={() => setShowAddToCart(false)}
+                theme={theme}
+                customizedProductLink={shareLink}
+                userId={userData?.uid}
+              />
+            ))}
     </div>
   );
 };

@@ -4,9 +4,7 @@ import "./globals.css"; // Import global styles
 import { UserProvider } from "@/utils/UserContext";
 import PopupMessage from "@/components/PopupMessage";
 import { Roboto } from "next/font/google";
-import ChatBot from "../components/ChatBot";
 import BackgroundDiv from "@/components/BackgroundDiv";
-import NotificationPanel from "@/components/NotificationPanel";
 import { FloatingButtonsHolder } from "@/components/FloatingButtonsHolder";
 
 const roboto = Roboto({

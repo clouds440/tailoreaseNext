@@ -75,7 +75,7 @@ const MyOutfits = () => {
       y: 0,
       transition: {
         duration: 0.2,
-        delay: index * 0.25,
+        delay: index * 0.08,
         ease: "easeOut",
       },
     }),

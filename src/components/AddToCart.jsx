@@ -23,7 +23,13 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 
-const AddToCart = ({ product, onClose, theme, userId, customizedProductLink }) => {
+const AddToCart = ({
+  product,
+  onClose,
+  theme,
+  userId,
+  customizedProductLink,
+}) => {
   const [animationStage, setAnimationStage] = useState(1);
   const [cartExists, setCartExists] = useState(false);
   const [currentTailorId, setCurrentTailorId] = useState(null);
@@ -54,7 +60,7 @@ const AddToCart = ({ product, onClose, theme, userId, customizedProductLink }) =
         product.isCustom && product.images?.length > 0
           ? product.images[0]
           : product.baseProductData?.imageUrl || "/images/default-product.png",
-      customizedProductLink: customizedProductLink || "", 
+      customizedProductLink: customizedProductLink || "",
       tailorId: product.tailorId || "",
       tailorName: product.tailor || "Unknown Tailor",
     };
@@ -203,6 +209,8 @@ const AddToCart = ({ product, onClose, theme, userId, customizedProductLink }) =
       }
 
       setSuccess(true);
+      sessionStorage.removeItem("localCustomizations");
+      sessionStorage.removeItem("product");
       setTimeout(() => setAnimationStage(4), 1000);
     } catch (err) {
       console.error("Error adding to cart:", err);
