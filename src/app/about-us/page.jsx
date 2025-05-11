@@ -103,7 +103,7 @@ const AboutUs = () => {
     {
       name: "Abdul Rehman",
       role: "Documenter / Internal System Designer",
-      email: "abdulrehman@example.com",
+      email: "abdulrehman4070411@gmail.com",
       image: "/team_data/abdul_rehman.jpg",
       quote: "Precision in documentation leads to excellence.",
     },

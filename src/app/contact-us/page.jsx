@@ -80,9 +80,9 @@ const ContactUs = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
-    }
+        delayChildren: 0.3,
+      },
+    },
   };
 
   const itemVariants = {
@@ -93,13 +93,13 @@ const ContactUs = () => {
       transition: {
         type: "spring",
         stiffness: 100,
-        damping: 10
-      }
-    }
+        damping: 10,
+      },
+    },
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -114,7 +114,7 @@ const ContactUs = () => {
           className={`w-full md:w-1/2 p-8 ${theme.mainTheme} flex flex-col items-start border-b md:border-b-0 md:border-r ${theme.colorBorder} rounded-t-xl md:rounded-tr-none md:rounded-l-xl`}
         >
           <div className="mb-8">
-            <motion.h2 
+            <motion.h2
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -122,32 +122,32 @@ const ContactUs = () => {
             >
               Get in Touch
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
               className={`${theme.colorText} mb-8 text-lg leading-relaxed`}
             >
-              Have questions or need assistance? Fill out the form, and we&apos;ll get
-              back to you as soon as possible. You can also reach us via email or
-              phone for immediate support.
+              Have questions or need assistance? Fill out the form, and
+              we&apos;ll get back to you as soon as possible. You can also reach
+              us via email or phone for immediate support.
             </motion.p>
           </div>
 
-          <motion.ul 
+          <motion.ul
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             className={`${theme.colorText} space-y-6 mb-8 w-full`}
           >
             <motion.li variants={itemVariants} className="flex items-start">
-              <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full mr-4">
-                <i className="fas fa-envelope text-blue-600 dark:text-blue-400 text-xl"></i>
+              <div className="bg-blue-700 px-3 py-2 rounded-full mr-4">
+                <i className="fas fa-envelope text-blue-400 text-xl"></i>
               </div>
               <div>
                 <h3 className="font-bold text-lg">Email</h3>
-                <a 
-                  href="mailto:support@tailorease.com" 
+                <a
+                  href="mailto:support@tailorease.com"
                   className="hover:text-blue-600 transition-colors"
                 >
                   support@tailorease.com
@@ -156,13 +156,13 @@ const ContactUs = () => {
             </motion.li>
 
             <motion.li variants={itemVariants} className="flex items-start">
-              <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full mr-4">
-                <i className="fab fa-whatsapp text-green-600 dark:text-green-400 text-xl"></i>
+              <div className="bg-green-700 px-3 py-2 rounded-full mr-4">
+                <i className="fab fa-whatsapp text-green-400 text-xl"></i>
               </div>
               <div>
                 <h3 className="font-bold text-lg">WhatsApp</h3>
-                <a 
-                  href="https://wa.me/923108646268" 
+                <a
+                  href="https://wa.me/923108646268"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-green-600 transition-colors"
@@ -173,21 +173,20 @@ const ContactUs = () => {
             </motion.li>
 
             <motion.li variants={itemVariants} className="flex items-start">
-              <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full mr-4">
-                <i className="fas fa-map-marker-alt text-purple-600 dark:text-purple-400 text-xl"></i>
+              <div className="bg-purple-700 px-3 py-2 rounded-full mr-4">
+                <i className="fas fa-map-marker-alt text-purple-400 text-xl"></i>
               </div>
               <div>
                 <h3 className="font-bold text-lg">Address</h3>
                 <p>
-                  3rd Floor, Ufone Tower, Office No. 248,
-                  Islamabad, Pakistan
+                  3rd Floor, Ufone Tower, Office No. 248, Islamabad, Pakistan
                 </p>
               </div>
             </motion.li>
           </motion.ul>
 
           {/* Social Media Links */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
@@ -239,7 +238,7 @@ const ContactUs = () => {
           transition={{ type: "spring", stiffness: 100 }}
           className={`w-full md:w-1/2 p-8 rounded-b-xl md:rounded-bl-none md:rounded-r-xl ${theme.mainTheme}`}
         >
-          <motion.h2 
+          <motion.h2
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -247,15 +246,15 @@ const ContactUs = () => {
           >
             Send Us a Message
           </motion.h2>
-          
-          <motion.form 
-            onSubmit={handleSubmit} 
+
+          <motion.form
+            onSubmit={handleSubmit}
             noValidate
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <motion.div 
+            <motion.div
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.5 }}
@@ -276,7 +275,7 @@ const ContactUs = () => {
               <i className="fas fa-user absolute right-4 top-4 text-gray-400 peer-focus:text-blue-500"></i>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.6 }}
@@ -297,7 +296,7 @@ const ContactUs = () => {
               <i className="fas fa-envelope absolute right-4 top-4 text-gray-400 peer-focus:text-blue-500"></i>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.7 }}
