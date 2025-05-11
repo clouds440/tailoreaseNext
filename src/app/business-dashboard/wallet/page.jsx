@@ -9,6 +9,7 @@ import SimpleButton from "@/components/SimpleButton";
 import DialogBox from "@/components/DialogBox";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { FaCoins, FaTimes } from "react-icons/fa";
 
 const TailorWallet = () => {
   const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
@@ -22,6 +23,7 @@ const TailorWallet = () => {
   const [transactionFilter, setTransactionFilter] = useState("all");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [useMax, setUseMax] = useState(false);
 
   // Bank form state
   const [bankForm, setBankForm] = useState({
@@ -138,6 +140,15 @@ const TailorWallet = () => {
 
     if (isNaN(currentBalance)) {
       currentBalance = 0;
+    }
+
+    if (amount % 500 != 0) {
+      setShowMessage({
+        type: "warning",
+        message: "Enter the amount in multiples of 500. (min 500)",
+      });
+      setPopUpMessageTrigger(true);
+      return;
     }
 
     if (isNaN(amount)) {
@@ -278,6 +289,7 @@ const TailorWallet = () => {
       return dateB - dateA;
     });
   };
+  const maxValue = Math.floor((walletData?.currentBalance || 0) / 500) * 500;
 
   // Clear date filters
   const clearDateFilters = () => {
@@ -343,7 +355,19 @@ const TailorWallet = () => {
               <h2 className="text-4xl font-bold my-2">
                 {formatCurrency(walletData?.currentBalance || 0)}
               </h2>
-              <p className="text-sm opacity-90">Available for withdrawal</p>
+              <p className="text-sm opacity-90 flex items-center gap-1">
+                {walletData.currentBalance >= 500 ? (
+                  <>
+                    <i className="fas fa-check-circle text-green-500"></i>
+                    Available for withdrawal
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-times-circle text-red-500"></i>
+                    Min to withdraw: 500
+                  </>
+                )}
+              </p>
             </div>
             <div className="bg-white bg-opacity-20 p-3 rounded-full">
               <i className="fas fa-wallet text-2xl"></i>
@@ -356,6 +380,7 @@ const TailorWallet = () => {
               type="default"
               icon={<i className="fas fa-money-bill-wave"></i>}
               extraclasses="mt-3"
+              disabled={walletData.currentBalance <= 500}
               onClick={() => setShowPayoutDialog(true)}
             />
           </div>
@@ -565,7 +590,7 @@ const TailorWallet = () => {
               {(transactionFilter !== "all" || startDate || endDate) && (
                 <SimpleButton
                   btnText="Clear Filters"
-                  type="secondary"
+                  type="default"
                   onClick={() => {
                     setTransactionFilter("all");
                     clearDateFilters();
@@ -660,26 +685,46 @@ const TailorWallet = () => {
               >
                 Amount (PKR)
               </label>
+
               <input
                 type="text"
                 value={payoutAmount}
                 onChange={(e) => {
                   const numericValue = e.target.value.replace(/\D/g, "");
                   setPayoutAmount(numericValue);
+                  if (useMax && numericValue !== maxValue.toString()) {
+                    setUseMax(false); // auto-undo if user types something different
+                  }
                 }}
                 className={`w-full p-3 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder}`}
-                placeholder={`Max ${formatCurrency(
-                  walletData?.currentBalance || 0
-                )}`}
+                placeholder={`Max ${formatCurrency(maxValue)}`}
                 inputMode="numeric"
                 pattern="[0-9]*"
               />
 
-              <p className={`text-xs mt-1 ${theme.colorText} opacity-70`}>
-                Available balance:{" "}
-                {formatCurrency(walletData?.currentBalance || 0)}
-              </p>
+              <div className="flex items-center justify-between mt-2">
+                <p className={`text-xs ${theme.colorText} opacity-70`}>
+                  Available balance:{" "}
+                  {formatCurrency(walletData?.currentBalance || 0)}
+                </p>
+                <SimpleButton
+                  btnText={useMax ? "Max" : "Max"}
+                  icon={useMax ? <FaTimes /> : <FaCoins />}
+                  type={useMax ? "accent" : "default"}
+                  onClick={() => {
+                    if (useMax) {
+                      setPayoutAmount("");
+                      setUseMax(false);
+                    } else {
+                      setPayoutAmount(maxValue.toString());
+                      setUseMax(true);
+                    }
+                  }}
+                  extraClasses="text-xs"
+                />
+              </div>
             </div>
+
             {walletData?.bankName &&
               walletData?.accountName &&
               walletData?.accountNumber && (

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect, useContext, act } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import UserContext from "@/utils/UserContext";
 import { useRouter } from "next/navigation";
@@ -199,15 +199,13 @@ const NotificationPanel = () => {
       {/* Floating Notification Button */}
       {userLoggedIn && (
         <div
-          className={`fixed bottom-2 sm:bottom-8 right-[58px] sm:right-[85px] w-12 h-12 flex items-center justify-center rounded-full border-2 shadow-lg cursor-pointer hover:scale-105 z-[9999] ${theme.mainTheme} ${theme.hoverBg}`}
+          className={`fixed bottom-2 sm:bottom-8 right-[58px] sm:right-[85px] w-12 h-12 flex items-center select-none justify-center rounded-full border-2 shadow-lg cursor-pointer hover:scale-105 z-[9999] ${theme.mainTheme} ${theme.hoverBg}`}
           onClick={() => setIsOpen(!isOpen)}
         >
           <div className="relative">
-            {isOpen ? (
-              <i className={`fas fa-bell text-2xl`}></i>
-            ) : (
-              <i className={`fas fa-bell text-2xl ${theme.iconColor}`}></i>
-            )}
+            <i
+              className={`fas fa-bell text-2xl ${!isOpen && theme.iconColor}`}
+            ></i>
             {totalUnreadCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                 {totalUnreadCount}

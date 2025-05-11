@@ -357,7 +357,7 @@ const ChatBot = () => {
     <>
       {/* ChatBot Trigger Icon */}
       <div
-        className={`fixed bottom-2 sm:bottom-8 right-2 sm:right-8 w-12 h-12 flex items-center justify-center rounded-full border-2 shadow-lg cursor-pointer hover:scale-105 z-[9999] ${theme.mainTheme} ${theme.hoverBg}`}
+        className={`fixed bottom-2 sm:bottom-8 right-2 sm:right-8 w-12 h-12 flex items-center justify-center select-none rounded-full border-2 shadow-lg cursor-pointer hover:scale-105 z-[9999] ${theme.mainTheme} ${theme.hoverBg}`}
         onClick={() => setIsOpen(true)}
       >
         {isOpen ? (

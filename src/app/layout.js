@@ -7,6 +7,7 @@ import { Roboto } from "next/font/google";
 import ChatBot from "../components/ChatBot";
 import BackgroundDiv from "@/components/BackgroundDiv";
 import NotificationPanel from "@/components/NotificationPanel";
+import { FloatingButtonsHolder } from "@/components/FloatingButtonsHolder";
 
 const roboto = Roboto({
   weight: "400",
@@ -41,8 +42,7 @@ export default function RootLayout({ children }) {
                 className={`overflow-hidden flex-1 mt-[85px] md:mt-0 px-[1px]`}
               >
                 <PopupMessage />
-                <ChatBot />
-                <NotificationPanel />
+                <FloatingButtonsHolder />
                 {children} {/* Renders each page's content */}
               </div>
             </div>

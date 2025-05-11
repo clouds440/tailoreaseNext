@@ -197,9 +197,9 @@ export default function Home() {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: 0.24 }}
-                  className="absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl bg-gray-800 shadow-lg p-4 border border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer"
-                  whileHover={{ y: -5 }}
+                  transition={{ delay: 0.1 }}
+                  className="absolute -bottom-6 -right-6 w-28 h-28 rounded-2xl bg-gray-800 shadow-lg p-4 border border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  whileHover={{ y: -8 }}
                 >
                   <div className="relative w-full h-full">
                     <Image
@@ -229,9 +229,9 @@ export default function Home() {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: 0.5 }}
+                  transition={{ delay: 0.1 }}
                   className="absolute -top-6 -left-6 w-32 h-32 rounded-full bg-gray-800 shadow-lg flex items-center justify-center border border-gray-200"
-                  whileHover={{ rotate: 5 }}
+                  whileHover={{ rotate: 360 }}
                 >
                   <div className="text-center p-4">
                     <div className="text-4xl font-bold text-blue-600">97%</div>
@@ -335,7 +335,9 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 bg-gradient-to-r from-blue-600 via-purple-600/40 to-gray-600/50 text-white relative overflow-hidden border-x max-w-[99.7%] mx-auto flex items-center justify-center w-auto select-none">
+      <section
+        className={`py-20 px-6 bg-gradient-to-r from-blue-600 via-purple-600/40 to-gray-600/50 text-white relative overflow-hidden max-w-[99.6%] mx-auto flex items-center justify-center w-auto select-none`}
+      >
         {/* Floating elements */}
         <div className="absolute top-0 left-0 w-32 h-32 rounded-full bg-white/10 blur-xl"></div>
         <div className="absolute bottom-0 right-0 w-48 h-48 rounded-full bg-white/10 blur-xl"></div>
