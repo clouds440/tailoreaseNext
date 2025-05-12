@@ -539,7 +539,8 @@ const TailorProfile = () => {
               <div className="flex items-center">
                 <i className="fas fa-map-marker-alt mr-2 text-red-500"></i>
                 <span>
-                  {tailorData.businessAddress || "Address not provided"}
+                  {tailorData.businessAddress || "Address not provided"},{" "}
+                  {tailorData.businessCity || "City not provided"}
                 </span>
               </div>
             </motion.div>

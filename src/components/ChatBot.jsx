@@ -292,7 +292,7 @@ const ChatBot = () => {
         const ordersQuery = query(
           ordersCollection,
           where("userId", "==", userData?.uid),
-          where("orderStatus", "not-in", ["inCart"]) // Firestore likes "not-in" instead of "!=". Can also search for multiple values like ["inCart", "cancelled"]
+          where("orderStatus", "not-in", ["inCart", "completed"]) // Firestore likes "not-in" instead of "!=". Can also search for multiple values like ["inCart", "cancelled"]
         );
 
         const querySnapshot = await getDocs(ordersQuery);

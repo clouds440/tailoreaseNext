@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext, useRef, useMemo } from "react";
 import { db } from "@/utils/firebaseConfig";
 import {
   collection,
@@ -17,6 +17,7 @@ import { ClipLoader } from "react-spinners";
 import Image from "next/image";
 import SimpleButton from "@/components/SimpleButton";
 import DialogBox from "@/components/DialogBox";
+import { useSearchParams } from "next/navigation";
 
 const TailorOrdersManagement = () => {
   const { theme, userData, setShowMessage, setPopUpMessageTrigger } =
@@ -33,6 +34,9 @@ const TailorOrdersManagement = () => {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const dropdownRef = useRef(null);
   const dropdownButtonRef = useRef(null);
+  const searchParams = useSearchParams();
+
+  const orderId = searchParams.get("id");
 
   // Order status configuration
   const statusConfig = {
@@ -108,7 +112,7 @@ const TailorOrdersManagement = () => {
         type: "payIn",
         amount: amount,
         date: new Date().toISOString(),
-        status: "completed"
+        status: "completed",
       };
 
       if (walletSnap.exists()) {
@@ -117,19 +121,19 @@ const TailorOrdersManagement = () => {
         await updateDoc(walletRef, {
           currentBalance: currentBalance + amount,
           transactions: [...walletSnap.data().transactions, transaction],
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         });
       } else {
         // Create new wallet
         await setDoc(walletRef, {
           tailorId,
-          bankName:"",
-          accountName:"",
-          accountNumber:"",
+          bankName: "",
+          accountName: "",
+          accountNumber: "",
           currentBalance: amount,
           transactions: [transaction],
           createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         });
       }
     } catch (error) {
@@ -145,24 +149,15 @@ const TailorOrdersManagement = () => {
 
       setLoading(true);
       try {
-        let q;
-        if (statusFilter === "all") {
-          q = query(
-            collection(db, "OrdersManagement"),
-            where("tailorId", "==", userData.bId),
-            where("orderStatus", "not-in", [
-              "inCart",
-              "paymentVerificationPending",
-              "paymentRejected",
-            ])
-          );
-        } else {
-          q = query(
-            collection(db, "OrdersManagement"),
-            where("tailorId", "==", userData.bId),
-            where("orderStatus", "==", statusFilter)
-          );
-        }
+        let q = query(
+          collection(db, "OrdersManagement"),
+          where("tailorId", "==", userData.bId),
+          where("orderStatus", "not-in", [
+            "inCart",
+            "paymentVerificationPending",
+            "paymentRejected",
+          ])
+        );
 
         const querySnapshot = await getDocs(q);
         let ordersData = [];
@@ -170,7 +165,7 @@ const TailorOrdersManagement = () => {
         for (const orderDoc of querySnapshot.docs) {
           const orderData = orderDoc.data();
 
-          let userDetails = {};
+          let userDetails = [];
           if (orderData.userId) {
             try {
               const userDocRef = doc(db, "users", orderData.userId);
@@ -180,8 +175,7 @@ const TailorOrdersManagement = () => {
                 const userData = userDocSnap.data();
                 userDetails = {
                   fullName: userData.fullName,
-                  profilePictureUrl:
-                    userData.profilePictureUrl || "/images/default-user.png",
+                  profilePictureUrl: userData.profilePictureUrl || "",
                 };
               }
             } catch (error) {
@@ -197,21 +191,7 @@ const TailorOrdersManagement = () => {
           });
         }
 
-        // Sort orders by date
-        ordersData.sort((a, b) => {
-          const dateA = new Date(a.placedOnDate);
-          const dateB = new Date(b.placedOnDate);
-          return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
-        });
-
         setOrders(ordersData);
-
-        // Select the first order by default if available
-        if (ordersData.length > 0 && !selectedOrder) {
-          setSelectedOrder(ordersData[0]);
-        } else {
-          setSelectedOrder(null);
-        }
       } catch (error) {
         console.error("Error fetching orders:", error);
         setShowMessage({
@@ -225,7 +205,24 @@ const TailorOrdersManagement = () => {
     };
 
     fetchOrders();
-  }, [userData?.bId, statusFilter, sortOrder]);
+  }, [setPopUpMessageTrigger, setShowMessage, userData.bId]);
+
+  useEffect(() => {
+    // if no orders or already picked one, bail
+    if (orders.length === 0 || selectedOrder) return;
+
+    // try to find the one with matching doc ID
+    if (orderId) {
+      const match = orders.find((o) => o.id === orderId);
+      if (match) {
+        setSelectedOrder(match);
+        return;
+      }
+    }
+
+    // fallback to first order
+    setSelectedOrder(orders[0]);
+  }, [orderId, orders, selectedOrder]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -255,14 +252,25 @@ const TailorOrdersManagement = () => {
   };
 
   // Filter orders based on search query
-  const filteredOrders = orders.filter(
-    (order) =>
-      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.orderStatus.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.userDetails?.fullName
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase())
-  );
+  const q = searchQuery.toLowerCase();
+
+  const filteredOrders = orders.filter((order) => {
+    // 1) Status check
+    const statusOK =
+      statusFilter === "all" || order.orderStatus === statusFilter;
+
+    // 2) Search check
+    const searchOK = [
+      order.id,
+      order.orderStatus,
+      order.deliveryAddress?.name,
+      order.deliveryAddress?.email,
+      order.deliveryAddress?.phone,
+    ].some((field) => field?.toLowerCase().includes(q));
+
+    // 3) Only keep if both pass
+    return statusOK && searchOK;
+  });
 
   // Format date
   const formatDate = (dateString) => {
@@ -306,7 +314,7 @@ const TailorOrdersManagement = () => {
 
       // If status is being updated to "delivered", update the tailor's wallet
       if (newStatus === "delivered") {
-        const order = orders.find(o => o.id === orderId);
+        const order = orders.find((o) => o.id === orderId);
         if (order && order.totalAmount) {
           await updateTailorWallet(userData.bId, order.totalAmount);
         }
@@ -350,6 +358,18 @@ const TailorOrdersManagement = () => {
       setUpdatingStatus(false);
       setShowCancelDialog(false);
     }
+  };
+
+  const sortOrders = (sort) => {
+    const sorted = [...orders].sort((a, b) => {
+      // Firestore Timestamp → JS ms
+      const timeA =
+        a.placedOnDate.seconds * 1000 + a.placedOnDate.nanoseconds / 1e6;
+      const timeB =
+        b.placedOnDate.seconds * 1000 + b.placedOnDate.nanoseconds / 1e6;
+      return sort === "newest" ? timeB - timeA : timeA - timeB;
+    });
+    setOrders(sorted);
   };
 
   return (
@@ -493,8 +513,8 @@ const TailorOrdersManagement = () => {
                         }}
                         className={`p-2 rounded-lg flex items-center justify-center text-sm ${
                           statusFilter === filter.value
-                            ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}`
-                            : `${theme.colorBg} ${theme.colorText}`
+                            ? `${theme.mainTheme}`
+                            : `${theme.colorBg}`
                         } border ${theme.colorBorder}`}
                       >
                         <i className={`fas fa-${filter.icon} mr-2`}></i>
@@ -520,11 +540,12 @@ const TailorOrdersManagement = () => {
                         whileTap={{ scale: 0.97 }}
                         onClick={() => {
                           setSortOrder(option.value);
+                          sortOrders(option.value);
                         }}
                         className={`p-2 rounded-lg flex items-center justify-center text-sm ${
                           sortOrder === option.value
-                            ? `${theme.colorPrimaryBg} ${theme.colorPrimaryText}`
-                            : `${theme.colorBg} ${theme.colorText}`
+                            ? `${theme.mainTheme}`
+                            : `${theme.colorBg}`
                         } border ${theme.colorBorder}`}
                       >
                         <i className={`fas fa-${option.icon} mr-2`}></i>
@@ -909,7 +930,10 @@ const TailorOrdersManagement = () => {
                           }
                           type="secondary"
                           onClick={() => {
-                            window.open(`/user?share=${selectedOrder.userId}`, '_blank');
+                            window.open(
+                              `/user?share=${selectedOrder.userId}`,
+                              "_blank"
+                            );
                           }}
                           fullWidth
                         />

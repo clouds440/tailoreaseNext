@@ -13,7 +13,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import UserContext from "@/utils/UserContext";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ClipLoader } from "react-spinners";
 import Image from "next/image";
 import axios from "axios";
