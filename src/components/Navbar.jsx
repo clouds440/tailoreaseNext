@@ -223,7 +223,6 @@ const Navbar = () => {
 
   // Visitor dropdown options
   const visitorDropdownOptions = [
-    ...commonDropdownOptions,
     {
       text: "Login",
       icon: <i className="fas fa-sign-in-alt fa-fw" />,
@@ -233,11 +232,11 @@ const Navbar = () => {
         setDropdownOpen(false);
       },
     },
+    ...commonDropdownOptions,
   ];
 
   // User dropdown options (shown when in user dashboard)
   const userDropdownOptions = [
-    ...commonDropdownOptions,
     {
       text: "Logout",
       icon: <i className="fas fa-sign-out-alt fa-fw text-red-700" />,
@@ -246,6 +245,7 @@ const Navbar = () => {
         setSelectedTab("Login");
       },
     },
+    ...commonDropdownOptions,
     {
       text: "Cart",
       icon: <i className="fas fa-shopping-cart fa-fw" />,
@@ -273,12 +273,12 @@ const Navbar = () => {
 
   // Tailor dropdown options (shown when in tailor dashboard)
   const tailorDropdownOptions = [
-    ...commonDropdownOptions,
     {
       text: "Logout",
       icon: <i className="fas fa-sign-out-alt fa-fw text-red-700" />,
       onClick: handleLogout,
     },
+    ...commonDropdownOptions,
     {
       text: "Settings",
       icon: <i className="fas fa-cog fa-fw" />,
