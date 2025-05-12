@@ -698,7 +698,7 @@ const OutfitCustomization = () => {
               <div className="flex space-x-2">
                 <SimpleButton
                   btnText={"Add to Cart"}
-                  icon={<i className="fas fa-shopping-cart mr-2" />}
+                  icon={<i className="fas fa-cart-plus mr-2" />}
                   type="accent"
                   extraclasses="w-full"
                   onClick={async () => {

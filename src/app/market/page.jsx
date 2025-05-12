@@ -990,7 +990,7 @@ const Market = () => {
                       <>
                         <SimpleButton
                           btnText={"Add to Cart"}
-                          icon={<i className="fas fa-shopping-cart mr-2"></i>}
+                          icon={<i className="fas fa-cart-plus mr-2"></i>}
                           type="accent"
                           onClick={handleAddToCart}
                           disabled={disableButtons}

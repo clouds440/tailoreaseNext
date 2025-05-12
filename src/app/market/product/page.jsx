@@ -341,12 +341,8 @@ const ProductPage = () => {
                 />
                 {product.has3DTryOn && (
                   <SimpleButton
-                    btnText={
-                      <>
-                        <i className="fas fa-magic mr-2"></i>
-                        Try-On In 3D
-                      </>
-                    }
+                    btnText={"Try-On In 3D"}
+                    icon={<i className="fas fa-magic mr-2"></i>}
                     type="default"
                     fullWidth
                     onClick={() => {
@@ -354,11 +350,13 @@ const ProductPage = () => {
                     }}
                   />
                 )}
-                <ShareLinkDialog
-                  shareLink={window.location.toString()}
-                  sender={userData ? userData : { fullName: "Someone" }}
-                  subject={"Product"}
-                />
+                <div className="w-auto">
+                  <ShareLinkDialog
+                    shareLink={window.location.toString()}
+                    sender={userData ? userData : { fullName: "Someone" }}
+                    subject={"Product"}
+                  />
+                </div>
               </div>
             </div>
           </div>

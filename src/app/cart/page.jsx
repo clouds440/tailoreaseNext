@@ -27,6 +27,7 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import { RiSecurePaymentFill } from "react-icons/ri";
+import { ClipLoader } from "react-spinners";
 
 const CartPage = () => {
   const {
@@ -44,9 +45,9 @@ const CartPage = () => {
   const [removing, setRemoving] = useState(null);
   const [checkoutStep, setCheckoutStep] = useState("details"); // 'details' or 'payment'
   const [checkoutData, setCheckoutData] = useState({
-    name: "",
-    phone: "",
-    email: "",
+    name: userData?.fullName || "",
+    phone: userData?.countryCode + userData?.phone || "",
+    email: userData?.email || "",
     streetAddress: "",
     city: "",
     district: "",
@@ -224,35 +225,116 @@ const CartPage = () => {
 
   // Validate checkout details
   const validateCheckoutDetails = () => {
-    const requiredFields = [
-      "name",
-      "phone",
-      "streetAddress",
-      "city",
-      "district",
-      "province",
-    ];
-    const missingFields = requiredFields.filter(
-      (field) => !checkoutData[field]?.trim()
-    );
+    const {
+      name,
+      email,
+      phone,
+      streetAddress,
+      city,
+      district,
+      province,
+      postalCode,
+      country,
+      deliveryInstructions,
+    } = checkoutData;
 
-    if (missingFields.length > 0) {
+    // Name
+    if (!name.trim()) {
+      setShowMessage({ type: "info", message: "Enter your name" });
+      return false;
+    } else if (name.length < 3) {
       setShowMessage({
-        type: "error",
-        message: `Please fill in all required fields: ${missingFields.join(
-          ", "
-        )}`,
+        type: "info",
+        message: "Name must be at least 3 characters",
       });
-      setPopUpMessageTrigger(true);
       return false;
     }
+
+    // Email
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      setShowMessage({ type: "warning", message: "Enter a valid email" });
+      return false;
+    }
+
+    // Phone
+    if (!/^\+?\d+$/.test(phone)) {
+      setShowMessage({
+        type: "warning",
+        message: "Phone number can only contain digits",
+      });
+      return false;
+    } else if (phone.length < 7 || phone.length > 14) {
+      setShowMessage({
+        type: "warning",
+        message: "Enter a valid phone number",
+      });
+      return false;
+    } else if (phone.startsWith("0")) {
+      setShowMessage({
+        type: "warning",
+        message: "Remove the leading zero from phone number",
+      });
+      return false;
+    }
+
+    // Street Address
+    if (!streetAddress.trim()) {
+      setShowMessage({ type: "info", message: "Enter your street address" });
+      return false;
+    }
+
+    // City / District / Province
+    if (!city.trim()) {
+      setShowMessage({ type: "info", message: "Enter your city" });
+      return false;
+    }
+    if (!district.trim()) {
+      setShowMessage({ type: "info", message: "Enter your district" });
+      return false;
+    }
+    if (!province.trim()) {
+      setShowMessage({ type: "info", message: "Enter your province/state" });
+      return false;
+    }
+
+    // Postal Code
+    if (!postalCode.trim()) {
+      setShowMessage({ type: "info", message: "Enter your postal code" });
+      return false;
+    } else if (!/^[A-Za-z0-9\- ]+$/.test(postalCode)) {
+      setShowMessage({
+        type: "warning",
+        message: "Postal code contains invalid characters",
+      });
+      return false;
+    }
+
+    // Country
+    if (!country.trim()) {
+      setShowMessage({ type: "info", message: "Enter your country" });
+      return false;
+    }
+
+    // Delivery Instructions (optional, but limit length)
+    if (deliveryInstructions && deliveryInstructions.length > 200) {
+      setShowMessage({
+        type: "info",
+        message: "Delivery instructions should be under 200 characters",
+      });
+      return false;
+    }
+
+    // All good
     return true;
   };
 
   // Save delivery address and proceed to payment
   const proceedToPayment = async () => {
     if (!cart || cart.products.length === 0) return;
-    if (!validateCheckoutDetails()) return;
+    if (!validateCheckoutDetails()) {
+      setPopUpMessageTrigger(true);
+      return;
+    }
 
     try {
       // Update cart with delivery address
@@ -293,7 +375,7 @@ const CartPage = () => {
       setPopUpMessageTrigger(true);
       return;
     }
-  
+
     try {
       const cartRef = doc(db, "OrdersManagement", cart.id);
       await updateDoc(cartRef, {
@@ -308,15 +390,15 @@ const CartPage = () => {
           timestamp: new Date().toISOString(),
         },
       });
-  
+
       // ✅ Send notification to user
       await sendNotification(
-        userData.uid, 
-        "user",    
+        userData.uid,
+        "user",
         "Your order has been placed successfully. Payment is under verification.",
         `/user?tab=orders/${cart.id}`
       );
-  
+
       setShowMessage({
         type: "success",
         message: "Order placed! - Payment under verification.",
@@ -332,33 +414,14 @@ const CartPage = () => {
       setPopUpMessageTrigger(true);
     }
   };
-  
 
   if (loading) {
     return (
       <div
-        className={`flex flex-col items-center justify-center h-screen ${theme.mainTheme}`}
+        className={`flex flex-col items-center justify-center h-screen ${theme.mainTheme} ${theme.colorText}`}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="mx-auto rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"
-          ></motion.div>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className={`mt-4 text-lg ${theme.colorText}`}
-          >
-            Loading your cart...
-          </motion.p>
-        </motion.div>
+        <ClipLoader size={35} color="white" />
+        <span className="mt-3 text-xl">Loading Cart...</span>
       </div>
     );
   }
@@ -853,20 +916,43 @@ const CartPage = () => {
                               className={`${inputStyles}`}
                               required
                             >
-                              <option value="">Select Province</option>
-                              <option value="Punjab">Punjab</option>
-                              <option value="Sindh">Sindh</option>
-                              <option value="Khyber Pakhtunkhwa">
+                              <option value="" className={theme.colorBg}>
+                                Select Province
+                              </option>
+                              <option value="Punjab" className={theme.colorBg}>
+                                Punjab
+                              </option>
+                              <option value="Sindh" className={theme.colorBg}>
+                                Sindh
+                              </option>
+                              <option
+                                value="Khyber Pakhtunkhwa"
+                                className={theme.colorBg}
+                              >
                                 Khyber Pakhtunkhwa
                               </option>
-                              <option value="Balochistan">Balochistan</option>
-                              <option value="Islamabad Capital Territory">
+                              <option
+                                value="Balochistan"
+                                className={theme.colorBg}
+                              >
+                                Balochistan
+                              </option>
+                              <option
+                                value="Islamabad Capital Territory"
+                                className={theme.colorBg}
+                              >
                                 Islamabad Capital Territory
                               </option>
-                              <option value="Gilgit-Baltistan">
+                              <option
+                                value="Gilgit-Baltistan"
+                                className={theme.colorBg}
+                              >
                                 Gilgit-Baltistan
                               </option>
-                              <option value="Azad Jammu and Kashmir">
+                              <option
+                                value="Azad Jammu and Kashmir"
+                                className={theme.colorBg}
+                              >
                                 Azad Jammu and Kashmir
                               </option>
                             </select>

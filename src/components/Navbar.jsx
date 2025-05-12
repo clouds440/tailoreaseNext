@@ -247,6 +247,15 @@ const Navbar = () => {
       },
     },
     {
+      text: "Cart",
+      icon: <i className="fas fa-shopping-cart fa-fw" />,
+      onClick: () => {
+        setSelectedTab("Cart");
+        router.replace("/cart");
+        setDropdownOpen(false);
+      },
+    },
+    {
       text: "Settings",
       icon: <i className="fas fa-cog fa-fw" />,
       onClick: () => {
@@ -295,7 +304,7 @@ const Navbar = () => {
     },
     {
       path: "/market",
-      icon: <i className="fas fa-shopping-cart" />,
+      icon: <i className="fas fa-globe-americas" />,
       label: "Market",
     },
     {
@@ -324,7 +333,7 @@ const Navbar = () => {
     },
     {
       path: "/market",
-      icon: <i className="fas fa-shopping-cart" />,
+      icon: <i className="fas fa-globe-americas" />,
       label: "Market",
     },
     {
