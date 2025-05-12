@@ -119,22 +119,13 @@ const ProductPage = () => {
     if (!product) return;
     // Before navigating
     sessionStorage.setItem("product", JSON.stringify(product));
-    const formatCategory = (str = "") => {
-      const words = str.trim().split(/\s+/);
-      if (words.length === 1) {
-        return words[0].toLowerCase();
-      }
-      return words
-        .map((word, index) =>
-          index === 0
-            ? word.toLowerCase()
-            : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        )
-        .join("");
+    const formatCategoryForUrl = (str = "") => {
+      // Simply remove spaces and keep original casing
+      return str.trim().replace(/\s+/g, "");
     };
 
-    const category = formatCategory(
-      product.baseProductData?.category || "shirt"
+    const category = formatCategoryForUrl(
+      product.baseProductData?.category || "shirt" // Default with original casing
     );
     router.push(`/outfit-customization?outfit=${category}`);
   };
@@ -224,7 +215,7 @@ const ProductPage = () => {
         >
           <div className="grid lg:grid-cols-2 gap-6">
             {/* IMAGE CAROUSEL */}
-            <div className="relative w-full h-[500px]">
+            <div className="relative w-full h-[400px]">
               <AnimatePresence initial={false}>
                 <motion.div
                   key={currentImg}
@@ -234,14 +225,17 @@ const ProductPage = () => {
                   transition={{ duration: 0.4 }}
                   className="absolute inset-0"
                 >
-                  <Image
-                    src={imgs[currentImg] || product.baseProductData.imageUrl}
-                    alt={product.baseProductData.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                    priority
-                  />
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={imgs[currentImg] || product.baseProductData.imageUrl}
+                      alt={product.baseProductData.name}
+                      width={300}
+                      height={400}
+                      className="object-cover w-auto h-full"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                      priority
+                    />
+                  </div>
                 </motion.div>
               </AnimatePresence>
               {imgs.length > 1 && (

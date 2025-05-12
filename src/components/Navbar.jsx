@@ -5,13 +5,29 @@ import SimpleButton from "./SimpleButton";
 import { auth } from "@/utils/firebaseConfig";
 import { signOut } from "firebase/auth";
 import UserContext from "@/utils/UserContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import DialogBox from "./DialogBox";
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/utils/firebaseConfig";
 import { MenuIcon } from "../../public/icons/svgIcons";
 import CompleteProfileModal from "./CompleteProfileModal";
+
+const tabMap = {
+  "/user": "Dashboard",
+  "/business-dashboard/profile": "Profile",
+  "/business-dashboard/products": "Products",
+  "/business-dashboard/orders": "Orders",
+  "/business-dashboard/analytics": "Analytics",
+  "/business-dashboard/wallet": "Wallet",
+  "/market": "Market",
+  "/tailors": "All Tailors",
+  "/contact-us": "Contact",
+  "/about-us": "About",
+  "/cart": "Cart",
+  "/settings": "Settings",
+  "/login": "Login",
+};
 
 const Navbar = () => {
   const {
@@ -38,14 +54,16 @@ const Navbar = () => {
 
   const dropdownRef = useRef(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (activeDashboard === "user") {
-      setSelectedTab("Dashboard");
-    } else {
-      setSelectedTab("Profile");
-    }
-  }, [activeDashboard]);
+    // exact or prefix match
+    const match =
+      tabMap[pathname] ||
+      Object.entries(tabMap).find(([p]) => pathname.startsWith(p))?.[1] ||
+      "";
+    setSelectedTab(match);
+  }, [pathname]);
   // Check if user is a verified tailor
   useEffect(() => {
     const checkTailorStatus = async () => {
@@ -228,7 +246,6 @@ const Navbar = () => {
       icon: <i className="fas fa-sign-in-alt fa-fw" />,
       onClick: () => {
         router.replace("/login");
-        setSelectedTab("Login");
         setDropdownOpen(false);
       },
     },
@@ -242,7 +259,6 @@ const Navbar = () => {
       icon: <i className="fas fa-sign-out-alt fa-fw text-red-700" />,
       onClick: () => {
         handleLogout();
-        setSelectedTab("Login");
       },
     },
     ...commonDropdownOptions,
@@ -250,7 +266,6 @@ const Navbar = () => {
       text: "Cart",
       icon: <i className="fas fa-shopping-cart fa-fw" />,
       onClick: () => {
-        setSelectedTab("Cart");
         router.replace("/cart");
         setDropdownOpen(false);
       },
@@ -259,7 +274,6 @@ const Navbar = () => {
       text: "Settings",
       icon: <i className="fas fa-cog fa-fw" />,
       onClick: () => {
-        setSelectedTab("Settings");
         router.replace("/settings");
         setDropdownOpen(false);
       },
@@ -283,7 +297,6 @@ const Navbar = () => {
       text: "Settings",
       icon: <i className="fas fa-cog fa-fw" />,
       onClick: () => {
-        setSelectedTab("Settings");
         router.replace("/settings");
         setDropdownOpen(false);
       },
@@ -430,7 +443,6 @@ const Navbar = () => {
                   <SimpleButton
                     onClick={() => {
                       router.replace("/login");
-                      setSelectedTab("Login");
                     }}
                     btnText={"Log In"}
                     type={"simple"}
@@ -451,7 +463,6 @@ const Navbar = () => {
                     key={index}
                     onClick={() => {
                       router.replace(item.path);
-                      setSelectedTab(item.label);
                     }}
                     className={`${linkStyles} ${
                       selectedTab === item.label ? theme.colorBg : ""

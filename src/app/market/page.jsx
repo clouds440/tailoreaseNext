@@ -361,7 +361,7 @@ const Market = () => {
     };
 
     const category = formatCategoryForUrl(
-      selectedProduct.baseProductData?.category || "Shirt" // Default with original casing
+      selectedProduct.baseProductData?.category || "shirt" // Default with original casing
     );
     router.push(
       `/outfit-customization?outfit=${category}${
