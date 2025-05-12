@@ -498,15 +498,19 @@ const Navbar = () => {
       <AnimatePresence>
         {dropdownOpen && (
           <motion.div
-            className={`absolute w-auto md:w-40 z-50 py-2 rounded-md ${
+            className={`absolute w-auto md:w-40 z-[500] py-2 rounded-md ${
               windowWidth >= 768
-                ? "md:bottom-[45px]"
-                : "right-1 top-[100px] px-2 py-2 " + theme?.colorBg
+                ? "md:bottom-[48px]"
+                : "right-3 top-[100px] px-2 py-2 " + theme?.colorBg
             } ${windowHeight <= 730 && theme?.colorBg}`}
             initial={{ opacity: 0, y: animate }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: animate }}
-            transition={{ duration: 0.3 }}
+            transition={{
+              // use an ease-out for fade and slide
+              opacity: { duration: 0.2, ease: "easeOut" },
+              y: { type: "spring", stiffness: 300, damping: 25 },
+            }}
           >
             <motion.ul
               className={`md:space-y-2 justify-center select-none w-full`}
