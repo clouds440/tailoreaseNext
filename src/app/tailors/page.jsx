@@ -73,12 +73,14 @@ const Tailors = () => {
 
       // Apply search filter
       if (searchQuery) {
-        tailors = tailors.filter(
-          (tailor) =>
-            tailor.businessName
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-            tailor.location?.toLowerCase().includes(searchQuery.toLowerCase())
+        const q = searchQuery.toLowerCase();
+        tailors = tailors.filter((tailor) =>
+          [
+            tailor.businessName,
+            tailor.businessAddress,
+            tailor.businessCity,
+            tailor.description,
+          ].some((field) => field?.toLowerCase().includes(q))
         );
       }
 
@@ -286,7 +288,7 @@ const Tailors = () => {
                     ></i>
                     <input
                       type="text"
-                      placeholder="Search tailors..."
+                      placeholder="Search Tailors or City"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className={`w-full p-2 pl-10 pr-8 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500`}
@@ -460,7 +462,9 @@ const Tailors = () => {
                         className={`text-sm mt-1 ${theme.colorText} opacity-80 flex items-center line-clamp-1`}
                       >
                         <i className="fas fa-map-marker-alt mr-2 text-xs"></i>
-                        {tailor.businessAddress || "Location not specified"}
+                        {tailor.businessAddress ||
+                          "Address not specified"},{" "}
+                        {tailor.businessCity || "City not specified"}
                       </p>
                       <div className="flex overflow-hidden items-center mt-2">
                         <div className="flex">

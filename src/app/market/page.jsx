@@ -344,9 +344,16 @@ const Market = () => {
     if (!selectedProduct) return;
     // Before navigating
     setDisableButtons(true);
-    const existing = JSON.parse(sessionStorage.getItem("product")) || [];
-    existing.push(product);
-    sessionStorage.setItem("product", JSON.stringify(existing));
+
+    let existing = JSON.parse(sessionStorage.getItem("product"));
+
+    if (addOutfit) {
+      existing = Array.isArray(existing) ? existing : [];
+      existing.push(product);
+      sessionStorage.setItem("product", JSON.stringify(existing));
+    } else {
+      sessionStorage.setItem("product", JSON.stringify([product]));
+    }
 
     const formatCategory = (str = "") => {
       const words = str.trim().split(/\s+/);
@@ -992,7 +999,9 @@ const Market = () => {
                           btnText={"Add to Cart"}
                           icon={<i className="fas fa-cart-plus mr-2"></i>}
                           type="accent"
-                          onClick={handleAddToCart}
+                          onClick={() => {
+                            handleAddToCart();
+                          }}
                           disabled={disableButtons}
                         />
                         <SimpleButton
@@ -1001,10 +1010,10 @@ const Market = () => {
                           icon={<i className="fas fa-eye"></i>}
                           disabled={disableButtons}
                           onClick={() => {
-                            setDisableButtons(true);
                             router.push(
                               `/market/product?id=${selectedProduct.id}`
                             );
+                            setDisableButtons(true);
                           }}
                         />
                       </>
@@ -1045,7 +1054,10 @@ const Market = () => {
       {showAddToCart && selectedProduct && (
         <AddToCart
           product={selectedProduct}
-          onClose={() => setShowAddToCart(false)}
+          onClose={() => {
+            setShowAddToCart(false);
+            setDisableButtons(false);
+          }}
           theme={theme}
           customizedProductLink={""}
           userId={userData?.uid}

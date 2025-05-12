@@ -10,6 +10,7 @@ const TailorApplicationForm = ({ onNext }) => {
     countryCode: "+92",
     businessPhone: "",
     businessAddress: "",
+    businessCity: "",
     description: "",
   });
 
@@ -56,7 +57,7 @@ const TailorApplicationForm = ({ onNext }) => {
 
     if (
       formData.businessPhone.length < 7 ||
-      formData.businessPhone.length > 10
+      formData.businessPhone.length > 12
     ) {
       setShowMessage({
         type: "warning",
@@ -87,6 +88,14 @@ const TailorApplicationForm = ({ onNext }) => {
       setShowMessage({
         type: "warning",
         message: "Business address is required",
+      });
+      setPopUpMessageTrigger(true);
+      return;
+    }
+    if (!formData.businessCity.trim()) {
+      setShowMessage({
+        type: "warning",
+        message: "Business city is required",
       });
       setPopUpMessageTrigger(true);
       return;
@@ -177,6 +186,20 @@ const TailorApplicationForm = ({ onNext }) => {
                 htmlFor="businessAddress"
               >
                 Business Address
+              </label>
+            </div>
+            <div className="relative mb-4">
+              <input
+                type="text"
+                id="businessCity"
+                name="businessCity"
+                value={formData.businessCity}
+                onChange={handleChange}
+                className={`${inputStyles}`}
+                placeholder=" "
+              />
+              <label className={`${placeHolderStyles}`} htmlFor="businessCity">
+                Business City
               </label>
             </div>
             <div className="relative mb-4">
