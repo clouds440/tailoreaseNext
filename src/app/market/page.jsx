@@ -348,22 +348,13 @@ const Market = () => {
     existing.push(product);
     sessionStorage.setItem("product", JSON.stringify(existing));
 
-    const formatCategory = (str = "") => {
-      const words = str.trim().split(/\s+/);
-      if (words.length === 1) {
-        return words[0].toLowerCase();
-      }
-      return words
-        .map((word, index) =>
-          index === 0
-            ? word.toLowerCase()
-            : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        )
-        .join("");
+    const formatCategoryForUrl = (str = "") => {
+      // Simply remove spaces and keep original casing
+      return str.trim().replace(/\s+/g, '');
     };
 
-    const category = formatCategory(
-      selectedProduct.baseProductData?.category || "shirt"
+    const category = formatCategoryForUrl(
+      selectedProduct.baseProductData?.category || "Shirt" // Default with original casing
     );
     router.push(
       `/outfit-customization?outfit=${category}${
