@@ -254,68 +254,82 @@ const AdminDashboard = () => {
   };
 
   // Handle order verification
-  const handleOrderVerification = async (orderId, action) => {
-    try {
-      const order = pendingOrders.find((o) => o.id === orderId);
-      if (!order) {
-        showAlert("error", "Order not found");
+const handleOrderVerification = async (orderId, action) => {
+  try {
+    // Find the order in pendingOrders
+    const order = pendingOrders.find((o) => o.id === orderId);
+    if (!order) {
+      showAlert("error", "Order not found");
+      return;
+    }
+
+    // Get the tailor's UID from users collection where bId matches order.tailorId
+    const usersRef = collection(db, "users");
+    const tailorQuery = query(usersRef, where("bId", "==", order.tailorId));
+    const tailorSnapshot = await getDocs(tailorQuery);
+
+    if (tailorSnapshot.empty) {
+      showAlert("error", "Tailor not found in users collection");
+      return;
+    }
+
+    const tailorData = tailorSnapshot.docs[0].data();
+    const tailorUid = tailorData.uid; // This is the tailor's UID
+
+    const orderRef = doc(db, "OrdersManagement", orderId);
+
+    if (action === "approve") {
+      // First create the user-tailor connection
+      const connectionCreated = await createUserTailorConnection(
+        order.userId,
+        order.tailorId
+      );
+
+      if (!connectionCreated) {
+        showAlert("error", "Failed to create user-tailor connection");
         return;
       }
 
-      const orderRef = doc(db, "OrdersManagement", orderId);
+      // Then update the order status
+      await updateDoc(orderRef, {
+        orderStatus: "paymentVerified",
+        updatedAt: new Date().toISOString(),
+      });
 
-      if (action === "approve") {
-        // First create the user-tailor connection
-        const connectionCreated = await createUserTailorConnection(
-          order.userId,
-          order.tailorId
-        );
-
-        if (!connectionCreated) {
-          showAlert("error", "Failed to create user-tailor connection");
-          return;
-        }
-
-        // Then update the order status
-        await updateDoc(orderRef, {
-          orderStatus: "paymentVerified",
-          updatedAt: new Date().toISOString(),
-        });
-
-
-        await sendNotification(
-        order.tailorId,
+      // Send notification to the tailor
+      await sendNotification(
+        tailorUid, // Using the tailor's UID we just fetched
         "business",
         "You got a new order in your business",
         `${window.location.origin}/business-dashboard/orders?id=${order.id}`
       );
-      
-        await sendNotification(
-        userData.uid,
+
+      // Send notification to the user
+      await sendNotification(
+        userData.uid, 
         "user",
         "Your payment has been verified.",
         `${window.location.origin}/user?tab=orders&id=${order.id}`
       );
 
-        showAlert(
-          "success",
-          "Payment verified and user-tailor connection created"
-        );
-      } else {
-        await updateDoc(orderRef, {
-          orderStatus: "paymentRejected",
-          updatedAt: new Date().toISOString(),
-        });
-        showAlert("success", "Payment rejected");
-      }
-
-      fetchPendingOrders();
-    } catch (error) {
-      console.error("Error updating order:", error);
-      showAlert("error", "Failed to update order status");
+      showAlert(
+        "success",
+        "Payment verified and notifications sent"
+      );
+    } else {
+      await updateDoc(orderRef, {
+        orderStatus: "paymentRejected",
+        updatedAt: new Date().toISOString(),
+      });
+      showAlert("success", "Payment rejected");
     }
-  };
 
+    fetchPendingOrders();
+  } catch (error) {
+    console.error("Error updating order:", error);
+    showAlert("error", "Failed to update order status");
+  }
+};
   // Handle image upload
   const handleImageUpload = async (file) => {
     setIsUploading(true);

@@ -15,6 +15,7 @@ import UserContext from "@/utils/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClipLoader } from "react-spinners";
 import Image from "next/image";
+import sendNotification from "@/utils/sendNotification";
 import SimpleButton from "@/components/SimpleButton";
 import DialogBox from "@/components/DialogBox";
 import { useSearchParams } from "next/navigation";
@@ -301,29 +302,66 @@ const TailorOrdersManagement = () => {
   };
 
   // Update order status
-  const updateOrderStatus = async (orderId, newStatus) => {
-    if (!orderId || !newStatus) return;
+  const updateOrderStatus = async (documentId, newStatus) => {
+    if (!documentId || !newStatus) return;
 
     setUpdatingStatus(true);
     try {
-      const orderRef = doc(db, "OrdersManagement", orderId);
+      const orderRef = doc(db, "OrdersManagement", documentId);
+      const orderSnapshot = await getDoc(orderRef);
+
+      if (!orderSnapshot.exists()) {
+        showAlert("error", "Order document not found");
+        return;
+      }
+
+      const orderData = orderSnapshot.data();
+
+      // Update the order status in Firestore
       await updateDoc(orderRef, {
         orderStatus: newStatus,
         updatedAt: new Date().toISOString(),
       });
 
       // If status is being updated to "delivered", update the tailor's wallet
-      if (newStatus === "delivered") {
-        const order = orders.find((o) => o.id === orderId);
-        if (order && order.totalAmount) {
-          await updateTailorWallet(userData.bId, order.totalAmount);
-        }
+      if (newStatus === "delivered" && orderData.totalAmount) {
+        await updateTailorWallet(userData.bId, orderData.totalAmount);
       }
+
+      // Send notification to the user about status update
+      let notificationMessage = "";
+      const notificationLink = `${window.location.origin}/user/orders?id=${documentId}`; // Using document ID
+
+      switch (newStatus) {
+        case "startedStitching":
+          notificationMessage = "Your tailor has started stitching your order!";
+          break;
+        case "onDelivery":
+          notificationMessage = "Your order is out for delivery!";
+          break;
+        case "delivered":
+          notificationMessage = "Your order has been delivered!";
+          break;
+        case "cancelled":
+          notificationMessage = "Your order has been cancelled by the tailor.";
+          break;
+        default:
+          notificationMessage = `Order status updated to: ${
+            statusConfig[newStatus]?.title || newStatus
+          }`;
+      }
+
+      await sendNotification(
+        orderData.userId, // User's UID from order data
+        "user", // Notification type
+        notificationMessage,
+        notificationLink
+      );
 
       // Update local state
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order.id === orderId
+          order.id === documentId
             ? {
                 ...order,
                 orderStatus: newStatus,
@@ -334,7 +372,7 @@ const TailorOrdersManagement = () => {
       );
 
       // Update selected order if it's the one being updated
-      if (selectedOrder && selectedOrder.id === orderId) {
+      if (selectedOrder?.id === documentId) {
         setSelectedOrder((prev) => ({
           ...prev,
           orderStatus: newStatus,
@@ -342,18 +380,10 @@ const TailorOrdersManagement = () => {
         }));
       }
 
-      setShowMessage({
-        type: "success",
-        message: "Order status updated successfully!",
-      });
-      setPopUpMessageTrigger(true);
+      showAlert("success", "Order status updated and user notified!");
     } catch (error) {
-      console.error("Error updating order status:", error);
-      setShowMessage({
-        type: "danger",
-        message: "Failed to update order status. Please try again.",
-      });
-      setPopUpMessageTrigger(true);
+      console.error("Order status update failed:", error);
+      showAlert("error", "Failed to update order status");
     } finally {
       setUpdatingStatus(false);
       setShowCancelDialog(false);
