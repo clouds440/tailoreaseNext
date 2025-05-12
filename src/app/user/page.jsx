@@ -27,6 +27,7 @@ const UserDashboard = () => {
 
   // For logged in mode, we use the "tab" search parameter; default to "profile"
   const initialTab = searchParams.get("tab") || "profile";
+  const orderId = searchParams.get("id");
 
   // State for dashboard mode (ignored if shared mode is active)
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -54,9 +55,11 @@ const UserDashboard = () => {
   // Update URL search parameter when activeTab changes (only in dashboard mode)
   useEffect(() => {
     if (!isSharedMode) {
-      router.replace(`/user?tab=${activeTab}`);
+      router.replace(
+        `/user?tab=${activeTab}${orderId ? `&id=${orderId}` : ""}`
+      );
     }
-  }, [activeTab, router, isSharedMode]);
+  }, [activeTab, router, isSharedMode, orderId]);
 
   useEffect(() => {
     const fetchEditMeasurementsAuth = async () => {
@@ -104,7 +107,7 @@ const UserDashboard = () => {
     }
     switch (activeTab) {
       case "orders":
-        return <MyOrders />;
+        return <MyOrders id={orderId} />;
       case "tailors":
         return <MyTailors />;
       case "outfits":

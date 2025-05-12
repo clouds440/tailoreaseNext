@@ -18,11 +18,11 @@ import { ClipLoader } from "react-spinners";
 import Image from "next/image";
 import axios from "axios";
 
-const MyOrders = () => {
+const MyOrders = ({ id }) => {
   const { theme, userData } = useContext(UserContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchActive, setSearchActive] = useState(false);
   const [sortOrder, setSortOrder] = useState("newest");
@@ -127,19 +127,7 @@ const MyOrders = () => {
           });
         }
 
-        // Sort orders based on selected sort order
-        ordersData.sort((a, b) => {
-          const dateA = new Date(a.placedOnDate);
-          const dateB = new Date(b.placedOnDate);
-          return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
-        });
-
         setOrders(ordersData);
-
-        // Select the first order by default if available
-        if (ordersData.length > 0 && !selectedOrder) {
-          setSelectedOrder(ordersData[0]);
-        }
       } catch (error) {
         console.error("Error fetching orders:", error);
       } finally {
@@ -148,7 +136,24 @@ const MyOrders = () => {
     };
 
     fetchOrders();
-  }, [userData?.uid, sortOrder]);
+  }, [userData.uid]);
+
+  useEffect(() => {
+    // if no orders or already picked one, bail
+    if (orders.length === 0 || selectedOrder) return;
+
+    // try to find the one with matching doc ID
+    if (id) {
+      const match = orders.find((o) => o.id === id);
+      if (match) {
+        setSelectedOrder(match);
+        return;
+      }
+    }
+
+    // fallback to first order
+    setSelectedOrder(orders[0]);
+  }, [orders, id, selectedOrder]);
 
   // Fetch product ratings and reviews when selected order changes
   useEffect(() => {
@@ -216,6 +221,18 @@ const MyOrders = () => {
         ?.toLowerCase()
         .includes(searchQuery.toLowerCase())
   );
+
+  const sortOrders = (sort) => {
+    const sorted = [...orders].sort((a, b) => {
+      // Firestore Timestamp → JS ms
+      const timeA =
+        a.placedOnDate.seconds * 1000 + a.placedOnDate.nanoseconds / 1e6;
+      const timeB =
+        b.placedOnDate.seconds * 1000 + b.placedOnDate.nanoseconds / 1e6;
+      return sort === "newest" ? timeB - timeA : timeA - timeB;
+    });
+    setOrders(sorted);
+  };
 
   // Format date
   const formatDate = (dateString) => {
@@ -361,24 +378,29 @@ const MyOrders = () => {
 
             <div className="flex items-center gap-4">
               {/* Sort Dropdown */}
-              <div className="relative">
-                <select
-                  value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value)}
-                  className={`appearance-none p-2 pr-8 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer`}
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                </select>
-                <i
-                  className={`fas fa-chevron-down absolute right-3 top-3 ${theme.iconColor} pointer-events-none`}
-                ></i>
-              </div>
+              {!searchActive && (
+                <div className="relative">
+                  <select
+                    value={sortOrder}
+                    onChange={(e) => {
+                      setSortOrder(e.target.value);
+                      sortOrders(e.target.value);
+                    }}
+                    className={`appearance-none p-2 pr-8 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer`}
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                  </select>
+                  <i
+                    className={`fas fa-chevron-down absolute right-3 top-3 ${theme.iconColor} pointer-events-none`}
+                  ></i>
+                </div>
+              )}
 
               {/* Search Bar */}
               <div
                 className={`relative transition-all duration-300 ${
-                  searchActive ? "w-64" : "w-10"
+                  searchActive ? "w-60" : "w-10"
                 }`}
               >
                 {searchActive ? (

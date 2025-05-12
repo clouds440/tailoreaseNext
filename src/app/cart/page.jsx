@@ -396,7 +396,7 @@ const CartPage = () => {
         userData.uid,
         "user",
         "Your order has been placed successfully. Payment is under verification.",
-        `/user?tab=orders/${cart.id}`
+        `${window.location.origin}/user?tab=orders&id=${cart.id}`
       );
 
       setShowMessage({
