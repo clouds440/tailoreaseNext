@@ -2,6 +2,7 @@
 import { useState, useEffect, useContext, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { db } from "@/utils/firebaseConfig";
+import sendNotification from "@/utils/sendNotification";
 import {
   collection,
   getDocs,
@@ -30,6 +31,7 @@ import ImageCropper from "@/components/ImageCropper";
 const AdminDashboard = () => {
   const {
     theme,
+    userData,
     inputStyles,
     placeHolderStyles,
     setShowMessage,
@@ -279,6 +281,21 @@ const AdminDashboard = () => {
           orderStatus: "paymentVerified",
           updatedAt: new Date().toISOString(),
         });
+
+
+        await sendNotification(
+        order.tailorId,
+        "business",
+        "You got a new order in your business",
+        `${window.location.origin}/business-dashboard/orders?id=${order.id}`
+      );
+      
+        await sendNotification(
+        userData.uid,
+        "user",
+        "Your payment has been verified.",
+        `${window.location.origin}/user?tab=orders&id=${order.id}`
+      );
 
         showAlert(
           "success",
