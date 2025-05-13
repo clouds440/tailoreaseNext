@@ -4,6 +4,7 @@ import { LoadingSpinner } from "./LoadingSpinner";
 import SimpleButton from "./SimpleButton";
 import { LinkIcon } from "../../public/icons/svgIcons";
 import Image from "next/image";
+import ImageCropper from "./ImageCropper";
 
 const TailorSpecialitiesForm = ({
   formData,
@@ -27,11 +28,13 @@ const TailorSpecialitiesForm = ({
     placeHolderStyles,
   } = useContext(UserContext);
   const [previewImage, setPreviewImage] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState(null);
 
   const handleChange = async (e) => {
     const { name, value, files } = e.target;
 
-    // Validate file type
+    // Handle image upload
     if (name === "businessPicture" && files[0]) {
       const file = files[0];
       const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
@@ -44,23 +47,11 @@ const TailorSpecialitiesForm = ({
         return;
       }
 
-      try {
-        // Convert file to Base64
-        const base64 = await convertToBase64(file);
-
-        // Update state with the Base64 image
-        setSpecialitiesData({ ...specialitiesData, [name]: base64 });
-        setPreviewImage(URL.createObjectURL(file));
-      } catch (error) {
-        console.error("Error converting file to Base64:", error);
-        setShowMessage({
-          type: "error",
-          message: "Failed to process the image. Please try again.",
-        });
-        setPopUpMessageTrigger(true);
-      }
-
-      return; // Prevent further execution for this case
+      // Show cropper with the selected image
+      const imageUrl = URL.createObjectURL(file);
+      setImageToCrop(imageUrl);
+      setShowCropper(true);
+      return;
     }
 
     if (name === "specialities") {
@@ -73,6 +64,30 @@ const TailorSpecialitiesForm = ({
       }));
     } else {
       setSpecialitiesData({ ...specialitiesData, [name]: value });
+    }
+  };
+
+  // Handle the cropped image
+  const handleCroppedImage = async (croppedImageUrl) => {
+    try {
+      // Convert the cropped image blob URL to Base64
+      const response = await fetch(croppedImageUrl);
+      const blob = await response.blob();
+      const base64 = await convertToBase64(blob);
+
+      // Update state with the Base64 image
+      setSpecialitiesData((prev) => ({
+        ...prev,
+        businessPicture: base64,
+      }));
+      setPreviewImage(croppedImageUrl);
+    } catch (error) {
+      console.error("Error processing cropped image:", error);
+      setShowMessage({
+        type: "error",
+        message: "Failed to process the image. Please try again.",
+      });
+      setPopUpMessageTrigger(true);
     }
   };
 
@@ -149,13 +164,34 @@ const TailorSpecialitiesForm = ({
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
-      setSpecialitiesData({ ...specialitiesData, businessPicture: file });
-      setPreviewImage(URL.createObjectURL(file));
+      const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
+      if (allowedTypes.includes(file.type)) {
+        const imageUrl = URL.createObjectURL(file);
+        setImageToCrop(imageUrl);
+        setShowCropper(true);
+      } else {
+        setShowMessage({
+          type: "warning",
+          message: "Please upload a JPG or PNG image file.",
+        });
+        setPopUpMessageTrigger(true);
+      }
     }
   };
 
   return (
     <div className="max-w-[99.5%] min-h-[97%] mx-auto flex items-center justify-center w-auto p-6 rounded-lg select-none">
+      {/* Image Cropper Modal */}
+      <ImageCropper
+        showModal={showCropper}
+        setShowModal={setShowCropper}
+        imageSrc={imageToCrop}
+        onCropComplete={handleCroppedImage}
+        aspectRatio={4 / 3}
+        modalTitle="Crop Your Business Image"
+        instructionText="Adjust the image to fit your preferred crop area"
+      />
+
       <div
         className={`p-6 h-full rounded-lg ${theme.mainTheme} flex flex-wrap justify-center items-center md:flex-nowrap w-full relative`}
       >
