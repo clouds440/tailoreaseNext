@@ -133,8 +133,6 @@ const ProductPage = () => {
   const inc = () => setQuantity((q) => Math.min(10, q + 1));
   const dec = () => setQuantity((q) => Math.max(1, q - 1));
 
-  console.log(relatedProducts);
-
   if (loading)
     return (
       <div
