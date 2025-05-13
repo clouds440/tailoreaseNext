@@ -44,6 +44,7 @@ const TailorAnalytics = () => {
         // Fetch orders
         const ordersQuery = query(
           collection(db, "OrdersManagement"),
+          where("orderStatus", "!=", "inCart"), 
           where("tailorId", "==", userData.bId),
           orderBy("placedOnDate", "desc")
         );
@@ -85,24 +86,17 @@ const TailorAnalytics = () => {
   // Process data for charts
   const getOrderStatusData = () => {
     const statusCounts = {
-      paymentVerificationPending: 0,
-      paymentVerified: 0,
-      startedStitching: 0,
-      onDelivery: 0,
-      delivered: 0,
-      cancelled: 0,
+      "Orders in Queue": orders.filter(order => order.orderStatus === "paymentVerificationPending").length,
+      "Active Orders": orders.filter(order => 
+        ["paymentVerified", "startedStitching", "onDelivery"].includes(order.orderStatus)
+      ).length,
+      "Delivered Orders": orders.filter(order => order.orderStatus === "delivered").length,
+      "Cancelled Orders": orders.filter(order => order.orderStatus === "cancelled").length
     };
 
-    orders.forEach((order) => {
-      statusCounts[order.orderStatus] =
-        (statusCounts[order.orderStatus] || 0) + 1;
-    });
-
-    return Object.entries(statusCounts).map(([status, count]) => ({
-      name: status
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase()),
-      value: count,
+    return Object.entries(statusCounts).map(([name, value]) => ({
+      name,
+      value,
     }));
   };
 
@@ -115,7 +109,7 @@ const TailorAnalytics = () => {
     for (let i = monthsToShow - 1; i >= 0; i--) {
       const date = new Date(now);
       date.setMonth(now.getMonth() - i);
-      const monthKey = format(date, "MMM yyyy");
+      const monthKey = format(date, "MMM");
       revenueByMonth[monthKey] = 0;
     }
 
@@ -125,7 +119,7 @@ const TailorAnalytics = () => {
         const orderDate = order.placedOnDate?.toDate
           ? order.placedOnDate.toDate()
           : new Date(order.placedOnDate);
-        const monthKey = format(orderDate, "MMM yyyy");
+        const monthKey = format(orderDate, "MMM");
 
         if (revenueByMonth.hasOwnProperty(monthKey)) {
           revenueByMonth[monthKey] += order.totalAmount || 0;
@@ -216,20 +210,20 @@ const TailorAnalytics = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`p-6 rounded-xl ${theme.colorBg} mb-6`}
+          className={`p-6 rounded-xl ${theme.colorBg} mb-6 shadow-lg`}
         >
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <div>
-              <h1 className={`text-3xl font-bold mb-2 ${theme.colorText}`}>Analytics Dashboard</h1>
+              <h1 className={`text-3xl font-bold mb-2 ${theme.colorText}`}>Tailor Analytics Dashboard</h1>
               <p className={`${theme.colorText} opacity-80`}>
-                Insights and performance metrics for your tailoring business
+                Comprehensive insights and performance metrics for your tailoring business
               </p>
             </div>
             <div className="flex space-x-2 mt-4 md:mt-0">
               <select
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value)}
-                className={`p-2 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} text-sm`}
+                className={`p-2 rounded-lg ${theme.colorBg} ${theme.colorText} border ${theme.colorBorder} text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
               >
                 <option value="monthly">Last 6 Months</option>
                 <option value="yearly">Last 12 Months</option>
@@ -238,7 +232,7 @@ const TailorAnalytics = () => {
                 btnText={
                   <>
                     <i className="fas fa-sync-alt mr-2"></i>
-                    Refresh
+                    Refresh Data
                   </>
                 }
                 type="secondary"
@@ -255,11 +249,11 @@ const TailorAnalytics = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 font-medium ${
+              className={`px-6 py-3 font-medium text-sm uppercase tracking-wider ${
                 activeTab === tab
-                  ? `${theme.colorText} border-b-2 border-blue-500`
+                  ? `${theme.colorText} border-b-2 border-blue-500 font-semibold`
                   : `${theme.subTextColor} hover:${theme.hoverText}`
-              }`}
+              } transition-all duration-300`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -283,13 +277,15 @@ const TailorAnalytics = () => {
                     title: "Total Orders",
                     value: orders.length,
                     icon: "fas fa-shopping-bag",
-                    color: "bg-blue-500",
+                    color: "text-blue-500",
+                    bgColor: "bg-blue-100",
                   },
                   {
                     title: "Completed Orders",
                     value: orders.filter((o) => o.orderStatus === "delivered").length,
                     icon: "fas fa-check-circle",
-                    color: "bg-green-500",
+                    color: "text-green-500",
+                    bgColor: "bg-green-100",
                   },
                   {
                     title: "Total Revenue",
@@ -298,13 +294,15 @@ const TailorAnalytics = () => {
                       .reduce((sum, order) => sum + (order.totalAmount || 0), 0),
                     format: formatCurrency,
                     icon: "fas fa-money-bill-wave",
-                    color: "bg-purple-500",
+                    color: "text-purple-500",
+                    bgColor: "bg-purple-100",
                   },
                   {
                     title: "Active Products",
                     value: products.length,
                     icon: "fas fa-tshirt",
-                    color: "bg-orange-500",
+                    color: "text-orange-500",
+                    bgColor: "bg-orange-100",
                   },
                 ].map((stat, index) => (
                   <motion.div
@@ -313,7 +311,7 @@ const TailorAnalytics = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -5 }}
-                    className={`p-6 rounded-xl shadow-md ${theme.colorBg} transition-all duration-300`}
+                    className={`p-6 rounded-xl shadow-md ${theme.colorBg} transition-all duration-300 border ${theme.colorBorder} hover:shadow-lg`}
                   >
                     <div className="flex justify-between items-center">
                       <div>
@@ -325,7 +323,7 @@ const TailorAnalytics = () => {
                         </h3>
                       </div>
                       <div
-                        className={`w-12 h-12 rounded-full ${stat.color} bg-opacity-20 flex items-center justify-center`}
+                        className={`w-12 h-12 rounded-full ${stat.bgColor} flex items-center justify-center`}
                       >
                         <i className={`${stat.icon} ${stat.color} text-xl`}></i>
                       </div>
@@ -341,11 +339,31 @@ const TailorAnalytics = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
-                  className={`p-6 rounded-xl ${theme.colorBg} h-96`}
+                  className={`p-6 rounded-xl ${theme.colorBg} h-96 border ${theme.colorBorder} shadow-sm`}
                 >
-                  <h3 className={`text-lg font-bold mb-4 ${theme.colorText}`}>
-                    Order Status Distribution
-                  </h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className={`text-lg font-bold ${theme.colorText}`}>
+                      Order Status Distribution
+                    </h3>
+                    <div className="flex space-x-2">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-[#0088FE] mr-1"></div>
+                        <span className="text-xs">Queue</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-[#00C49F] mr-1"></div>
+                        <span className="text-xs">Active</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-[#FFBB28] mr-1"></div>
+                        <span className="text-xs">Delivered</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-[#FF8042] mr-1"></div>
+                        <span className="text-xs">Cancelled</span>
+                      </div>
+                    </div>
+                  </div>
                   <ResponsiveContainer width="100%" height="90%">
                     <PieChart>
                       <Pie
@@ -377,8 +395,8 @@ const TailorAnalytics = () => {
                           borderRadius: "0.5rem",
                         }}
                         itemStyle={{ color: theme.colorText }}
+                        formatter={(value) => [value, "Orders"]}
                       />
-                      <Legend />
                     </PieChart>
                   </ResponsiveContainer>
                 </motion.div>
@@ -388,7 +406,7 @@ const TailorAnalytics = () => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
-                  className={`p-6 rounded-xl ${theme.colorBg} h-96`}
+                  className={`p-6 rounded-xl ${theme.colorBg} h-96 border ${theme.colorBorder} shadow-sm`}
                 >
                   <h3 className={`text-lg font-bold mb-4 ${theme.colorText}`}>
                     Revenue Trend ({timeRange === "monthly" ? "Monthly" : "Yearly"})
@@ -432,7 +450,7 @@ const TailorAnalytics = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 }}
-                  className={`p-6 rounded-xl ${theme.colorBg} h-96`}
+                  className={`p-6 rounded-xl ${theme.colorBg} h-96 border ${theme.colorBorder} shadow-sm`}
                 >
                   <h3 className={`text-lg font-bold mb-4 ${theme.colorText}`}>
                     Top Performing Products
@@ -479,7 +497,7 @@ const TailorAnalytics = () => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
-                  className={`p-6 rounded-xl ${theme.colorBg} h-96`}
+                  className={`p-6 rounded-xl ${theme.colorBg} h-96 border ${theme.colorBorder} shadow-sm`}
                 >
                   <h3 className={`text-lg font-bold mb-4 ${theme.colorText}`}>
                     Customer City Distribution
@@ -539,7 +557,7 @@ const TailorAnalytics = () => {
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`p-6 rounded-xl ${theme.colorBg}`}
+                className={`p-6 rounded-xl ${theme.colorBg} shadow-md`}
               >
                 <h2 className={`text-2xl font-bold mb-6 ${theme.colorText}`}>
                   Order Analytics
@@ -551,7 +569,7 @@ const TailorAnalytics = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className={`p-6 rounded-xl ${theme.colorBg} h-96`}
+                    className={`p-6 rounded-xl ${theme.colorBg} h-96 border ${theme.colorBorder}`}
                   >
                     <h3 className={`text-lg font-bold mb-4 ${theme.colorText}`}>
                       Order Status Over Time
@@ -593,7 +611,7 @@ const TailorAnalytics = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}
-                    className={`p-6 rounded-xl ${theme.colorBg}`}
+                    className={`p-6 rounded-xl ${theme.colorBg} border ${theme.colorBorder}`}
                   >
                     <h3 className={`text-lg font-bold mb-4 ${theme.colorText}`}>
                       Recent Orders
@@ -602,16 +620,16 @@ const TailorAnalytics = () => {
                       <table className="w-full">
                         <thead>
                           <tr className={`border-b ${theme.colorBorder}`}>
-                            <th className={`py-2 text-left ${theme.colorText}`}>
+                            <th className={`py-3 text-left ${theme.colorText} font-medium text-sm`}>
                               Order ID
                             </th>
-                            <th className={`py-2 text-left ${theme.colorText}`}>
+                            <th className={`py-3 text-left ${theme.colorText} font-medium text-sm`}>
                               Date
                             </th>
-                            <th className={`py-2 text-left ${theme.colorText}`}>
+                            <th className={`py-3 text-left ${theme.colorText} font-medium text-sm`}>
                               Status
                             </th>
-                            <th className={`py-2 text-right ${theme.colorText}`}>
+                            <th className={`py-3 text-right ${theme.colorText} font-medium text-sm`}>
                               Amount
                             </th>
                           </tr>
@@ -623,7 +641,7 @@ const TailorAnalytics = () => {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.1 * index }}
-                              className={`border-b ${theme.colorBorder} hover:${theme.hoverBg}`}
+                              className={`border-b ${theme.colorBorder} hover:bg-opacity-50 ${theme.hoverBg}`}
                             >
                               <td className="py-3">
                                 <span className="text-sm font-medium">
