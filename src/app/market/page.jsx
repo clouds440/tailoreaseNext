@@ -165,8 +165,9 @@ const Market = () => {
 
       // Apply gender filters
       if (appliedGenderFilter.length > 0) {
+        const lowerCaseFilter = appliedGenderFilter.map((g) => g.toLowerCase());
         products = products.filter((product) =>
-          appliedGenderFilter.includes(product.gender)
+          lowerCaseFilter.includes(product.baseProductData.gender.toLowerCase())
         );
       }
 
@@ -207,7 +208,14 @@ const Market = () => {
       console.error("Error fetching products:", error);
     }
     setLoading(false);
-  }, [filters.sortBy, appliedGenderFilter, searchQuery]);
+  }, [
+    TailorProductsView,
+    searchQuery,
+    appliedGenderFilter,
+    filters.sortBy,
+    addOutfit,
+    type,
+  ]);
 
   useEffect(() => {
     fetchProducts();
@@ -357,7 +365,7 @@ const Market = () => {
 
     const formatCategoryForUrl = (str = "") => {
       // Simply remove spaces and keep original casing
-      return str.trim().replace(/\s+/g, '');
+      return str.trim().replace(/\s+/g, "");
     };
 
     const category = formatCategoryForUrl(

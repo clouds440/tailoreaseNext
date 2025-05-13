@@ -13,6 +13,7 @@ import FemaleGown from "./FemaleGown";
 import FemaleJacket from "./FemaleJacket";
 import FullShirt from "./FullShirt";
 import Trousers from "./Trousers";
+import { MORPH_TARGETS } from "@/utils/morphTargets.config";
 
 const outfitComponents = {
   jacket: Jacket,
@@ -44,43 +45,33 @@ const CustomizationScene = ({
   const [morphTargets, localSetMorphTargets] = useState({});
 
   useEffect(() => {
-    const newOutfits = outfitTypes
-      .map((type) => outfitComponents[type])
+    // pick the React components
+    const comps = outfitTypes
+      .map((key) => outfitComponents[key])
       .filter(Boolean);
+    setSelectedOutfits(comps);
 
-    setSelectedOutfits(newOutfits);
-
+    // build your morphTargets map straight from MORPH_TARGETS
     const newMorphTargets = {};
-    newOutfits.forEach((OutfitComponent) => {
-      const targets = OutfitComponent.morphTargets || [];
-      newMorphTargets[OutfitComponent.name] = targets;
+    outfitTypes.forEach((key) => {
+      newMorphTargets[key] = MORPH_TARGETS[key] || [];
     });
-
     localSetMorphTargets(newMorphTargets);
+    setMorphTargets((prev) =>
+      JSON.stringify(prev) !== JSON.stringify(newMorphTargets)
+        ? newMorphTargets
+        : prev
+    );
 
-    setMorphTargets((prevTargets) => {
-      // Only update if there's a change
-      if (JSON.stringify(prevTargets) !== JSON.stringify(newMorphTargets)) {
-        return newMorphTargets;
-      }
-      return prevTargets;
-    });
-
+    // build initial morphValues if missing
     setMorphValues((prev) => {
-      const updatedMorphValues = { ...prev };
-      newOutfits.forEach((OutfitComponent) => {
-        if (!updatedMorphValues[OutfitComponent.name]) {
-          updatedMorphValues[OutfitComponent.name] = Array(
-            OutfitComponent.morphTargets?.length || 0
-          ).fill(0);
+      const updated = { ...prev };
+      outfitTypes.forEach((key) => {
+        if (!Array.isArray(updated[key])) {
+          updated[key] = MORPH_TARGETS[key].map(() => 0);
         }
       });
-
-      // Only update if there's a change
-      if (JSON.stringify(prev) !== JSON.stringify(updatedMorphValues)) {
-        return updatedMorphValues;
-      }
-      return prev;
+      return JSON.stringify(prev) === JSON.stringify(updated) ? prev : updated;
     });
   }, [outfitTypes, setMorphTargets, setMorphValues]);
 
@@ -104,7 +95,7 @@ const CustomizationScene = ({
         colorValue={colorValue}
         gender={gender}
         useSkirtAsDefaultLegs={
-          !outfitTypes.some((type) =>
+          !outfitTypes.some((t) =>
             [
               "pants",
               "shorts",
@@ -113,23 +104,26 @@ const CustomizationScene = ({
               "femaleDress",
               "kameezShalwar",
               "trousers",
-            ].includes(type)
+            ].includes(t)
           )
         }
       />
 
-      {selectedOutfits.map((Outfit, index) => (
-        <Outfit
-          key={index}
-          morphValues={morphValues[Outfit.name] || []}
-          morphTargets={morphTargets[Outfit.name] || []}
-          texture={texture[Outfit.name]}
-          color={color[Outfit.name]}
-          buttonTexturePath={buttonTexturePath}
-          shalwarTexturePath={shalwarTexurePath}
-          collarVisible={collarVisible}
-        />
-      ))}
+      {selectedOutfits.map((Comp, i) => {
+        const key = outfitTypes[i];
+        return (
+          <Comp
+            key={key}
+            morphValues={morphValues[key] || []}
+            morphTargets={morphTargets[key] || []}
+            texture={texture[key]}
+            color={color[key]}
+            buttonTexturePath={buttonTexturePath}
+            shalwarTexturePath={shalwarTexurePath}
+            collarVisible={collarVisible}
+          />
+        );
+      })}
 
       <OrbitControls minDistance={1} maxDistance={7} />
     </Canvas>

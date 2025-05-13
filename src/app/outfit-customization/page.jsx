@@ -37,11 +37,11 @@ const outfitCategories = {
 };
 
 const hasButtonsTypes = [
-  "Jacket",
-  "KameezShalwar",
-  "Shirt",
-  "FemaleJacket",
-  "FullShirt",
+  "jacket",
+  "kameezShalwar",
+  "shirt",
+  "femaleJacket",
+  "fullShirt",
 ];
 
 const OutfitCustomization = () => {
@@ -582,7 +582,7 @@ const OutfitCustomization = () => {
                   className="hidden" // Hide the default input element
                 />
               </div>
-              {["KameezShalwar", "FemaleGown"].includes(outfit) && (
+              {["kameezShalwar", "femaleGown"].includes(outfit) && (
                 <div className="flex items-center">
                   <label
                     htmlFor={`file-shalwar-${outfit}`}
@@ -624,7 +624,7 @@ const OutfitCustomization = () => {
               </div>
             )}
 
-            {outfit === "KameezShalwar" && (
+            {outfit === "kameezShalwar" && (
               <div className="mt-4 border-t pt-3">
                 <h4 className="text-sm font-semibold mb-2">
                   Choose Collar Type for {outfit}
