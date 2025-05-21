@@ -101,7 +101,7 @@ export default function Home() {
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.08 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-extrabold"
+                className={`text-4xl md:text-5xl lg:text-6xl font-extrabold ${theme.colorText}`}
               >
                 Revolutionizing <br /> Tailoring Experience
               </motion.h1>
