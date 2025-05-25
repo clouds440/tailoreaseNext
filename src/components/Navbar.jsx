@@ -17,6 +17,7 @@ const tabMap = {
   "/user": "Dashboard",
   "/business-dashboard/profile": "Profile",
   "/business-dashboard/products": "Products",
+  "/business-dashboard/customers": "Customers",
   "/business-dashboard/orders": "Orders",
   "/business-dashboard/analytics": "Analytics",
   "/business-dashboard/wallet": "Wallet",
@@ -377,6 +378,11 @@ const Navbar = () => {
       path: "/business-dashboard/products",
       icon: <i className="fas fa-box-open" />,
       label: "Products",
+    },
+    {
+      path: "/business-dashboard/customers",
+      icon: <i className="fas fa-person" />,
+      label: "Customers",
     },
     {
       path: "/business-dashboard/orders",

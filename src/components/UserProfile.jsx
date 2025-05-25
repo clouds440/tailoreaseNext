@@ -31,7 +31,12 @@ const UserProfile = ({ userData, uid }) => {
         transition={{ duration: 0.7, delay: 0.3 }}
       >
         <h3 className="text-2xl font-bold">
-          {uid ? "Shared" : "Your"} Profile
+          {uid
+            ? displayUser?.createdByTailor
+              ? "Customer"
+              : "Shared"
+            : "Your"}{" "}
+          Profile
         </h3>
 
         <div className="mt-4">

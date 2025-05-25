@@ -522,7 +522,9 @@ const OutfitCustomization = () => {
         {/* Morph sliders for each outfit */}
         {Object.keys(morphTargets).map((outfit) => (
           <div key={outfit} className="mb-4 border-b pb-4">
-            <h3 className="text-lg font-semibold mb-2">{outfit}</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              {outfit.toUpperCase()}
+            </h3>
             {morphTargets[outfit]?.map((target, index) => (
               <div key={`${outfit}-${index}`} className="mb-3">
                 <label className="block text-sm font-medium">{target}</label>

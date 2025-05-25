@@ -302,10 +302,18 @@ const SignUpForm = () => {
                     onChange={handleChange}
                     className={`border-b-2 bg-transparent p-2 ${theme.colorText} ${theme.colorBorder} focus:border-blue-600 outline-none`}
                   >
-                    <option value="+92">🇵🇰 +92</option>
-                    <option value="+1">🇺🇸 +1</option>
-                    <option value="+44">🇬🇧 +44</option>
-                    <option value="+61">🇦🇺 +61</option>
+                    <option value="+92" className={theme.colorBg}>
+                      🇵🇰 +92
+                    </option>
+                    <option value="+1" className={theme.colorBg}>
+                      🇺🇸 +1
+                    </option>
+                    <option value="+44" className={theme.colorBg}>
+                      🇬🇧 +44
+                    </option>
+                    <option value="+61" className={theme.colorBg}>
+                      🇦🇺 +61
+                    </option>
                     {/* Add more countries if you want */}
                   </select>
                   <input
