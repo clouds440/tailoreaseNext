@@ -33,6 +33,9 @@ const TailorCustomers = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showWarningDialog, setShowWarningDialog] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [addingCustomer, setAddingCustomer] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     countryCode: "+92",
@@ -73,6 +76,7 @@ const TailorCustomers = () => {
 
   const handleAddCustomer = async (e) => {
     e.preventDefault();
+    setAddingCustomer(true);
     try {
       const userRef = doc(collection(db, "users"));
       const uid = userRef.id;
@@ -105,6 +109,8 @@ const TailorCustomers = () => {
       console.error("Error adding customer:", error);
       setShowMessage({ message: "Failed to add customer.", type: "danger" });
       setPopUpMessageTrigger(true);
+    } finally {
+      setAddingCustomer(false);
     }
   };
 
@@ -137,7 +143,7 @@ const TailorCustomers = () => {
   };
 
   const handleClickContact = (customer) => {
-    const message = "";
+    const message = `Hello ${customer.fullName}, this is your tailor! 👋`;
 
     const url = `https://wa.me/${
       customer.countryCode + customer.phone
@@ -272,7 +278,13 @@ const TailorCustomers = () => {
               <SimpleButton
                 type="primary-submit"
                 btnText={"Add Customer"}
-                icon={<i className="fas fa-add"></i>}
+                icon={
+                  addingCustomer ? (
+                    <LoadingSpinner size={20} />
+                  ) : (
+                    <i className="fas fa-add"></i>
+                  )
+                }
               />
             </motion.form>
           )}
@@ -299,7 +311,7 @@ const TailorCustomers = () => {
                   </p>
                   <span
                     className="text-sm opacity-70 cursor-pointer"
-                    onClick={() => handleClickContact(customer)}
+                    onClick={() => handleClickContact(customer.id)}
                   >
                     {customer.countryCode}-{customer.phone}
                   </span>
@@ -314,7 +326,7 @@ const TailorCustomers = () => {
                   <SimpleButton
                     btnText="Delete"
                     icon={
-                      deleting ? (
+                      deleting && selectedCustomer?.id === customer.id ? (
                         <LoadingSpinner size={20} />
                       ) : (
                         <i className="fas fa-trash"></i>
@@ -322,7 +334,10 @@ const TailorCustomers = () => {
                     }
                     type="danger"
                     disabled={deleting}
-                    onClick={() => handleDeleteCustomer(customer.id)}
+                    onClick={() => {
+                      setSelectedCustomer(customer);
+                      setShowWarningDialog(true);
+                    }}
                   />
                 </div>
               </div>
@@ -330,6 +345,25 @@ const TailorCustomers = () => {
           </div>
         )}
       </div>
+      {showWarningDialog && (
+        <DialogBox
+          title={`Confirm Deleting ${selectedCustomer.fullName}`}
+          body="Are you sure you want to delete this customer? This action cannot be reversed"
+          type="danger"
+          showDialog={showWarningDialog}
+          setShowDialog={setShowWarningDialog}
+          buttons={[
+            {
+              label: "Yes, Delete",
+              onClick: () => {
+                handleDeleteCustomer(selectedCustomer.id);
+                setShowWarningDialog(false);
+              },
+              type: "danger",
+            },
+          ]}
+        />
+      )}
     </div>
   );
 };
