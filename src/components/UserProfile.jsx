@@ -22,6 +22,15 @@ const UserProfile = ({ userData, uid }) => {
     }
   }, [loading, router, user, userData]);
 
+  const handleClickContact = () => {
+    const message = `Hello ${displayUser.fullName}! 👋`;
+
+    const url = `https://wa.me/${
+      displayUser.countryCode + displayUser.phone
+    }?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+  };
+
   return (
     <div className="p-4 text-center">
       <motion.div
@@ -43,8 +52,20 @@ const UserProfile = ({ userData, uid }) => {
           {displayUser ? (
             <>
               <p className="text-lg font-semibold">{displayUser.fullName}</p>
+              <p className="text-lg font-semibold">
+                {displayUser.createdByTailor
+                  ? `${displayUser.age} years old`
+                  : ""}
+              </p>
               <p className="text-sm">{displayUser.email}</p>
-              <p className="text-sm">
+              <p
+                className={`text-sm hover:text-green-500 ${
+                  displayUser.createdByTailor ? "cursor-pointer" : ""
+                }`}
+                onClick={() => {
+                  if (displayUser.createdByTailor) handleClickContact();
+                }}
+              >
                 {displayUser.countryCode}-{displayUser.phone}
               </p>
             </>
